@@ -1,0 +1,11 @@
+{
+	"name": "Shelf",
+	"short_name": "Shelf",
+	"display": "standalone",
+	"theme_color": "#F5E02F",
+	"background_color": "#141411",
+	"icons": [
+		{ "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
+		{ "src": "/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" }
+	]
+}

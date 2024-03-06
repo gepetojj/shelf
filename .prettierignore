@@ -1,0 +1,9 @@
+node_modules/
+emulators/
+.vercel/
+.next/
+
+pnpm-lock.yaml
+next-env.d.ts
+*.log
+.env

@@ -1,0 +1,8 @@
+node_modules/
+emulators/
+.vercel/
+.next/
+
+next-env.d.ts
+*.log
+.env
