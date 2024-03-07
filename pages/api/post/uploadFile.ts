@@ -1,4 +1,5 @@
 import formidable from "formidable";
+import { readFile } from "fs/promises";
 
 import type { File } from "@/entities/File";
 import { now } from "@/lib/time";
@@ -34,7 +35,8 @@ export const uploadFile = async ({ file, uploader, bookId }: UploadFileProps): P
 		},
 	};
 
-	await storage.file(data.location).save(file.filepath);
+	const buffer = await readFile(file.filepath);
+	await storage.file(data.location).save(buffer);
 	const rollback = async () => {
 		await storage.file(data.location).delete();
 	};

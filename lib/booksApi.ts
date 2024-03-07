@@ -7,7 +7,7 @@ export interface BookApiItem {
 		publisher: string;
 		description: string;
 		pageCount: number;
-		industryIdentifiers: { type: string; identifier: string }[];
+		industryIdentifiers?: { type: string; identifier: string }[];
 		imageLinks?: {
 			smallThumbnail: string;
 			thumbnail: string;

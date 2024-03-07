@@ -40,7 +40,10 @@ export const Books: React.FC = memo(function Component() {
 		<>
 			<form
 				className="flex w-full items-center justify-center"
-				onSubmit={e => e.preventDefault()}
+				onSubmit={e => {
+					e.preventDefault();
+					onSearch();
+				}}
 			>
 				<div className="flex w-full max-w-md">
 					<input
@@ -92,9 +95,11 @@ export const Books: React.FC = memo(function Component() {
 											</span>
 										</div>
 										<div className="flex w-full flex-col text-sm text-neutral-100">
-											<span className="break-words">
-												ISBN: {book.volumeInfo.industryIdentifiers[0].identifier}
-											</span>
+											{book.volumeInfo.industryIdentifiers?.length ? (
+												<span className="break-words">
+													ISBN: {book.volumeInfo.industryIdentifiers?.at(0)?.identifier}
+												</span>
+											) : null}
 											<span className="break-words">
 												Páginas: {book.volumeInfo.pageCount || "Não informado"}
 											</span>
@@ -102,7 +107,7 @@ export const Books: React.FC = memo(function Component() {
 									</div>
 									<div className="flex w-full items-center justify-end">
 										<Link
-											href={`/app/new?isbn=${book.volumeInfo.industryIdentifiers[0].identifier}`}
+											href={`/app/new${book.volumeInfo.industryIdentifiers ? `?isbn=${book.volumeInfo.industryIdentifiers[0].identifier}` : ""}`}
 											className="flex w-fit items-center justify-center gap-3 rounded-2xl bg-main 
                                             px-5 py-1 text-black duration-200 hover:brightness-90"
 										>

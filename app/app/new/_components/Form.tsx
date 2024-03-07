@@ -40,10 +40,10 @@ export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 		if (!fieldIsbn) return;
 
 		const response = await queryBooks(fieldIsbn);
-		const book = response[0];
+		const book = response.find(val => val.volumeInfo.industryIdentifiers?.find(id => id.identifier === isbn));
 		if (!book) return setMessage("Nenhum resultado encontrado.");
 		setBook(book);
-	}, [getValues]);
+	}, [getValues, isbn]);
 
 	const onSubmit: SubmitHandler<Fields> = useCallback(
 		async fields => {

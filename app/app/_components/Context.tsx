@@ -39,12 +39,14 @@ export const ContextProvider: React.FC<React.PropsWithChildren<ContextProps>> = 
 	const [filters, setStateFilters] = useState(value.filters);
 
 	const filteredBooks = useMemo(() => {
-		const filtered = books.filter(
-			book =>
-				book.semester === filters.semester &&
-				(filters.discipline ? book.disciplines.includes(filters.discipline) : true) &&
-				(filters.topic ? book.topics.includes(filters.topic) : true),
-		);
+		const filtered = books
+			.filter(
+				book =>
+					book.semester === filters.semester &&
+					(filters.discipline ? book.disciplines.includes(filters.discipline) : true) &&
+					(filters.topic ? book.topics.includes(filters.topic) : true),
+			)
+			.toSorted((a, b) => b.uploadedAt - a.uploadedAt);
 
 		const fuse = new Fuse(filtered, searchOptions);
 		const search = fuse.search(filters.query).map(val => val.item);

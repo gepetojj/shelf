@@ -18,6 +18,14 @@ const config = {
 					foreground: "#1C1C1A",
 				},
 			},
+			animation: {
+				"progress-in": "progress-in 2s ease-in 200ms",
+			},
+			keyframes: {
+				"progress-in": {
+					"0%": { width: "0" },
+				},
+			},
 		},
 	},
 	plugins: [require("tailwindcss-animate")],
