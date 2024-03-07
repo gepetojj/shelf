@@ -15,7 +15,7 @@ dependencies:
     specifier: 2.1.0
     version: 2.1.0
   epubjs:
-    specifier: ^0.3.93
+    specifier: 0.3.93
     version: 0.3.93
   firebase-admin:
     specifier: 12.0.0
