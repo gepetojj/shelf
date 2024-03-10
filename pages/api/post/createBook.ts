@@ -14,8 +14,8 @@ export interface CreateBookProps {
 export const createBook = ({ data, user }: CreateBookProps): Omit<Book, "files"> => {
 	const book = data.book;
 
-	const isbn13 = book.volumeInfo.industryIdentifiers.find(val => val.type === "ISBN_13");
-	const isbn10 = book.volumeInfo.industryIdentifiers.find(val => val.type === "ISBN_10");
+	const isbn13 = book.volumeInfo.industryIdentifiers?.find(val => val.type === "ISBN_13");
+	const isbn10 = book.volumeInfo.industryIdentifiers?.find(val => val.type === "ISBN_10");
 	const largeThumbnail = new URL(book.volumeInfo.imageLinks?.thumbnail || "");
 	largeThumbnail.searchParams.set("zoom", "2");
 
