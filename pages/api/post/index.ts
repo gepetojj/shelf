@@ -22,7 +22,7 @@ export const schema = z.object({
 		id: z.string(),
 		volumeInfo: z.object({
 			title: z.string(),
-			subtitle: z.string(),
+			subtitle: z.string().optional(),
 			authors: z.array(z.string()),
 			publisher: z.string(),
 			description: z.string(),
