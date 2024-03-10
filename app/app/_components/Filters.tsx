@@ -23,7 +23,7 @@ export const Filters: React.FC = memo(function Component() {
 	);
 
 	return (
-		<div className="sticky top-10 flex flex-col items-start gap-6">
+		<div className="sticky top-10 flex w-full flex-col items-start gap-6 home-break:w-fit">
 			<Autocomplete
 				id="semester"
 				label="Semestre"

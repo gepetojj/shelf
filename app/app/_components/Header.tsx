@@ -2,6 +2,7 @@ import Image from "next/image";
 import { memo } from "react";
 
 import logo from "@/public/logo.svg";
+import { Tooltip } from "@mantine/core";
 
 export const Header: React.FC = memo(function Component({}) {
 	return (
@@ -12,12 +13,14 @@ export const Header: React.FC = memo(function Component({}) {
 				className="max-w-[110px]"
 			/>
 			<div className="flex h-full justify-start pl-2">
-				<span
-					title="Este programa está em fase inicial de desenvolvimento."
-					className="relative top-0 h-fit cursor-pointer rounded-lg bg-main px-1 text-xs text-black"
+				<Tooltip
+					label="Este programa está em fase inicial de desenvolvimento."
+					position="bottom"
 				>
-					beta
-				</span>
+					<span className="relative top-0 h-fit cursor-pointer rounded-lg bg-main px-1 text-xs text-black">
+						beta
+					</span>
+				</Tooltip>
 			</div>
 		</header>
 	);

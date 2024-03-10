@@ -27,16 +27,18 @@ export const schema = z.object({
 			publisher: z.string(),
 			description: z.string(),
 			pageCount: z.coerce.number(),
-			industryIdentifiers: z.array(
-				z.object({
-					type: z.string(),
-					identifier: z.string(),
-				}),
-			),
+			industryIdentifiers: z
+				.array(
+					z.object({
+						type: z.string(),
+						identifier: z.string(),
+					}),
+				)
+				.optional(),
 			imageLinks: z
 				.object({
-					smallThumbnail: z.string().url(),
-					thumbnail: z.string().url(),
+					smallThumbnail: z.string().url().optional(),
+					thumbnail: z.string().url().optional(),
 				})
 				.optional(),
 		}),

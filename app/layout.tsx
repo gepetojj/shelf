@@ -5,6 +5,10 @@ import { Nunito_Sans } from "next/font/google";
 
 import { SessionProvider } from "@/components/logic/SessionProvider";
 import { auth } from "@/models/auth";
+import { MantineProvider } from "@mantine/core";
+import "@mantine/core/styles.css";
+import { Notifications } from "@mantine/notifications";
+import "@mantine/notifications/styles.css";
 
 import "./globals.css";
 
@@ -25,7 +29,10 @@ export default async function Layout({
 	return (
 		<html lang="pt-br">
 			<body className={clsx("min-h-screen bg-main-background text-white antialiased", nunito.className)}>
-				<SessionProvider session={session}>{children}</SessionProvider>
+				<MantineProvider defaultColorScheme="dark">
+					<Notifications position="top-right" />
+					<SessionProvider session={session}>{children}</SessionProvider>
+				</MantineProvider>
 			</body>
 		</html>
 	);

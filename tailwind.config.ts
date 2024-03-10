@@ -26,6 +26,12 @@ const config = {
 					"0%": { width: "0" },
 				},
 			},
+			screens: {
+				"home-break": "1000px",
+				"home-break-mobile": "600px",
+				"home-break-book": "530px",
+				"break-reader": "700px",
+			},
 		},
 	},
 	plugins: [require("tailwindcss-animate")],

@@ -3,21 +3,28 @@
 import clsx from "clsx/lite";
 import TimeAgo from "javascript-time-ago";
 import pt from "javascript-time-ago/locale/pt";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { memo, useCallback, useState, useTransition } from "react";
 import { FaGoogle } from "react-icons/fa";
-import { MdMoreHoriz, MdSearch } from "react-icons/md";
+import { MdMoreHoriz, MdSearch, MdSettings } from "react-icons/md";
 
 import { type BookApiItem, queryBooks } from "@/lib/booksApi";
 import { seconds } from "@/lib/time";
+import { Drawer } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 
 import { useContext } from "./Context";
+
+const Filters = dynamic(() => import("./Filters").then(mod => mod.Filters));
 
 TimeAgo.addDefaultLocale(pt);
 const timeAgo = new TimeAgo("pt");
 
 export const Books: React.FC = memo(function Component() {
+	const [drawerOpen, drawerActions] = useDisclosure(false);
+
 	const { books, filteredBooks, setFilters } = useContext();
 	const [query, setQuery] = useState("");
 
@@ -38,8 +45,20 @@ export const Books: React.FC = memo(function Component() {
 
 	return (
 		<>
+			<Drawer
+				opened={drawerOpen}
+				onClose={drawerActions.close}
+				closeButtonProps={{ "aria-label": "Botão de fechar o painel de filtros" }}
+				title="Filtros de pesquisa"
+				style={{
+					backgroundColor: "var(--tw-main-background)",
+				}}
+			>
+				<Filters />
+			</Drawer>
+
 			<form
-				className="flex w-full items-center justify-center"
+				className="flex w-full items-center justify-center gap-3"
 				onSubmit={e => {
 					e.preventDefault();
 					onSearch();
@@ -64,8 +83,18 @@ export const Books: React.FC = memo(function Component() {
 						<MdSearch className="text-xl" />
 					</button>
 				</div>
+				<div className="inline home-break:hidden">
+					<button
+						type="button"
+						onClick={drawerActions.toggle}
+						className="rounded-md p-2 duration-200 hover:bg-neutral-800"
+					>
+						<MdSettings className="text-xl" />
+					</button>
+				</div>
 			</form>
-			<section className="h-full w-full gap-2 overflow-y-auto px-12 py-7">
+
+			<section className="h-full w-full gap-2 overflow-y-auto px-4 py-7 home-break-mobile:px-12">
 				{apiBooks && apiBooks.length ? (
 					<div
 						className={clsx(
@@ -91,7 +120,7 @@ export const Books: React.FC = memo(function Component() {
 												{new Intl.ListFormat("pt-br", {
 													style: "long",
 													type: "conjunction",
-												}).format(book.volumeInfo.authors.slice(0, 2))}{" "}
+												}).format(book.volumeInfo.authors.slice(0, 2))}
 											</span>
 										</div>
 										<div className="flex w-full flex-col text-sm text-neutral-100">
@@ -131,80 +160,95 @@ export const Books: React.FC = memo(function Component() {
 							filteredBooks.map(book => (
 								<li
 									key={book.id}
-									className="flex w-full flex-col gap-4 rounded-xl bg-main-foreground p-4 duration-100 animate-in fade-in-20 hover:brightness-90"
+									className="relative flex w-full flex-col gap-4 rounded-xl bg-main-foreground p-4 duration-100 animate-in fade-in-20 hover:brightness-90"
 								>
-									<header className="flex items-center justify-between">
-										<div className="flex items-center gap-2 font-light">
-											<Image
-												alt="Imagem do usuário, vinda da conta Google vinculada."
-												src={
-													book.uploader.iconUrl ||
-													"https://randomuser.me/api/portraits/lego/1.jpg"
-												}
-												width={34}
-												height={34}
-												className="rounded-full"
-											/>
-											<span className="pl-1">
-												{book.uploader.name.split(" ").slice(0, 2).join(" ")}
-											</span>
-											<span className="text-sm text-neutral-400">·</span>
-											<span className="text-sm text-neutral-400">
-												postou {timeAgo.format(new Date(seconds(book.uploadedAt) * 1000))}
-											</span>
-										</div>
-										<button>
-											<MdMoreHoriz
-												className="text-2xl text-neutral-400"
-												aria-hidden="true"
-											/>
-										</button>
-									</header>
-									<Link
-										href={`/app/${book.id}`}
-										className="flex items-center justify-between gap-10 pl-12"
-									>
-										<div className="flex flex-col gap-2 text-sm text-neutral-100">
-											<div className="flex flex-col">
-												<span>Título: {book.title}</span>
-												<span>
-													Autores(as):{" "}
-													{new Intl.ListFormat("pt-br", {
-														style: "long",
-														type: "conjunction",
-													}).format(book.authors)}
-												</span>
-												<span>ISBN: {book.isbn13 || book.isbn10}</span>
-											</div>
-											<div className="flex flex-col">
-												<span>Semestre: {book.semester}º Semestre</span>
-												<span>
-													Disciplina(s):{" "}
-													{new Intl.ListFormat("pt-br", {
-														style: "long",
-														type: "conjunction",
-													}).format(book.disciplines)}
-												</span>
-												<span>
-													Tema(s):{" "}
-													{new Intl.ListFormat("pt-br", {
-														style: "long",
-														type: "conjunction",
-													}).format(book.topics)}
-												</span>
-											</div>
-										</div>
-										<div className="h-[136px] w-[100px] rounded bg-slate-800">
-											{book.thumbnail.small && (
+									<div className="z-[1] h-full w-full">
+										<header className="flex items-center justify-between gap-2">
+											<div className="flex items-center gap-2 font-light">
 												<Image
-													alt={`Imagem da capa do livro '${book.title}'.`}
-													src={book.thumbnail.small}
-													width={100}
-													height={136}
+													alt="Imagem do usuário, vinda da conta Google vinculada."
+													src={
+														book.uploader.iconUrl ||
+														"https://randomuser.me/api/portraits/lego/1.jpg"
+													}
+													width={34}
+													height={34}
+													className="rounded-full"
 												/>
-											)}
+												<span className="truncate pl-1">
+													{book.uploader.name.split(" ").slice(0, 2).join(" ")}
+												</span>
+												<span className="text-sm text-neutral-400">·</span>
+												<span className="truncate text-sm text-neutral-400">
+													postou {timeAgo.format(new Date(seconds(book.uploadedAt) * 1000))}
+												</span>
+											</div>
+											<button>
+												<MdMoreHoriz
+													className="text-2xl text-neutral-400"
+													aria-hidden="true"
+												/>
+											</button>
+										</header>
+										<Link
+											href={`/app/${book.id}`}
+											className="flex items-center justify-between gap-10 pl-12"
+										>
+											<div className="flex flex-col gap-2 text-sm text-neutral-100">
+												<div className="flex flex-col">
+													<span>Título: {book.title}</span>
+													<span>
+														Autores(as):{" "}
+														{new Intl.ListFormat("pt-br", {
+															style: "long",
+															type: "conjunction",
+														}).format(book.authors)}
+													</span>
+													<span>ISBN: {book.isbn13 || book.isbn10}</span>
+												</div>
+												<div className="flex flex-col">
+													<span>Semestre: {book.semester}º Semestre</span>
+													<span>
+														Disciplina(s):{" "}
+														{new Intl.ListFormat("pt-br", {
+															style: "long",
+															type: "conjunction",
+														}).format(book.disciplines)}
+													</span>
+													<span>
+														Tema(s):{" "}
+														{new Intl.ListFormat("pt-br", {
+															style: "long",
+															type: "conjunction",
+														}).format(book.topics)}
+													</span>
+												</div>
+											</div>
+											<div className="hidden bg-slate-800 home-break-book:inline">
+												{book.thumbnail.small && (
+													<Image
+														alt={`Imagem da capa do livro '${book.title}'.`}
+														src={book.thumbnail.small}
+														width={100}
+														height={136}
+														className="max-h-[136px] max-w-[100px] rounded-sm object-cover"
+													/>
+												)}
+											</div>
+										</Link>
+									</div>
+
+									{book.thumbnail.large && (
+										<div className="absolute inset-0 h-full w-full home-break-book:hidden">
+											<Image
+												alt={`Imagem da capa do livro '${book.title}'.`}
+												src={book.thumbnail.large}
+												width={120}
+												height={163}
+												className="h-full w-full rounded-xl object-cover opacity-10"
+											/>
 										</div>
-									</Link>
+									)}
 								</li>
 							))
 						) : (

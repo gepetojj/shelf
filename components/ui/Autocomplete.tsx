@@ -60,7 +60,7 @@ export const Autocomplete: React.FC<AutocompleteProps> = memo(function Component
 			defaultValue={getInitial(initial, items)}
 			onChange={onOptionChange}
 		>
-			<div className="relative">
+			<div className="relative w-full">
 				<div className="flex flex-col gap-1">
 					{label && (
 						<label

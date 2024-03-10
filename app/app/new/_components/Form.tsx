@@ -9,6 +9,9 @@ import { MdUpload } from "react-icons/md";
 
 import { Autocomplete } from "@/components/ui/Autocomplete";
 import { type BookApiItem, queryBooks } from "@/lib/booksApi";
+import { Modal } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 
 import { TextInput } from "./TextInput";
 
@@ -28,29 +31,55 @@ export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 	const { register, handleSubmit, getValues, setValue } = useForm<Fields>({ defaultValues: { isbn } });
 
 	const [book, setBook] = useState<BookApiItem | undefined>(undefined);
+	const [options, setOptions] = useState<BookApiItem[]>([]);
 	const [file, setFile] = useState<File | undefined>(undefined);
 	const [message, setMessage] = useState("");
 
 	const [fetching, startFetching] = useTransition();
 	const [uploading, setUploading] = useState(false);
+	const [modalOpen, { open, close }] = useDisclosure(false);
 
 	const fetchISBN = useCallback(async () => {
 		setMessage("");
+		setOptions([]);
+
 		const fieldIsbn = getValues("isbn");
 		if (!fieldIsbn) return;
 
 		const response = await queryBooks(fieldIsbn);
+		if (!response) return setMessage("O Google não está retornando resultados. Tente novamente mais tarde.");
+
+		setOptions(response);
+		response.length && open();
+
 		const book = response.find(val => val.volumeInfo.industryIdentifiers?.find(id => id.identifier === isbn));
 		if (!book) return setMessage("Nenhum resultado encontrado.");
 		setBook(book);
-	}, [getValues, isbn]);
+	}, [getValues, isbn, open]);
 
 	const onSubmit: SubmitHandler<Fields> = useCallback(
 		async fields => {
-			// TODO: Improve error messages
-			if (!book) return setMessage("Selecione um livro antes de postar.");
-			if (!file) return setMessage("Selecione o arquivo do livro antes de postar.");
-			if (!fields.semester) return setMessage("Selecione o período antes de postar.");
+			if (!book) {
+				return notifications.show({
+					title: "Erro",
+					message: "Selecione um livro antes de postar.",
+					color: "red",
+				});
+			}
+			if (!file) {
+				return notifications.show({
+					title: "Erro",
+					message: "Selecione o arquivo do livro antes de postar.",
+					color: "red",
+				});
+			}
+			if (!fields.semester) {
+				return notifications.show({
+					title: "Erro",
+					message: "Selecione o semestre antes de postar.",
+					color: "red",
+				});
+			}
 
 			setUploading(true);
 			const disciplines = fields.disciplines.split(",").map(val => val.trim());
@@ -68,10 +97,22 @@ export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 				method: "POST",
 				body,
 			});
+			const json = (await res.json()) as { message: string };
 			setUploading(false);
 
-			if (res.ok) return router.push("/app");
-			// TODO: Handle error
+			if (res.ok) {
+				notifications.show({
+					title: "Sucesso",
+					message: "O livro foi postado.",
+					color: "green",
+				});
+				return router.push("/app");
+			}
+			return notifications.show({
+				title: "Erro",
+				message: json.message || "Houve um erro ao tentar postar o livro.",
+				color: "red",
+			});
 		},
 		[book, file, router],
 	);
@@ -85,22 +126,85 @@ export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 
 	return (
 		<>
+			<Modal
+				opened={modalOpen}
+				onClose={close}
+				title="Selecione o livro"
+				centered
+			>
+				<section className="flex h-full w-full flex-col divide-y divide-white/5">
+					{book && (
+						<div className="flex w-full flex-col gap-1">
+							<span className="text-xs text-neutral-400">Já selecionado</span>
+							<div className="flex w-full flex-col p-2 text-sm">
+								<h2 className="truncate">{book.volumeInfo.title}</h2>
+								<h3 className="truncate text-neutral-200">
+									Autores(as):{" "}
+									{new Intl.ListFormat("pt-br", {
+										style: "long",
+										type: "conjunction",
+									}).format(book.volumeInfo.authors.slice(0, 2))}
+								</h3>
+								{book.volumeInfo.industryIdentifiers?.length ? (
+									<h3 className="truncate text-neutral-200">
+										ISBN: {book.volumeInfo.industryIdentifiers?.at(0)?.identifier}
+									</h3>
+								) : null}
+							</div>
+						</div>
+					)}
+					{options.length ? (
+						options.map(option => (
+							<button
+								key={option.id}
+								className="flex w-full flex-col rounded-md p-2 text-sm duration-200 hover:bg-main-foreground"
+								onClick={() => {
+									setBook(option);
+									setMessage("");
+									close();
+								}}
+							>
+								<h2 className="truncate">{option.volumeInfo.title}</h2>
+								<h3 className="truncate text-neutral-200">
+									Autores(as):{" "}
+									{new Intl.ListFormat("pt-br", {
+										style: "long",
+										type: "conjunction",
+									}).format(option.volumeInfo.authors.slice(0, 2))}
+								</h3>
+								{option.volumeInfo.industryIdentifiers?.length ? (
+									<h3 className="truncate text-neutral-200">
+										ISBN: {option.volumeInfo.industryIdentifiers?.at(0)?.identifier}
+									</h3>
+								) : null}
+							</button>
+						))
+					) : (
+						<div className="w-full text-center">
+							<span>Não há resultados.</span>
+						</div>
+					)}
+				</section>
+			</Modal>
+
 			<form
 				className="flex flex-col gap-2 px-12 py-7"
 				onSubmit={handleSubmit(onSubmit)}
 			>
 				<h1 className="text-2xl font-bold">Publicar um livro</h1>
 				<h2>Insira as informações e faça upload do arquivo do livro.</h2>
-				<section className="flex flex-col gap-2 truncate">
+				<section className="flex flex-col gap-2 break-words">
 					<TextInput
 						id="isbn"
 						placeholder="ISBN:"
 						{...register("isbn", {
 							required: true,
-							onBlur: () =>
+							onBlur: () => {
+								if (!getValues("isbn")) return;
 								startFetching(() => {
 									fetchISBN();
-								}),
+								});
+							},
 						})}
 					/>
 					{fetching && (
@@ -133,6 +237,7 @@ export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 							{ id: 8, label: "8º Semestre" },
 						]}
 						onChange={selected => setValue("semester", selected.id as number)}
+						initial={1}
 					/>
 					<TextInput
 						id="disciplines"
@@ -144,7 +249,7 @@ export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 						placeholder="Temas:"
 						{...register("topics", { required: true })}
 					/>
-					<span className="pt-1 text-sm font-light text-neutral-100">
+					<span className="break-words pt-1 text-sm font-light text-neutral-100">
 						Separe as matérias e temas usando vírgulas. Ex.: Tema 1, Tema 2, Tema 3
 					</span>
 

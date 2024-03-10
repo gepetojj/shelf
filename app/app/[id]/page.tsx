@@ -1,15 +1,16 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MdFilePresent } from "react-icons/md";
 
-import type { Book } from "@/entities/Book";
+import type { Book as IBook } from "@/entities/Book";
 import { query } from "@/lib/query";
+import { Spoiler } from "@mantine/core";
 
 import { Header } from "../_components/Header";
+import { Book } from "./_components/Book";
 
 export default async function Page({ params }: Readonly<{ params: { id: string } }>) {
-	const info = await query<Book>("books").id(params.id).get();
+	const info = await query<IBook>("books").id(params.id).get();
 	const book = info.data();
 
 	if (!info.exists || !book) return notFound();
@@ -31,7 +32,13 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 							</h3>
 						</div>
 						<div>
-							<p className="text-light text-justify text-neutral-300">{book.description}</p>
+							<Spoiler
+								maxHeight={200}
+								showLabel="Ler mais"
+								hideLabel="Ler menos"
+							>
+								<p className="text-light text-justify text-neutral-300">{book.description}</p>
+							</Spoiler>
 						</div>
 						<div className="text-light break-words text-sm text-neutral-300">
 							<h4 className="break-words">ISBN: {book.isbn13 || book.isbn10}</h4>
@@ -51,6 +58,15 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 								}).format(book.topics)}
 							</h4>
 						</div>
+					</div>
+					<div className="w-full home-break-mobile:hidden">
+						<Link
+							href={`/reader/${book.id}`}
+							className="flex w-full items-center justify-center gap-3 rounded-2xl bg-main px-6 py-1 
+                        	text-center leading-tight text-black duration-200 hover:brightness-90"
+						>
+							Iniciar leitura
+						</Link>
 					</div>
 					<div className="flex flex-col gap-2">
 						<h2 className="text-2xl font-bold text-zinc-200">Anexos</h2>
@@ -77,36 +93,8 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 					</div>
 				</section>
 			</section>
-			<aside
-				className="sticky w-1/2"
-				aria-hidden="true"
-			>
-				<div className="sticky top-10 flex w-fit flex-col items-start gap-3 rounded-md bg-main-foreground p-3">
-					<Image
-						alt={`Imagem da capa do livro '${book.title}'`}
-						src={book.thumbnail.large}
-						width={200}
-						height={180}
-					/>
-					<div className="flex w-full flex-col truncate text-sm text-neutral-100">
-						<span className="truncate">Upload: {book.uploader.name}</span>
-						<span className="truncate">Páginas: {book.pages}</span>
-						<span className="truncate">
-							{new Intl.ListFormat("pt-br", {
-								style: "long",
-								type: "conjunction",
-							}).format(book.publishers)}
-						</span>
-					</div>
-					<div className="w-full">
-						<Link
-							href={`/reader/${book.id}`}
-							className="flex w-full items-center justify-center gap-3 rounded-2xl bg-main px-6 py-1 text-black duration-200 hover:brightness-90"
-						>
-							Iniciar leitura
-						</Link>
-					</div>
-				</div>
+			<aside className="sticky hidden w-1/2 home-break-mobile:inline">
+				<Book {...{ book }} />
 			</aside>
 		</>
 	);

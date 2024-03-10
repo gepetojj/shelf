@@ -22,11 +22,11 @@ export default async function Page() {
 				},
 			}}
 		>
-			<section className="flex w-full flex-col">
+			<section className="flex w-full max-w-[45rem] flex-col home-break:max-w-full">
 				<Header />
 				<Books />
 			</section>
-			<aside className="sticky w-1/2">
+			<aside className="sticky hidden w-1/2 home-break:inline">
 				<Filters />
 			</aside>
 		</ContextProvider>
