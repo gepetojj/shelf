@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { type Session, getServerSession } from "next-auth";
 import { type NextHandler, createRouter } from "next-connect";
+import { ZodError } from "zod";
 
 import { auth } from "@/models/auth";
 
@@ -13,9 +14,20 @@ export type Middleware = (req: ApiRequest, res: NextApiResponse, next: NextHandl
 export const handlerConfig = {
 	onError: (err: unknown, _req: ApiRequest, res: NextApiResponse) => {
 		console.error(err);
+
+		if (err instanceof ZodError) {
+			return res.status(400).json({
+				message: "Houve um erro de validação.",
+				error: {
+					message: err.message,
+					issues: err.issues,
+				},
+			});
+		}
+
 		return res.status(500).json({ message: "Houve um erro desconhecido." });
 	},
-	onNoMatch: (req: ApiRequest, res: NextApiResponse) => {
+	onNoMatch: (_req: ApiRequest, res: NextApiResponse) => {
 		return res.status(404).json({ message: "Recurso não encontrado." });
 	},
 };

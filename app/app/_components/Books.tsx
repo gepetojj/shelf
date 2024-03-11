@@ -1,8 +1,6 @@
 "use client";
 
 import clsx from "clsx/lite";
-import TimeAgo from "javascript-time-ago";
-import pt from "javascript-time-ago/locale/pt";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,17 +8,14 @@ import { memo, useCallback, useState, useTransition } from "react";
 import { FaGoogle } from "react-icons/fa";
 import { MdMoreHoriz, MdSearch, MdSettings } from "react-icons/md";
 
+import { Time } from "@/components/ui/Time";
 import { type BookApiItem, queryBooks } from "@/lib/booksApi";
-import { seconds } from "@/lib/time";
 import { Drawer } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
 import { useContext } from "./Context";
 
 const Filters = dynamic(() => import("./Filters").then(mod => mod.Filters));
-
-TimeAgo.addDefaultLocale(pt);
-const timeAgo = new TimeAgo("pt");
 
 export const Books: React.FC = memo(function Component() {
 	const [drawerOpen, drawerActions] = useDisclosure(false);
@@ -180,7 +175,7 @@ export const Books: React.FC = memo(function Component() {
 												</span>
 												<span className="text-sm text-neutral-400">·</span>
 												<span className="truncate text-sm text-neutral-400">
-													postou {timeAgo.format(new Date(seconds(book.uploadedAt) * 1000))}
+													postou <Time milliseconds={book.uploadedAt} />
 												</span>
 											</div>
 											<button>

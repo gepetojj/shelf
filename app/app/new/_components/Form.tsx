@@ -8,12 +8,11 @@ import { FaSpinner } from "react-icons/fa";
 import { MdUpload } from "react-icons/md";
 
 import { Autocomplete } from "@/components/ui/Autocomplete";
+import { TextInput } from "@/components/ui/TextInput";
 import { type BookApiItem, queryBooks } from "@/lib/booksApi";
 import { Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-
-import { TextInput } from "./TextInput";
 
 interface Fields {
 	isbn: string;
