@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MdFilePresent } from "react-icons/md";
 
+import { Layout } from "@/components/ui/Layout";
 import type { Book as IBook } from "@/entities/Book";
 import { query } from "@/lib/query";
 import { Spoiler } from "@mantine/core";
@@ -16,8 +17,8 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 	if (!info.exists || !book) return notFound();
 
 	return (
-		<>
-			<section className="flex w-full flex-col">
+		<Layout>
+			<>
 				<Header />
 				<section className="flex h-full w-full flex-col gap-4 overflow-y-auto px-12 py-7">
 					<div className="flex flex-col gap-4">
@@ -92,10 +93,9 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 						</div>
 					</div>
 				</section>
-			</section>
-			<aside className="sticky hidden w-1/2 home-break-mobile:inline">
-				<Book {...{ book }} />
-			</aside>
-		</>
+			</>
+
+			<Book {...{ book }} />
+		</Layout>
 	);
 }

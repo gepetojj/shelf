@@ -1,3 +1,6 @@
+import { Suspense } from "react";
+
+import { Layout } from "@/components/ui/Layout";
 import type { Book } from "@/entities/Book";
 import { query, resolver } from "@/lib/query";
 
@@ -22,13 +25,15 @@ export default async function Page() {
 				},
 			}}
 		>
-			<section className="flex w-full max-w-[45rem] flex-col home-break:max-w-full">
-				<Header />
-				<Books />
-			</section>
-			<aside className="sticky hidden w-1/2 home-break:inline">
+			<Layout>
+				<>
+					<Header />
+					<Suspense>
+						<Books />
+					</Suspense>
+				</>
 				<Filters />
-			</aside>
+			</Layout>
 		</ContextProvider>
 	);
 }
