@@ -4,8 +4,8 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/models/auth";
 
-import { Logout } from "./_components/Logout";
-import { NavActions } from "./_components/NavActions";
+import { Logout } from "./_components/layout/Logout";
+import { NavActions } from "./_components/layout/NavActions";
 
 export default async function Layout({
 	children,

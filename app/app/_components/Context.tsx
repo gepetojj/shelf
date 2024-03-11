@@ -4,10 +4,12 @@ import Fuse, { type IFuseOptions } from "fuse.js";
 import { createContext, memo, useCallback, useMemo, useContext as useReactContext, useState } from "react";
 
 import type { Book } from "@/entities/Book";
+import type { BookApiItem } from "@/lib/booksApi";
 
 export interface Context {
 	books: Book[];
 	filteredBooks: Book[];
+	apiBooks: BookApiItem[];
 	filters: {
 		query: string;
 		semester: number;
@@ -16,11 +18,12 @@ export interface Context {
 	};
 
 	setBooks: (books: Book[]) => void;
+	setApiBooks: (apiBooks: BookApiItem[]) => void;
 	setFilters: (filters: Partial<Context["filters"]>) => void;
 }
 
 export interface ContextProps {
-	value: Omit<Context, "filteredBooks" | "setBooks" | "setFilters">;
+	value: Omit<Context, "apiBooks" | "filteredBooks" | "setBooks" | "setApiBooks" | "setFilters">;
 }
 
 export const searchOptions: IFuseOptions<Book> = {
@@ -36,6 +39,7 @@ export const ContextProvider: React.FC<React.PropsWithChildren<ContextProps>> = 
 	value,
 }) {
 	const [books, setBooks] = useState(value.books);
+	const [apiBooks, setApiBooks] = useState<BookApiItem[]>([]);
 	const [filters, setStateFilters] = useState(value.filters);
 
 	const filteredBooks = useMemo(() => {
@@ -62,9 +66,11 @@ export const ContextProvider: React.FC<React.PropsWithChildren<ContextProps>> = 
 		<Context.Provider
 			value={{
 				books,
+				apiBooks,
 				filteredBooks,
 				filters,
 				setBooks,
+				setApiBooks,
 				setFilters,
 			}}
 		>

@@ -48,7 +48,7 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 					</span>
 				</div>
 			</section>
-			<section className="relative flex h-full w-full justify-center gap-2 px-4 pb-3">
+			<section className="flex h-full w-full justify-center gap-2 px-4 pb-3">
 				<Suspense
 					fallback={
 						<div className="h-full w-full">

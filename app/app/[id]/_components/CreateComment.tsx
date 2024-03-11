@@ -17,9 +17,10 @@ interface Fields {
 export interface CreateCommentProps {
 	bookId: string;
 	parentId?: string;
+	asResponse?: boolean;
 }
 
-export const CreateComment: React.FC<CreateCommentProps> = memo(function Component({ bookId, parentId }) {
+export const CreateComment: React.FC<CreateCommentProps> = memo(function Component({ bookId, parentId, asResponse }) {
 	const { register, handleSubmit } = useForm<Fields>({ defaultValues: { bookId, parentId } });
 	const [loading, setLoading] = useState(false);
 	const { refresh } = useRouter();
@@ -56,7 +57,7 @@ export const CreateComment: React.FC<CreateCommentProps> = memo(function Compone
 			className="flex w-full items-center gap-2"
 		>
 			<TextInput
-				placeholder="Escreva seu comentário:"
+				placeholder={asResponse ? "Escreva sua resposta:" : "Escreva seu comentário:"}
 				autoComplete="none"
 				{...register("comment", { required: true })}
 			/>

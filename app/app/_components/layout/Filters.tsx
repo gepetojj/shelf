@@ -5,7 +5,7 @@ import { memo, useMemo } from "react";
 import { Autocomplete } from "@/components/ui/Autocomplete";
 import { unique } from "@/lib/unique";
 
-import { useContext } from "./Context";
+import { useContext } from "../Context";
 
 export const Filters: React.FC = memo(function Component() {
 	const { books, filters, setFilters } = useContext();

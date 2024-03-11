@@ -1,6 +1,6 @@
 import { Layout } from "@/components/ui/Layout";
 
-import { Header } from "../_components/Header";
+import { Header } from "../_components/layout/Header";
 import { Form } from "./_components/Form";
 
 export default async function Page({ searchParams }: Readonly<{ searchParams: { isbn?: string } }>) {

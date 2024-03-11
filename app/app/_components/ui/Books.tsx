@@ -4,39 +4,22 @@ import clsx from "clsx/lite";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import { memo, useCallback, useState, useTransition } from "react";
+import { memo } from "react";
 import { FaGoogle } from "react-icons/fa";
-import { MdMoreHoriz, MdSearch, MdSettings } from "react-icons/md";
+import { MdMoreHoriz } from "react-icons/md";
 
 import { Time } from "@/components/ui/Time";
-import { type BookApiItem, queryBooks } from "@/lib/booksApi";
 import { Drawer } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
-import { useContext } from "./Context";
+import { useContext } from "../Context";
+import { Search } from "../ui/Search";
 
-const Filters = dynamic(() => import("./Filters").then(mod => mod.Filters));
+const Filters = dynamic(() => import("../layout/Filters").then(mod => mod.Filters));
 
 export const Books: React.FC = memo(function Component() {
 	const [drawerOpen, drawerActions] = useDisclosure(false);
-
-	const { books, filteredBooks, setFilters } = useContext();
-	const [query, setQuery] = useState("");
-
-	const [apiBooks, setApiBooks] = useState<BookApiItem[]>([]);
-	const [fetching, startFetching] = useTransition();
-
-	const fetchBooksApi = useCallback(async () => {
-		const response = await queryBooks(query);
-		setApiBooks(response);
-	}, [query]);
-
-	const onSearch = useCallback(() => {
-		setFilters({ query });
-		startFetching(() => {
-			fetchBooksApi();
-		});
-	}, [fetchBooksApi, query, setFilters]);
+	const { books, filteredBooks, apiBooks } = useContext();
 
 	return (
 		<>
@@ -52,49 +35,13 @@ export const Books: React.FC = memo(function Component() {
 				<Filters />
 			</Drawer>
 
-			<form
-				className="flex w-full items-center justify-center gap-3"
-				onSubmit={e => {
-					e.preventDefault();
-					onSearch();
-				}}
-			>
-				<div className="flex w-full max-w-md">
-					<input
-						type="search"
-						name="books"
-						placeholder="Busque por título, autor, ISBN, tema:"
-						autoComplete="none"
-						className="w-full rounded-l-xl bg-neutral-800 p-2 px-3 outline-none placeholder:text-neutral-600"
-						value={query}
-						onChange={e => setQuery(e.target.value)}
-					/>
-					<button
-						type="submit"
-						className="flex items-center justify-center rounded-r-xl bg-main p-1 px-1.5 text-black duration-200 hover:brightness-90"
-						onClick={onSearch}
-					>
-						<span className="sr-only">Botão para executar pesquisa.</span>
-						<MdSearch className="text-xl" />
-					</button>
-				</div>
-				<div className="inline home-break:hidden">
-					<button
-						type="button"
-						onClick={drawerActions.toggle}
-						className="rounded-md p-2 duration-200 hover:bg-neutral-800"
-					>
-						<MdSettings className="text-xl" />
-					</button>
-				</div>
-			</form>
+			<Search toggleDrawer={drawerActions.toggle} />
 
 			<section className="h-full w-full gap-2 overflow-y-auto px-4 py-7 home-break-mobile:px-12">
 				{apiBooks && apiBooks.length ? (
 					<div
 						className={clsx(
 							"border-bottom w-full border-white/10 duration-100 animate-in slide-in-from-left-1",
-							fetching && "animate-pulse brightness-50",
 						)}
 					>
 						<span className="flex items-center gap-2 text-xs font-light text-neutral-200">

@@ -1,22 +1,15 @@
-import { Suspense } from "react";
-
 import { Layout } from "@/components/ui/Layout";
-import type { Book } from "@/entities/Book";
-import { query, resolver } from "@/lib/query";
 
 import { ContextProvider } from "./_components/Context";
 import { Filters } from "./_components/layout/Filters";
 import { Header } from "./_components/layout/Header";
-import { Books } from "./_components/ui/Books";
+import { Search } from "./_components/ui/Search";
 
-export default async function Page() {
-	const { docs } = await query<Book>("books").col.get();
-	const books = resolver(docs);
-
+export default async function Loading() {
 	return (
 		<ContextProvider
 			value={{
-				books,
+				books: [],
 				filters: {
 					query: "",
 					semester: 1,
@@ -28,9 +21,11 @@ export default async function Page() {
 			<Layout>
 				<>
 					<Header />
-					<Suspense>
-						<Books />
-					</Suspense>
+					<Search />
+					<section className="flex h-full w-full flex-col gap-2 overflow-y-auto px-4 py-7 home-break-mobile:px-12">
+						<div className="h-52 w-full animate-pulse rounded-xl bg-main-foreground"></div>
+						<div className="h-52 w-full animate-pulse rounded-xl bg-main-foreground"></div>
+					</section>
 				</>
 				<Filters />
 			</Layout>

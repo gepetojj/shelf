@@ -1,23 +1,22 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MdFilePresent } from "react-icons/md";
 
 import { Layout } from "@/components/ui/Layout";
-import { Time } from "@/components/ui/Time";
 import type { Book as IBook } from "@/entities/Book";
-import { Comment } from "@/entities/Comment";
+import type { Comment as IComment } from "@/entities/Comment";
 import { query, resolver } from "@/lib/query";
 import { Spoiler } from "@mantine/core";
 
-import { Header } from "../_components/Header";
+import { Header } from "../_components/layout/Header";
 import { Book } from "./_components/Book";
+import { Comment } from "./_components/Comment";
 import { CreateComment } from "./_components/CreateComment";
 
 export default async function Page({ params }: Readonly<{ params: { id: string } }>) {
 	const [booksRef, commentsRef] = await Promise.all([
 		query<IBook>("books").id(params.id).get(),
-		query<Comment>("comments").where("bookId", "==", params.id).get(),
+		query<IComment>("comments").where("bookId", "==", params.id).get(),
 	]);
 
 	const book = booksRef.data();
@@ -102,51 +101,13 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 								comments
 									.filter(comment => !comment.parentId)
 									.map(comment => (
-										<li
+										<Comment
 											key={comment.id}
-											className="flex w-full gap-2 py-1 text-sm"
-										>
-											<div className="flex h-full items-start justify-start">
-												<Image
-													alt={`Imagem da conta de ${comment.creator.name}`}
-													src={comment.creator.iconUrl}
-													width={32}
-													height={32}
-													className="rounded-full"
-												/>
-											</div>
-											<div className="flex flex-col">
-												<header className="flex w-full gap-1 truncate">
-													<span className="font-semibold">{comment.creator.name}</span>
-													<span className="text-neutral-400">
-														<Time milliseconds={comment.createdAt} />
-													</span>
-												</header>
-												<div>
-													<p>{comment.content}</p>
-												</div>
-												{/*<div className="w-full pt-2">
-													<Popover
-														position="bottom"
-														withArrow
-														shadow="md"
-													>
-														<Popover.Target>
-															<button className="rounded-2xl px-3 py-2 duration-150 hover:bg-main-foreground">
-																Responder
-															</button>
-														</Popover.Target>
-														<Popover.Dropdown>
-															<CreateComment
-																bookId={book.id}
-																parentId={comment.parentId || comment.id}
-															/>
-														</Popover.Dropdown>
-													</Popover>
-												</div>
-											 */}
-											</div>
-										</li>
+											{...{
+												comment,
+												responses: comments.filter(val => val.parentId === comment.id),
+											}}
+										/>
 									))
 							) : (
 								<li className="w-full text-center">
