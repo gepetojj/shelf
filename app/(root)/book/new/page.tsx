@@ -1,5 +1,6 @@
 import { AppHeader } from "@/components/ui/app-header";
 import { Layout } from "@/components/ui/layout";
+import "@mantine/dropzone/styles.css";
 
 import { Form } from "./_components/Form";
 

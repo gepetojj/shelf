@@ -15,6 +15,8 @@ import {
 	MdPostAdd,
 } from "react-icons/md";
 
+import { SignedIn } from "@clerk/nextjs";
+
 type NavOption = {
 	href: string;
 	label: string;
@@ -65,13 +67,15 @@ export const AppNav: React.FC = memo(function AppNav() {
 				</Link>
 			))}
 
-			<Link
-				href="/book/new"
-				className="flex items-center justify-center gap-3 rounded-2xl bg-main p-1 text-black duration-200 hover:brightness-90 home-break-mobile:mt-4 home-break-mobile:w-full"
-			>
-				<span className="hidden home-break:inline">Postar</span>
-				<MdPostAdd className="inline text-2xl home-break:hidden" />
-			</Link>
+			<SignedIn>
+				<Link
+					href="/book/new"
+					className="flex items-center justify-center gap-3 rounded-2xl bg-main p-1 text-black duration-200 hover:brightness-90 home-break-mobile:mt-4 home-break-mobile:w-full"
+				>
+					<span className="hidden home-break:inline">Postar</span>
+					<MdPostAdd className="inline text-2xl home-break:hidden" />
+				</Link>
+			</SignedIn>
 		</nav>
 	);
 });

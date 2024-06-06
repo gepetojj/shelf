@@ -1,14 +1,15 @@
 "use client";
 
-import clsx from "clsx/lite";
 import { useRouter } from "next/navigation";
 import { memo, useCallback, useEffect, useState, useTransition } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { FaSpinner } from "react-icons/fa";
-import { MdUpload } from "react-icons/md";
+import { LuFileCheck2 } from "react-icons/lu";
+import { MdFileUploadOff, MdUpload } from "react-icons/md";
 
 import { type BookApiItem, queryBooks } from "@/lib/booksApi";
-import { Modal } from "@mantine/core";
+import { Button, Group, Modal, Select, TextInput } from "@mantine/core";
+import { Dropzone, PDF_MIME_TYPE } from "@mantine/dropzone";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 
@@ -25,7 +26,13 @@ export interface FormProps {
 
 export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 	const router = useRouter();
-	const { register, handleSubmit, getValues, setValue } = useForm<Fields>({ defaultValues: { isbn } });
+	const {
+		register,
+		handleSubmit,
+		getValues,
+		setValue,
+		formState: { isSubmitting, errors },
+	} = useForm<Fields>({ defaultValues: { isbn } });
 
 	const [book, setBook] = useState<BookApiItem | undefined>(undefined);
 	const [options, setOptions] = useState<BookApiItem[]>([]);
@@ -33,7 +40,6 @@ export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 	const [message, setMessage] = useState("");
 
 	const [fetching, startFetching] = useTransition();
-	const [uploading, setUploading] = useState(false);
 	const [modalOpen, { open, close }] = useDisclosure(false);
 
 	const fetchISBN = useCallback(async () => {
@@ -41,7 +47,7 @@ export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 		setOptions([]);
 
 		const fieldIsbn = getValues("isbn");
-		if (!fieldIsbn) return;
+		if (!fieldIsbn || fieldIsbn.length < 10 || fieldIsbn.length > 13) return;
 
 		const response = await queryBooks(fieldIsbn);
 		if (!response) return setMessage("O Google não está retornando resultados. Tente novamente mais tarde.");
@@ -78,7 +84,6 @@ export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 				});
 			}
 
-			setUploading(true);
 			const disciplines = fields.disciplines.split(",").map(val => val.trim());
 			const topics = fields.topics.split(",").map(val => val.trim());
 
@@ -95,7 +100,6 @@ export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 				body,
 			});
 			const json = (await res.json()) as { message: string };
-			setUploading(false);
 
 			if (res.ok) {
 				notifications.show({
@@ -191,11 +195,14 @@ export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 				<h1 className="text-2xl font-bold">Publicar um livro</h1>
 				<h2>Insira as informações e faça upload do arquivo do livro.</h2>
 				<section className="flex flex-col gap-2 break-words">
-					{/* <TextInput
-						id="isbn"
-						placeholder="ISBN:"
+					<TextInput
+						label="ISBN:"
+						type="number"
+						placeholder="Digite aqui:"
 						{...register("isbn", {
 							required: true,
+							minLength: { value: 10, message: "O ISBN tem no mínimo 10 números." },
+							maxLength: { value: 13, message: "O ISBN tem no máximo 13 números." },
 							onBlur: () => {
 								if (!getValues("isbn")) return;
 								startFetching(() => {
@@ -203,7 +210,8 @@ export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 								});
 							},
 						})}
-					/> */}
+						error={errors.isbn?.message}
+					/>
 					{fetching && (
 						<span className="flex items-center gap-1 text-sm animate-in slide-in-from-top-2">
 							<FaSpinner className="animate-spin" />
@@ -220,70 +228,90 @@ export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 							Livro selecionado: {book.volumeInfo.title}
 						</span>
 					)}
-					{/* <Autocomplete
-						id="semester"
+					<Select
 						label="Semestre:"
-						items={[
-							{ id: 1, label: "1º Semestre" },
-							{ id: 2, label: "2º Semestre" },
-							{ id: 3, label: "3º Semestre" },
-							{ id: 4, label: "4º Semestre" },
-							{ id: 5, label: "5º Semestre" },
-							{ id: 6, label: "6º Semestre" },
-							{ id: 7, label: "7º Semestre" },
-							{ id: 8, label: "8º Semestre" },
+						placeholder="Selecione:"
+						data={[
+							{ value: "1", label: "1º Semestre" },
+							{ value: "2", label: "2º Semestre" },
+							{ value: "3", label: "3º Semestre" },
+							{ value: "4", label: "4º Semestre" },
+							{ value: "5", label: "5º Semestre" },
+							{ value: "6", label: "6º Semestre" },
+							{ value: "7", label: "7º Semestre" },
+							{ value: "8", label: "8º Semestre" },
 						]}
-						onChange={selected => setValue("semester", selected.id as number)}
-						initial={1}
+						defaultValue={"1"}
+						onChange={selected => setValue("semester", Number(selected) || 1)}
+						checkIconPosition="right"
 					/>
 					<TextInput
-						id="disciplines"
-						placeholder="Matérias:"
+						label="Matérias:"
+						placeholder="Digite aqui:"
 						{...register("disciplines", { required: true })}
+						error={errors.disciplines?.message}
 					/>
 					<TextInput
-						id="topics"
-						placeholder="Temas:"
+						label="Temas:"
+						placeholder="Digite aqui:"
 						{...register("topics", { required: true })}
-					/> */}
+						error={errors.topics?.message}
+					/>
 					<span className="break-words pt-1 text-sm font-light text-neutral-100">
 						Separe as matérias e temas usando vírgulas. Ex.: Tema 1, Tema 2, Tema 3
 					</span>
 
-					<label
-						role="button"
-						htmlFor="file"
-						className="flex w-full select-none items-center justify-center gap-2 rounded-lg bg-main-foreground px-3 py-1.5 outline-none duration-200 hover:brightness-90"
-						aria-disabled={uploading}
+					<Dropzone
+						onDrop={files => setFile(files[0])}
+						accept={PDF_MIME_TYPE}
+						maxSize={5 * 1024 ** 2}
+						maxFiles={1}
+						loading={isSubmitting}
 					>
-						<MdUpload className="text-xl" />
-						Selecione o arquivo do livro
-					</label>
-					{file && (
-						<span className="text-sm animate-in slide-in-from-top-2">Arquivo selecionado: {file.name}</span>
-					)}
-					<input
-						id="file"
-						type="file"
-						accept="application/epub+zip"
-						onChange={e => setFile(e.target.files?.length ? e.target.files[0] : undefined)}
-						hidden
-						aria-hidden="true"
-						disabled={uploading}
-					/>
+						<Group
+							justify="center"
+							gap="xl"
+							mih={100}
+						>
+							<Dropzone.Accept>
+								<LuFileCheck2 className="text-5xl" />
+							</Dropzone.Accept>
+							<Dropzone.Reject>
+								<MdFileUploadOff className="text-5xl" />
+							</Dropzone.Reject>
+							<Dropzone.Idle>
+								<MdUpload className="text-5xl" />
+							</Dropzone.Idle>
+
+							<div className="flex flex-col">
+								<h2 className="text-lg font-bold">
+									{file ? (
+										<>
+											Arquivo selecionado: <span className="truncate italic">{file.name}</span>
+										</>
+									) : (
+										<>Arraste e solte o arquivo do livro</>
+									)}
+								</h2>
+								<span className="text-sm font-light">
+									{file ? (
+										<>Solte ou selecione para enviar outro arquivo.</>
+									) : (
+										<>ou clique para selecionar</>
+									)}
+								</span>
+							</div>
+						</Group>
+					</Dropzone>
 				</section>
 				<div className="flex w-full items-center justify-end">
-					<button
+					<Button
 						type="submit"
-						className={clsx(
-							"mt-2 flex w-fit items-center justify-center gap-3 rounded-2xl bg-main px-6 py-1 text-black duration-200 hover:brightness-90",
-							uploading && "cursor-progress brightness-90",
-						)}
-						disabled={uploading}
+						loading={isSubmitting}
+						radius="xl"
 					>
-						{uploading && <FaSpinner className="animate-spin" />}
 						Publicar
-					</button>
+					</Button>
 				</div>
 			</form>
 		</>

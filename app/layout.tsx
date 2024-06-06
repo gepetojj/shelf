@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Nunito_Sans } from "next/font/google";
 
 import { ClerkProvider } from "@clerk/nextjs";
-import { MantineProvider } from "@mantine/core";
+import { MantineProvider, createTheme } from "@mantine/core";
 import "@mantine/core/styles.css";
 import { Notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";
@@ -17,6 +17,30 @@ export const metadata: Metadata = {
 	description: "Organize suas leituras acadêmicas e leia diretamente do navegador.",
 };
 
+const theme = createTheme({
+	fontFamily: "Nunito Sans, sans-serif",
+	fontFamilyMonospace: "Nunito Sans, sans-serif",
+	fontSmoothing: true,
+	colors: {
+		main: [
+			"#fffde3",
+			"#fffacd",
+			"#fff59c",
+			"#ffef66",
+			"#ffea3b",
+			"#ffe721",
+			"#ffe611",
+			"#e3cc00",
+			"#c9b500",
+			"#ad9c00",
+		],
+	},
+	defaultRadius: "md",
+	primaryColor: "main",
+	cursorType: "pointer",
+	autoContrast: true,
+});
+
 export default async function Layout({
 	children,
 }: Readonly<{
@@ -26,7 +50,10 @@ export default async function Layout({
 		<ClerkProvider>
 			<html lang="pt-br">
 				<body className={clsx("min-h-screen bg-main-background text-white antialiased", nunito.className)}>
-					<MantineProvider defaultColorScheme="dark">
+					<MantineProvider
+						defaultColorScheme="dark"
+						theme={theme}
+					>
 						<Notifications position="top-right" />
 						{children}
 					</MantineProvider>
@@ -35,4 +62,3 @@ export default async function Layout({
 		</ClerkProvider>
 	);
 }
-
