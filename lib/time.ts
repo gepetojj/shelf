@@ -2,6 +2,7 @@ export const now = () => {
 	return new Date().valueOf();
 };
 
-export const seconds = (val: number) => {
-	return Math.floor(val / 1000);
+export const seconds = (milliseconds: number) => {
+	return Math.floor(milliseconds / 1000);
 };
+

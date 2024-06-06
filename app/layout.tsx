@@ -1,10 +1,8 @@
 import clsx from "clsx/lite";
 import type { Metadata } from "next";
-import { getServerSession } from "next-auth";
 import { Nunito_Sans } from "next/font/google";
 
-import { SessionProvider } from "@/components/logic/SessionProvider";
-import { auth } from "@/models/auth";
+import { ClerkProvider } from "@clerk/nextjs";
 import { MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
 import { Notifications } from "@mantine/notifications";
@@ -24,16 +22,17 @@ export default async function Layout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
-	const session = await getServerSession(auth);
-
 	return (
-		<html lang="pt-br">
-			<body className={clsx("min-h-screen bg-main-background text-white antialiased", nunito.className)}>
-				<MantineProvider defaultColorScheme="dark">
-					<Notifications position="top-right" />
-					<SessionProvider session={session}>{children}</SessionProvider>
-				</MantineProvider>
-			</body>
-		</html>
+		<ClerkProvider>
+			<html lang="pt-br">
+				<body className={clsx("min-h-screen bg-main-background text-white antialiased", nunito.className)}>
+					<MantineProvider defaultColorScheme="dark">
+						<Notifications position="top-right" />
+						{children}
+					</MantineProvider>
+				</body>
+			</html>
+		</ClerkProvider>
 	);
 }
+

@@ -3,18 +3,17 @@
 import { memo, useCallback } from "react";
 import { MdMenu } from "react-icons/md";
 
-import { Autocomplete, type AutocompleteItem } from "@/components/ui/Autocomplete";
 import { Drawer } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
 export const Settings: React.FC = memo(function Component({}) {
 	const [opened, { toggle, close }] = useDisclosure(false);
 
-	const onThemeChange = useCallback((selected: AutocompleteItem) => {
-		localStorage.setItem("reader-settings", JSON.stringify({ theme: selected.id }));
-		const event = new CustomEvent("settings-changed");
-		window.dispatchEvent(event);
-	}, []);
+	// const onThemeChange = useCallback((selected: AutocompleteItem) => {
+	// 	localStorage.setItem("reader-settings", JSON.stringify({ theme: selected.id }));
+	// 	const event = new CustomEvent("settings-changed");
+	// 	window.dispatchEvent(event);
+	// }, []);
 
 	return (
 		<>
@@ -34,7 +33,7 @@ export const Settings: React.FC = memo(function Component({}) {
 				onClose={close}
 				title="Leitura"
 			>
-				<Autocomplete
+				{/* <Autocomplete
 					id="theme"
 					label="Tema"
 					items={[
@@ -50,7 +49,7 @@ export const Settings: React.FC = memo(function Component({}) {
 						)?.theme || "sepia"
 					}
 					onChange={onThemeChange}
-				/>
+				/> */}
 			</Drawer>
 		</>
 	);

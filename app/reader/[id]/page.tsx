@@ -1,28 +1,23 @@
-import { getServerSession } from "next-auth";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import type { Book } from "@/entities/Book";
 import type { Progress } from "@/entities/Progress";
 import { query } from "@/lib/query";
-import { auth } from "@/models/auth";
 import { Loader } from "@mantine/core";
 
 import { Reader } from "./_components/Reader";
 
 export default async function Page({ params }: Readonly<{ params: { id: string } }>) {
-	const session = await getServerSession(auth);
-	if (!session || !session.user) return redirect("/");
-
 	const info = await query<Book>("books").id(params.id).get();
 	const book = info.data();
 
 	if (!info.exists || !book) return notFound();
 
-	const progressInfo = await query<Progress>("progress")
-		.id(session.user.id || "")
-		.get();
-	const progress = progressInfo.data();
+	// const progressInfo = await query<Progress>("progress")
+	// 	.id(session.user.id || "")
+	// 	.get();
+	// const progress = progressInfo.data();
 
 	return (
 		<div className="flex flex-col gap-5">
@@ -62,7 +57,7 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 				>
 					<Reader
 						book={book}
-						location={progress?.books[book.id]?.location}
+						location={undefined}
 					/>
 				</Suspense>
 			</section>

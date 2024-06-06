@@ -1,0 +1,16 @@
+import { AppHeader } from "@/components/ui/app-header";
+import { Layout } from "@/components/ui/layout";
+
+import { Form } from "./_components/Form";
+
+export default async function Page({ searchParams }: Readonly<{ searchParams: { isbn?: string } }>) {
+	return (
+		<Layout>
+			<>
+				<AppHeader />
+				<Form isbn={searchParams.isbn} />
+			</>
+			<></>
+		</Layout>
+	);
+}
