@@ -1,5 +1,8 @@
+import { IoMdLogIn } from "react-icons/io";
+
 import { AppNav } from "@/components/ui/app-nav";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { Button } from "@mantine/core";
 
 export default async function Layout({
 	children,
@@ -10,27 +13,38 @@ export default async function Layout({
 		<section className="flex h-full min-h-screen w-full gap-4 py-10">
 			<aside className="sticky hidden w-full max-w-[8rem] flex-col items-end justify-between home-break-mobile:flex home-break:w-[30%] home-break:max-w-full">
 				<AppNav />
-				<div className="sticky bottom-10 flex w-full max-w-56 select-none justify-end">
-					{/* <div className="flex w-fit items-center justify-end gap-2 rounded-3xl p-2 px-4 duration-200 hover:bg-neutral-800 home-break:w-full home-break:justify-between home-break:px-2">
-						<div className="hidden w-full items-center gap-2 home-break:flex">
-							<Image
-								alt="Imagem do usuário, vinda da conta Google vinculada."
-								src={session.user.image || "https://randomuser.me/api/portraits/lego/1.jpg"}
-								width={34}
-								height={34}
-								className="rounded-full"
-							/>
-							<span className="truncate font-light">
-								{session.user.name?.split(" ").slice(0, 2).join(" ") || "Usuário"}
-							</span>
-						</div>
-						<Logout />
-					</div> */}
+				<div className="sticky bottom-10 flex w-full max-w-56 select-none justify-end home-break:w-52">
 					<SignedIn>
-						<UserButton />
+						<UserButton
+							showName
+							appearance={{
+								elements: {
+									rootBox: "w-full flex justify-end",
+									userButtonBox: "flex items-center justify-center w-full flex-row-reverse",
+									userButtonOuterIdentifier: "hidden home-break:inline",
+									userButtonTrigger: "home-break:w-full bg-main py-1 rounded-2xl shadow-sm px-4",
+								},
+							}}
+						/>
 					</SignedIn>
 					<SignedOut>
-						<SignInButton />
+						<SignInButton mode="modal">
+							<div className="flex w-full justify-end">
+								<div className="hidden w-full home-break:inline">
+									<Button
+										className="w-full shadow-sm"
+										radius="xl"
+									>
+										Entre já
+									</Button>
+								</div>
+								<div className="home-break:hidden">
+									<Button radius="xl">
+										<IoMdLogIn className="text-xl" />
+									</Button>
+								</div>
+							</div>
+						</SignInButton>
 					</SignedOut>
 				</div>
 			</aside>

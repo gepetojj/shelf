@@ -4,6 +4,8 @@ const publicSchema = z.object({
 	NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string(),
 	NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string(),
 	NEXT_PUBLIC_CLERK_SIGN_UP_URL: z.string(),
+	NEXT_CLERK_AFTER_SIGN_UP_URL: z.string(),
+	NEXT_CLERK_AFTER_SIGN_IN_URL: z.string(),
 });
 
 const schema = publicSchema.and(
