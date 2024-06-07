@@ -2,28 +2,26 @@ import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 
-let post = {
-	id: 1,
-	name: "Hello World",
-};
-
 export const postRouter = createTRPCRouter({
-	hello: publicProcedure.input(z.object({ text: z.string() })).query(({ input }) => {
-		return {
-			greeting: `Hello ${input.text}`,
-		};
-	}),
-
-	create: publicProcedure.input(z.object({ name: z.string().min(1) })).mutation(async ({ input }) => {
-		// simulate a slow db call
-		await new Promise(resolve => setTimeout(resolve, 1000));
-
-		post = { id: post.id + 1, name: input.name };
-		return post;
-	}),
-
-	getLatest: publicProcedure.query(() => {
-		return post;
-	}),
+	newBook: publicProcedure
+		.input(
+			z.object({
+				isbn: z.string(),
+				semester: z.coerce.number().min(1).max(10),
+				disciplines: z.array(z.string()),
+				topics: z.array(z.string()),
+				file: z
+					.custom<File>()
+					.refine(file => !file || file.size > 100 * 10 ** 6, {
+						message: "O livro enviado é maior que o limite de 100MB.",
+					})
+					.refine(file => !file || !file.type.startsWith("application/pdf"), {
+						message: "O arquivo enviado não é um PDF.",
+					}),
+				book: z.object({ id: z.string() }),
+			}),
+		)
+		.mutation(({ input }) => {
+			console.log(input);
+		}),
 });
-

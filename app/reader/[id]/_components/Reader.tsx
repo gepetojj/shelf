@@ -97,8 +97,7 @@ export const Reader: React.FC<ReaderProps> = memo(function Component({ book, loc
 	return (
 		<>
 			<button
-				className="fixed left-0 z-10 
-				flex h-full w-[40%] items-center justify-center rounded-md p-1 duration-200 break-reader:static break-reader:h-auto break-reader:w-auto break-reader:hover:bg-main-foreground"
+				className="fixed left-0 z-10 flex h-full w-[40%] items-center justify-center rounded-md p-1 duration-200 break-reader:static break-reader:h-auto break-reader:w-auto break-reader:hover:bg-main-foreground"
 				onClick={previousPage}
 			>
 				<span className="sr-only">Botão para ir à página anterior</span>
@@ -112,8 +111,7 @@ export const Reader: React.FC<ReaderProps> = memo(function Component({ book, loc
 				className="h-full w-full max-w-[38rem]"
 			></div>
 			<button
-				className="fixed right-0 z-10 
-				flex h-full w-[40%] items-center justify-center rounded-md p-1 duration-200 break-reader:static break-reader:h-auto break-reader:w-auto break-reader:hover:bg-main-foreground"
+				className="fixed right-0 z-10 flex h-full w-[40%] items-center justify-center rounded-md p-1 duration-200 break-reader:static break-reader:h-auto break-reader:w-auto break-reader:hover:bg-main-foreground"
 				onClick={nextPage}
 			>
 				<span className="sr-only">Botão para ir à página seguinte</span>

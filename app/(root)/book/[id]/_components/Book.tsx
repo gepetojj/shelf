@@ -31,8 +31,7 @@ export const Book: React.FC<BookProps> = memo(function Component({ book }) {
 				<div className="w-full">
 					<Link
 						href={`/reader/${book.id}`}
-						className="flex w-full items-center justify-center gap-3 rounded-2xl bg-main px-6 py-1 
-                        text-center leading-tight text-black duration-200 hover:brightness-90"
+						className="flex w-full items-center justify-center gap-3 rounded-2xl bg-main px-6 py-1 text-center leading-tight text-black duration-200 hover:brightness-90"
 					>
 						Iniciar leitura
 					</Link>

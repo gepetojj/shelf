@@ -1,4 +1,3 @@
-import type { Session } from "next-auth";
 import { z } from "zod";
 
 import type { Book } from "@/entities/Book";
@@ -8,10 +7,9 @@ import { schema } from ".";
 
 export interface CreateBookProps {
 	data: z.infer<typeof schema>;
-	user: Session["user"];
 }
 
-export const createBook = ({ data, user }: CreateBookProps): Omit<Book, "files"> => {
+export const createBook = ({ data }: CreateBookProps): Omit<Book, "files"> => {
 	const book = data.book;
 
 	const isbn13 = book.volumeInfo.industryIdentifiers?.find(val => val.type === "ISBN_13");
@@ -37,9 +35,9 @@ export const createBook = ({ data, user }: CreateBookProps): Omit<Book, "files">
 		disciplines: data.disciplines,
 		topics: data.topics,
 		uploader: {
-			id: user?.id || "",
-			name: user?.name || "",
-			iconUrl: user?.image || "",
+			id: "asd",
+			name: "Uploader",
+			iconUrl: "",
 		},
 		uploadedAt: now(),
 	};

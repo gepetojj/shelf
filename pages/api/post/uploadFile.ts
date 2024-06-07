@@ -1,41 +1,39 @@
-import formidable from "formidable";
-import { readFile } from "fs/promises";
-
-import type { File } from "@/entities/File";
+import type { File as IFile } from "@/entities/File";
 import { now } from "@/lib/time";
 import { storage } from "@/models/firebase";
 
 export interface UploadFileProps {
-	file: formidable.File;
+	file: File;
 	uploader: string;
 	bookId: string;
 }
 
 export interface UploadFileReturn {
-	file: File;
+	file: IFile;
 	rollback: () => Promise<void>;
 }
 
 export const uploadFile = async ({ file, uploader, bookId }: UploadFileProps): Promise<UploadFileReturn> => {
-	const fullname = file.newFilename + "." + file.originalFilename?.split(".").reverse()[0];
-	const data: File = {
+	const name = crypto.randomUUID();
+	const fullname = name + ".pdf";
+	const data: IFile = {
 		id: crypto.randomUUID(),
 		bookId,
-		name: file.newFilename,
+		name,
 		fullname,
-		mime: file.mimetype || "",
+		mime: file.type,
 		size: file.size,
-		location: `epubs/${fullname}`,
+		location: `pdfs/${fullname}`,
 		meta: {
 			uploadedBy: uploader,
 			uploadedAt: now(),
-			originalName: file.originalFilename || "",
-			originalMime: file.mimetype || "",
+			originalName: "",
+			originalMime: file.type,
 			originalSize: file.size,
 		},
 	};
 
-	const buffer = await readFile(file.filepath);
+	const buffer = Buffer.from(await file.arrayBuffer());
 	await storage.file(data.location).save(buffer);
 	const rollback = async () => {
 		await storage.file(data.location).delete();

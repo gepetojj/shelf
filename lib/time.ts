@@ -5,4 +5,3 @@ export const now = () => {
 export const seconds = (milliseconds: number) => {
 	return Math.floor(milliseconds / 1000);
 };
-

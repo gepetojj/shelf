@@ -13,4 +13,3 @@ export const Layout: React.FC<{ children: React.ReactElement[] }> = memo(functio
 		</>
 	);
 });
-

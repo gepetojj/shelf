@@ -8,16 +8,18 @@ import { LuFileCheck2 } from "react-icons/lu";
 import { MdFileUploadOff, MdUpload } from "react-icons/md";
 
 import { type BookApiItem, queryBooks } from "@/lib/booksApi";
-import { Button, Group, Modal, Select, TextInput } from "@mantine/core";
+import { Button, Group, Modal, Select, TagsInput, TextInput } from "@mantine/core";
 import { Dropzone, PDF_MIME_TYPE } from "@mantine/dropzone";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 
+import { upload } from "../actions/upload";
+
 interface Fields {
 	isbn: string;
 	semester: number;
-	disciplines: string;
-	topics: string;
+	disciplines: string[];
+	topics: string[];
 }
 
 export interface FormProps {
@@ -32,12 +34,16 @@ export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 		getValues,
 		setValue,
 		formState: { isSubmitting, errors },
-	} = useForm<Fields>({ defaultValues: { isbn } });
+	} = useForm<Fields>({ defaultValues: { isbn, semester: 1 } });
 
 	const [book, setBook] = useState<BookApiItem | undefined>(undefined);
 	const [options, setOptions] = useState<BookApiItem[]>([]);
 	const [file, setFile] = useState<File | undefined>(undefined);
 	const [message, setMessage] = useState("");
+
+	const [semester, setSemester] = useState("1");
+	const [disciplines, setDisciplines] = useState<string[]>([]);
+	const [topics, setTopics] = useState<string[]>([]);
 
 	const [fetching, startFetching] = useTransition();
 	const [modalOpen, { open, close }] = useDisclosure(false);
@@ -53,7 +59,7 @@ export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 		if (!response) return setMessage("O Google não está retornando resultados. Tente novamente mais tarde.");
 
 		setOptions(response);
-		response.length && open();
+		response.length > 1 && open();
 
 		const book = response.find(val => val.volumeInfo.industryIdentifiers?.find(id => id.identifier === isbn));
 		if (!book) return setMessage("Nenhum resultado encontrado.");
@@ -83,35 +89,44 @@ export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 					color: "red",
 				});
 			}
-
-			const disciplines = fields.disciplines.split(",").map(val => val.trim());
-			const topics = fields.topics.split(",").map(val => val.trim());
+			if (!fields.disciplines.length) {
+				return notifications.show({
+					title: "Erro",
+					message: "Insira ao menos uma matéria antes de postar.",
+					color: "red",
+				});
+			}
+			if (!fields.topics.length) {
+				return notifications.show({
+					title: "Erro",
+					message: "Insira ao menos um tópico antes de postar.",
+					color: "red",
+				});
+			}
 
 			const body = new FormData();
 			body.append("file", file);
-			body.append("book", JSON.stringify(book));
-			body.append("isbn", fields.isbn);
-			body.append("disciplines", JSON.stringify(disciplines));
-			body.append("topics", JSON.stringify(topics));
-			body.append("semester", String(fields.semester));
 
-			const res = await fetch("/api/post", {
-				method: "POST",
-				body,
+			const result = await upload({
+				blobs: body,
+				book,
+				isbn: fields.isbn,
+				disciplines: fields.disciplines,
+				topics: fields.topics,
+				semester: fields.semester,
 			});
-			const json = (await res.json()) as { message: string };
 
-			if (res.ok) {
+			if (result.success) {
 				notifications.show({
 					title: "Sucesso",
 					message: "O livro foi postado.",
 					color: "green",
 				});
-				return router.push("/app");
+				return router.push("/");
 			}
 			return notifications.show({
 				title: "Erro",
-				message: json.message || "Houve um erro ao tentar postar o livro.",
+				message: result.message,
 				color: "red",
 			});
 		},
@@ -241,31 +256,55 @@ export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 							{ value: "7", label: "7º Semestre" },
 							{ value: "8", label: "8º Semestre" },
 						]}
-						defaultValue={"1"}
-						onChange={selected => setValue("semester", Number(selected) || 1)}
+						clearable={false}
+						allowDeselect={false}
+						value={semester}
+						onChange={selected => {
+							setSemester(selected || "1");
+							setValue("semester", Number(selected) || 1);
+						}}
 						checkIconPosition="right"
 					/>
-					<TextInput
+					<TagsInput
 						label="Matérias:"
 						placeholder="Digite aqui:"
-						{...register("disciplines", { required: true })}
+						description="Digite uma matéria e pressione Enter para adicionar."
+						value={disciplines}
+						onChange={values => {
+							setDisciplines(values);
+							setValue("disciplines", values);
+						}}
+						clearable
 						error={errors.disciplines?.message}
 					/>
-					<TextInput
+					<TagsInput
 						label="Temas:"
 						placeholder="Digite aqui:"
-						{...register("topics", { required: true })}
+						description="Digite um tópico e pressione Enter para adicionar."
+						value={topics}
+						onChange={values => {
+							setTopics(values);
+							setValue("topics", values);
+						}}
+						clearable
 						error={errors.topics?.message}
 					/>
-					<span className="break-words pt-1 text-sm font-light text-neutral-100">
-						Separe as matérias e temas usando vírgulas. Ex.: Tema 1, Tema 2, Tema 3
-					</span>
 
 					<Dropzone
+						className="mb-2 mt-3"
 						onDrop={files => setFile(files[0])}
+						onReject={() => {
+							setFile(undefined);
+							notifications.show({
+								title: "Erro",
+								message: "O arquivo selecionado não é válido.",
+								color: "red",
+							});
+						}}
 						accept={PDF_MIME_TYPE}
-						maxSize={5 * 1024 ** 2}
+						maxSize={100 * 10 ** 6}
 						maxFiles={1}
+						multiple={false}
 						loading={isSubmitting}
 					>
 						<Group
@@ -295,7 +334,7 @@ export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 								</h2>
 								<span className="text-sm font-light">
 									{file ? (
-										<>Solte ou selecione para enviar outro arquivo.</>
+										<>Solte ou selecione para trocar o arquivo.</>
 									) : (
 										<>ou clique para selecionar</>
 									)}

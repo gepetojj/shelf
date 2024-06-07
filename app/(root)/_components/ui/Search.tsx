@@ -70,4 +70,3 @@ export const Search: React.FC<SearchProps> = memo(function Component({ toggleDra
 		</form>
 	);
 });
-

@@ -16,4 +16,3 @@ export const Time: React.FC<TimeProps> = memo(function Time({ milliseconds }) {
 
 	return <>{timeAgo.format(new Date(seconds(milliseconds) * 1000))}</>;
 });
-

@@ -63,4 +63,3 @@ export const Filters: React.FC = memo(function Component() {
 		</div>
 	);
 });
-
