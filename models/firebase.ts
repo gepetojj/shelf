@@ -1,6 +1,6 @@
 import firebase, { type ServiceAccount, credential } from "firebase-admin";
 
-import { config } from "./config";
+import { config } from "@/config";
 
 export const credentials: ServiceAccount = {
 	projectId: config.FIREBASE_ID,

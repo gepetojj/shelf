@@ -2,6 +2,7 @@ import clsx from "clsx/lite";
 import type { Metadata } from "next";
 import { Nunito_Sans } from "next/font/google";
 
+import { TRPCReactProvider } from "@/trpc/react";
 import { ClerkProvider } from "@clerk/nextjs";
 import { MantineProvider, createTheme } from "@mantine/core";
 import "@mantine/core/styles.css";
@@ -49,15 +50,17 @@ export default async function Layout({
 	return (
 		<ClerkProvider>
 			<html lang="pt-br">
-				<body className={clsx("min-h-screen bg-main-background text-white antialiased", nunito.className)}>
-					<MantineProvider
-						defaultColorScheme="dark"
-						theme={theme}
-					>
-						<Notifications position="top-right" />
-						{children}
-					</MantineProvider>
-				</body>
+				<TRPCReactProvider>
+					<body className={clsx("min-h-screen bg-main-background text-white antialiased", nunito.className)}>
+						<MantineProvider
+							defaultColorScheme="dark"
+							theme={theme}
+						>
+							<Notifications position="top-right" />
+							{children}
+						</MantineProvider>
+					</body>
+				</TRPCReactProvider>
 			</html>
 		</ClerkProvider>
 	);
