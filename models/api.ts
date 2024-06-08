@@ -1,31 +1,37 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { type NextHandler, createRouter } from "next-connect";
+import { type NextHandler, createEdgeRouter } from "next-connect";
+import { RequestContext } from "next/dist/server/base-server";
+import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
 
-export type Middleware = (req: NextApiRequest, res: NextApiResponse, next: NextHandler) => Promise<void>;
+import { UnknownError } from "@/errors/infra";
+
+export type Middleware = (req: NextRequest, ctx: RequestContext, next: NextHandler) => Promise<void>;
 
 export const handlerConfig = {
-	onError: (err: unknown, _req: NextApiRequest, res: NextApiResponse) => {
-		console.error(err);
-
+	onError: (err: unknown, _req: NextRequest, _ctx: RequestContext) => {
 		if (err instanceof ZodError) {
-			return res.status(400).json({
-				message: "Houve um erro de validação.",
-				error: {
-					message: err.message,
+			return NextResponse.json(
+				{
+					message: "Houve um erro de validação dos dados enviados.",
 					issues: err.issues,
 				},
-			});
+				{ status: 400 },
+			);
 		}
 
-		return res.status(500).json({ message: "Houve um erro desconhecido." });
+		// TODO: Use logger
+		console.error(err);
+		if (err instanceof UnknownError) {
+			return NextResponse.json({ message: err.message, location: err.location }, { status: 500 });
+		}
+		return NextResponse.json({ message: "Houve um erro desconhecido." }, { status: 500 });
 	},
-	onNoMatch: (_req: NextApiRequest, res: NextApiResponse) => {
-		return res.status(404).json({ message: "Recurso não encontrado." });
+	onNoMatch: (_req: NextRequest, _ctx: RequestContext) => {
+		return NextResponse.json({ message: "Recurso não encontrado." }, { status: 404 });
 	},
 };
 
 export const api = () => {
-	const router = createRouter<NextApiRequest, NextApiResponse>();
+	const router = createEdgeRouter<NextRequest, RequestContext>();
 	return router;
 };

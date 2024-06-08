@@ -5,14 +5,15 @@ export type DefaultInfraProps = BaseErrorProps & {
 };
 
 export class UnknownError extends BaseError {
-	protected context: Record<string, any>;
-
 	constructor(protected props: DefaultInfraProps) {
 		super({
 			message: props.message || "Houve um erro desconhecido.",
 			location: props.location,
 		});
-		this.context = props.context || {};
+	}
+
+	get context() {
+		return this.props.context;
 	}
 }
 
@@ -21,10 +22,11 @@ export type ResourceNotFoundProps = DefaultInfraProps & {
 };
 
 export class ResourceNotFound extends UnknownError {
-	implementation?: string;
-
 	constructor(protected props: ResourceNotFoundProps) {
 		super(props);
-		this.implementation = props.implementation;
+	}
+
+	get implementation() {
+		return this.props.implementation;
 	}
 }
