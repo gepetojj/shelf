@@ -11,7 +11,13 @@ import "@mantine/notifications/styles.css";
 
 import "./globals.css";
 
-const nunito = Nunito_Sans({ subsets: ["latin"], weight: "variable" });
+const nunito = Nunito_Sans({
+	subsets: ["latin"],
+	style: ["normal", "italic"],
+	weight: "variable",
+	display: "swap",
+	variable: "--font-nunito-sans",
+});
 
 export const metadata: Metadata = {
 	title: "Shelf: Organize suas leituras",

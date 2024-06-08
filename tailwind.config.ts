@@ -32,6 +32,9 @@ const config = {
 				"home-break-book": "530px",
 				"break-reader": "700px",
 			},
+			fontFamily: {
+				"nunito-sans": ["var(--font-nunito-sans)"],
+			},
 		},
 	},
 	plugins: [require("tailwindcss-animate")],
