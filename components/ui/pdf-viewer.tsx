@@ -16,7 +16,7 @@ export type PDFViewerProps = {
 	startPage?: number;
 };
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url).toString();
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 export const PDFViewer: React.FC<PDFViewerProps> = memo(function PDFViewer({ location, startPage }) {
 	const [pages, setPages] = useState(0);
