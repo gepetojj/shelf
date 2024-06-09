@@ -13,7 +13,7 @@ const router = api().use(async (_req, _event, next) => {
 	const end = Date.now();
 
 	const logger = container.get<Logger>(Registry.Logger);
-	logger.http(`API de leitura levou ${end - start}ms`);
+	logger.debug(`API de leitura levou ${end - start}ms`);
 
 	return res;
 });

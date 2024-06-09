@@ -1,8 +1,8 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
+import { PDFViewer } from "@/components/ui/pdf-viewer";
 import type { Book } from "@/entities/Book";
-import type { Progress } from "@/entities/Progress";
 import { query } from "@/lib/query";
 import { Loader } from "@mantine/core";
 
@@ -55,10 +55,11 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 						</div>
 					}
 				>
-					<Reader
+					{/* <Reader
 						book={book}
 						location={undefined}
-					/>
+					/> */}
+					<PDFViewer location={book.files[0].location} />
 				</Suspense>
 			</section>
 		</div>

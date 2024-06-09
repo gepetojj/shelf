@@ -8,6 +8,7 @@ import { MantineProvider, createTheme } from "@mantine/core";
 import "@mantine/core/styles.css";
 import { Notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";
+import "@ungap/with-resolvers";
 
 import "./globals.css";
 
