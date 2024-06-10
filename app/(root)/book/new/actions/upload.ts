@@ -7,7 +7,7 @@ import { query } from "@/lib/query";
 import { createBook } from "@/pages/api/post/createBook";
 import { uploadFile } from "@/pages/api/post/uploadFile";
 
-const inputs = z.object({
+export const inputs = z.object({
 	isbn: z.string(),
 	semester: z.coerce.number().min(1).max(10),
 	disciplines: z.array(z.string()),
