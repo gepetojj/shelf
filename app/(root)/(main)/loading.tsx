@@ -9,13 +9,11 @@ export default async function Loading() {
 	return (
 		<ContextProvider
 			value={{
-				books: [],
-				filters: {
-					query: "",
-					semester: 1,
-					discipline: "",
-					topic: "",
-				},
+				isDrawerOpen: false,
+				query: "",
+				semester: 1,
+				discipline: "",
+				topic: "",
 			}}
 		>
 			<Layout>
