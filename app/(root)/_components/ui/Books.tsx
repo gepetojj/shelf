@@ -124,7 +124,10 @@ export const Books: React.FC = memo(function Component() {
 													postou <Time milliseconds={book.uploadedAt} />
 												</span>
 											</div>
-											<button title="Configurações do post">
+											<button
+												type="button"
+												title="Configurações do post"
+											>
 												<MdMoreHoriz
 													className="text-2xl text-neutral-400"
 													aria-hidden="true"

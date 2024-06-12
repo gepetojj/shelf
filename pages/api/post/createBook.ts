@@ -1,11 +1,9 @@
-import { z } from "zod";
-
-import { inputs } from "@/app/(root)/book/new/actions/upload";
+import { Inputs } from "@/app/(root)/book/new/actions/upload";
 import type { Book } from "@/entities/Book";
 import { now } from "@/lib/time";
 
 export interface CreateBookProps {
-	data: z.infer<typeof inputs>;
+	data: Inputs;
 }
 
 export const createBook = ({ data }: CreateBookProps): Omit<Book, "files"> => {

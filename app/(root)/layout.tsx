@@ -20,9 +20,10 @@ export default async function Layout({
 							appearance={{
 								elements: {
 									rootBox: "w-full flex justify-end",
-									userButtonBox: "flex items-center justify-center w-full flex-row-reverse",
+									userButtonBox: "flex items-center justify-end w-full flex-row-reverse",
 									userButtonOuterIdentifier: "hidden home-break:inline",
-									userButtonTrigger: "home-break:w-full bg-main py-1 rounded-2xl shadow-sm px-4",
+									userButtonTrigger:
+										"home-break:w-full rounded-2xl shadow-sm px-4 py-1.5 text-white bg-neutral-900/50 duration-200 hover:brightness-110",
 								},
 							}}
 						/>
@@ -32,8 +33,9 @@ export default async function Layout({
 							<div className="flex w-full justify-end">
 								<div className="hidden w-full home-break:inline">
 									<Button
-										className="w-full shadow-sm"
+										className="min-w-full shadow-sm"
 										radius="xl"
+										rightSection={<IoMdLogIn className="text-xl" />}
 									>
 										Entre já
 									</Button>

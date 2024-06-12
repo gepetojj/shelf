@@ -2,7 +2,7 @@
 
 import TimeAgo from "javascript-time-ago";
 import pt from "javascript-time-ago/locale/pt";
-import { memo } from "react";
+import { memo, useMemo } from "react";
 
 import { seconds } from "@/lib/time";
 
@@ -11,8 +11,10 @@ export interface TimeProps {
 }
 
 export const Time: React.FC<TimeProps> = memo(function Time({ milliseconds }) {
-	TimeAgo.addDefaultLocale(pt);
-	const timeAgo = new TimeAgo("pt");
+	const timeAgo = useMemo(() => {
+		TimeAgo.addLocale(pt);
+		return new TimeAgo("pt");
+	}, []);
 
 	return <>{timeAgo.format(new Date(seconds(milliseconds) * 1000))}</>;
 });

@@ -7,7 +7,7 @@ import { query } from "@/lib/query";
 import { createBook } from "@/pages/api/post/createBook";
 import { uploadFile } from "@/pages/api/post/uploadFile";
 
-export const inputs = z.object({
+const inputs = z.object({
 	isbn: z.string(),
 	semester: z.coerce.number().min(1).max(10),
 	disciplines: z.array(z.string()),
@@ -46,6 +46,8 @@ export const inputs = z.object({
 		}),
 	}),
 });
+
+export type Inputs = z.infer<typeof inputs>;
 
 type Outputs = {
 	success: boolean;
