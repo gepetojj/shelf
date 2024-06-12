@@ -14,12 +14,19 @@ type Leaves<T> = T extends object
 		}[keyof T]
 	: never;
 
-export interface QueryLanguage<Keys> {
-	key: Leaves<Keys>;
-	comparator: "==" | "<" | "<=" | ">" | ">=" | "array-contains" | "in";
-	value: any;
-	ignore?: boolean;
-}
+export type QueryLanguage<Keys> =
+	| {
+			key: Leaves<Keys>;
+			comparator: "==" | "<" | "<=" | ">" | ">=" | "array-contains" | "in";
+			value: any;
+			ignore?: boolean;
+	  }
+	| {
+			orderBy: Leaves<Keys>;
+			sort?: "asc" | "desc";
+			offset: number;
+			page: number;
+	  };
 
 export type DatabaseQuery<Keys> = QueryLanguage<Keys>[];
 

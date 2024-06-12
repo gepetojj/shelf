@@ -13,9 +13,10 @@ const config = {
 		extend: {
 			colors: {
 				main: {
-					DEFAULT: "#F5E02F",
-					background: "#141411",
-					foreground: "#1C1C1A",
+					DEFAULT: "#ffcb74",
+					background: "#111111",
+					foreground: "#2f2f2f",
+					contrast: "#f6f6f6",
 				},
 			},
 			animation: {

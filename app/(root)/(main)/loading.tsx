@@ -2,8 +2,8 @@ import { AppHeader } from "@/components/ui/app-header";
 import { Layout } from "@/components/ui/layout";
 
 import { ContextProvider } from "./_components/Context";
-import { Filters } from "./_components/layout/Filters";
-import { Search } from "./_components/ui/Search";
+import { Filters } from "./_components/layout/filters";
+import { Search } from "./_components/ui/search";
 
 export default async function Loading() {
 	return (
@@ -23,8 +23,12 @@ export default async function Loading() {
 					<AppHeader />
 					<Search />
 					<section className="flex h-full w-full flex-col gap-2 overflow-y-auto px-4 py-7 home-break-mobile:px-12">
-						<div className="h-52 w-full animate-pulse rounded-xl bg-main-foreground"></div>
-						<div className="h-52 w-full animate-pulse rounded-xl bg-main-foreground"></div>
+						<div className="h-52 w-full animate-pulse rounded-xl bg-main-foreground" />
+						<div className="h-52 w-full animate-pulse rounded-xl bg-main-foreground" />
+						<div className="h-52 w-full animate-pulse rounded-xl bg-main-foreground" />
+						<div className="h-52 w-full animate-pulse rounded-xl bg-main-foreground" />
+						<div className="h-52 w-full animate-pulse rounded-xl bg-main-foreground" />
+						<div className="h-52 w-full animate-pulse rounded-xl bg-main-foreground" />
 					</section>
 				</>
 				<Filters />

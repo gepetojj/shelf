@@ -10,16 +10,16 @@ const theme = createTheme({
 	fontSmoothing: true,
 	colors: {
 		main: [
-			"#fffee0",
-			"#fffacb",
-			"#fef39a",
-			"#fded64",
-			"#fce838",
-			"#fce41b",
-			"#fce303",
-			"#e0c900",
-			"#c7b200",
-			"#ab9900",
+			"#fff6e1",
+			"#ffedcc",
+			"#ffda9b",
+			"#ffc564",
+			"#ffb438",
+			"#ffa91b",
+			"#ffa309",
+			"#e38e00",
+			"#ca7d00",
+			"#b06c00",
 		],
 	},
 	defaultRadius: "md",
@@ -29,7 +29,7 @@ const theme = createTheme({
 	components: {
 		Button: Button.extend({
 			defaultProps: {
-				color: "#F5E02F",
+				color: "#ffcb74",
 			},
 		}),
 	},

@@ -16,10 +16,22 @@ export class FirestoreRepository implements DatabaseRepository {
 		query: DatabaseQuery<Keys>,
 		ref: FirebaseFirestore.Query<FirebaseFirestore.DocumentData, FirebaseFirestore.DocumentData>,
 	): FirebaseFirestore.Query<FirebaseFirestore.DocumentData> {
-		query.forEach(({ comparator, key, value, ignore }) => {
-			if (ignore) return;
-			ref = ref.where(key as string, comparator, value);
-		});
+		for (const command of query) {
+			if ("key" in command) {
+				const { key, comparator, value, ignore } = command;
+				if (ignore) continue;
+				ref = ref.where(key as string, comparator, value);
+			}
+
+			if ("offset" in command) {
+				const { offset, page, orderBy, sort } = command;
+				ref = ref
+					.orderBy(orderBy, sort)
+					.limit(offset)
+					.offset((page - 1) * offset);
+			}
+		}
+
 		return ref;
 	}
 

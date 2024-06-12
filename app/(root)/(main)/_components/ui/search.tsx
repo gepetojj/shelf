@@ -1,10 +1,9 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { memo, useCallback } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { MdSearch, MdSettings } from "react-icons/md";
-
-import { queryBooks } from "@/lib/booksApi";
 
 import { useContext } from "../Context";
 
@@ -12,29 +11,19 @@ interface Fields {
 	query: string;
 }
 
-export interface SearchProps {
-	toggleDrawer?: () => void;
-}
-
-export const Search: React.FC<SearchProps> = memo(function Component({ toggleDrawer }) {
-	const { filters, setFilters, setApiBooks } = useContext();
-	const { register, handleSubmit } = useForm<Fields>({ defaultValues: { query: filters.query } });
-
-	const fetchBooksApi = useCallback(
-		async (query: string) => {
-			const response = await queryBooks(query);
-			setApiBooks(response);
-		},
-		[setApiBooks],
-	);
+export const Search: React.FC = memo(function Search() {
+	const router = useRouter();
+	const { query, drawerActions } = useContext();
+	const { register, handleSubmit } = useForm<Fields>({ defaultValues: { query } });
 
 	const onSubmit: SubmitHandler<Fields> = useCallback(
 		async fields => {
-			const { query } = fields;
-			setFilters({ query });
-			await fetchBooksApi(query);
+			const query = fields.query;
+			const url = new URL(window.location.href);
+			url.searchParams.set("q", encodeURIComponent(query));
+			router.push(url.toString());
 		},
-		[fetchBooksApi, setFilters],
+		[router],
 	);
 
 	return (
@@ -61,7 +50,7 @@ export const Search: React.FC<SearchProps> = memo(function Component({ toggleDra
 				<button
 					type="button"
 					title="Configurações de pesquisa"
-					onClick={toggleDrawer}
+					onClick={drawerActions.toggle}
 					className="rounded-md p-2 duration-200 hover:bg-neutral-800"
 				>
 					<MdSettings className="text-xl" />

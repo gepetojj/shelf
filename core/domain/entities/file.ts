@@ -11,6 +11,7 @@ export type FileProps = {
 	disciplines: string[];
 	topics: string[];
 
+	defaultFile: FileReferenceProps["id"];
 	files: FileReferenceProps[];
 	uploaderId: string;
 	uploadedAt: number;
@@ -51,6 +52,10 @@ export abstract class File {
 		return this.props.topics;
 	}
 
+	get defaultFile() {
+		return this.props.defaultFile;
+	}
+
 	get files() {
 		return this.props.files;
 	}
@@ -73,6 +78,7 @@ export abstract class File {
 			semester: this.semester,
 			disciplines: this.disciplines,
 			topics: this.topics,
+			defaultFile: this.defaultFile,
 			files: this.files,
 			uploaderId: this.uploaderId,
 			uploadedAt: this.uploadedAt,
