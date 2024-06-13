@@ -26,6 +26,7 @@
 		"@trpc/react-query": "next",
 		"@trpc/server": "next",
 		"@ungap/with-resolvers": "^0.1.0",
+		"axios": "^1.7.2",
 		"clsx": "^2.1.1",
 		"file-type": "^19.0.0",
 		"firebase-admin": "^12.1.1",

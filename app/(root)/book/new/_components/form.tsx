@@ -1,19 +1,18 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { memo, useCallback, useEffect, useState, useTransition } from "react";
+import { memo, useCallback, useState } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
-import { FaSpinner } from "react-icons/fa";
 import { LuFileCheck2 } from "react-icons/lu";
 import { MdFileUploadOff, MdUpload } from "react-icons/md";
 
-import { type BookApiItem, queryBooks } from "@/lib/booksApi";
-import { Button, Group, Modal, Select, TagsInput, TextInput } from "@mantine/core";
+import { FileExternalProps } from "@/core/domain/entities/file-external";
+import { Button, Group, Select, TagsInput } from "@mantine/core";
 import { Dropzone, PDF_MIME_TYPE } from "@mantine/dropzone";
-import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 
 import { upload } from "../actions/upload";
+import { ISBNSearch } from "./isbn-search";
 
 interface Fields {
 	isbn: string;
@@ -29,42 +28,17 @@ export interface FormProps {
 export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 	const router = useRouter();
 	const {
-		register,
 		handleSubmit,
-		getValues,
 		setValue,
 		formState: { isSubmitting, errors },
 	} = useForm<Fields>({ defaultValues: { isbn, semester: 1 } });
 
-	const [book, setBook] = useState<BookApiItem | undefined>(undefined);
-	const [options, setOptions] = useState<BookApiItem[]>([]);
+	const [book, setBook] = useState<FileExternalProps | undefined>(undefined);
 	const [file, setFile] = useState<File | undefined>(undefined);
-	const [message, setMessage] = useState("");
 
 	const [semester, setSemester] = useState("1");
 	const [disciplines, setDisciplines] = useState<string[]>([]);
 	const [topics, setTopics] = useState<string[]>([]);
-
-	const [fetching, startFetching] = useTransition();
-	const [modalOpen, { open, close }] = useDisclosure(false);
-
-	const fetchISBN = useCallback(async () => {
-		setMessage("");
-		setOptions([]);
-
-		const fieldIsbn = getValues("isbn");
-		if (!fieldIsbn || fieldIsbn.length < 10 || fieldIsbn.length > 13) return;
-
-		const response = await queryBooks(fieldIsbn);
-		if (!response) return setMessage("O Google não está retornando resultados. Tente novamente mais tarde.");
-
-		setOptions(response);
-		response.length > 1 && open();
-
-		const book = response.find(val => val.volumeInfo.industryIdentifiers?.find(id => id.identifier === isbn));
-		if (!book) return setMessage("Nenhum resultado encontrado.");
-		setBook(book);
-	}, [getValues, isbn, open]);
 
 	const onSubmit: SubmitHandler<Fields> = useCallback(
 		async fields => {
@@ -133,76 +107,8 @@ export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 		[book, file, router],
 	);
 
-	useEffect(() => {
-		if (!isbn || typeof isbn !== "string") return;
-		startFetching(() => {
-			fetchISBN();
-		});
-	}, [fetchISBN, isbn]);
-
 	return (
 		<>
-			<Modal
-				opened={modalOpen}
-				onClose={close}
-				title="Selecione o livro"
-				centered
-			>
-				<section className="flex h-full w-full flex-col divide-y divide-white/5">
-					{book && (
-						<div className="flex w-full flex-col gap-1">
-							<span className="text-xs text-neutral-400">Já selecionado</span>
-							<div className="flex w-full flex-col p-2 text-sm">
-								<h2 className="truncate">{book.volumeInfo.title}</h2>
-								<h3 className="truncate text-neutral-200">
-									Autores(as):{" "}
-									{new Intl.ListFormat("pt-br", {
-										style: "long",
-										type: "conjunction",
-									}).format(book.volumeInfo.authors.slice(0, 2))}
-								</h3>
-								{book.volumeInfo.industryIdentifiers?.length ? (
-									<h3 className="truncate text-neutral-200">
-										ISBN: {book.volumeInfo.industryIdentifiers?.at(0)?.identifier}
-									</h3>
-								) : null}
-							</div>
-						</div>
-					)}
-					{options.length ? (
-						options.map(option => (
-							<button
-								key={option.id}
-								className="flex w-full flex-col rounded-md p-2 text-sm duration-200 hover:bg-main-foreground"
-								onClick={() => {
-									setBook(option);
-									setMessage("");
-									close();
-								}}
-							>
-								<h2 className="truncate">{option.volumeInfo.title}</h2>
-								<h3 className="truncate text-neutral-200">
-									Autores(as):{" "}
-									{new Intl.ListFormat("pt-br", {
-										style: "long",
-										type: "conjunction",
-									}).format(option.volumeInfo.authors.slice(0, 2))}
-								</h3>
-								{option.volumeInfo.industryIdentifiers?.length ? (
-									<h3 className="truncate text-neutral-200">
-										ISBN: {option.volumeInfo.industryIdentifiers?.at(0)?.identifier}
-									</h3>
-								) : null}
-							</button>
-						))
-					) : (
-						<div className="w-full text-center">
-							<span>Não há resultados.</span>
-						</div>
-					)}
-				</section>
-			</Modal>
-
 			<form
 				className="flex flex-col gap-2 px-12 py-7"
 				onSubmit={handleSubmit(onSubmit)}
@@ -210,39 +116,10 @@ export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 				<h1 className="text-2xl font-bold">Publicar um livro</h1>
 				<h2>Insira as informações e faça upload do arquivo do livro.</h2>
 				<section className="flex flex-col gap-2 break-words">
-					<TextInput
-						label="ISBN:"
-						type="number"
-						placeholder="Digite aqui:"
-						{...register("isbn", {
-							required: true,
-							minLength: { value: 10, message: "O ISBN tem no mínimo 10 números." },
-							maxLength: { value: 13, message: "O ISBN tem no máximo 13 números." },
-							onBlur: () => {
-								if (!getValues("isbn")) return;
-								startFetching(() => {
-									fetchISBN();
-								});
-							},
-						})}
-						error={errors.isbn?.message}
+					<ISBNSearch
+						selected={book}
+						setSelected={setBook}
 					/>
-					{fetching && (
-						<span className="flex items-center gap-1 text-sm animate-in slide-in-from-top-2">
-							<FaSpinner className="animate-spin" />
-							Carregando...
-						</span>
-					)}
-					{message && (
-						<span className="flex items-center gap-1 text-sm animate-in slide-in-from-top-2">
-							{message}
-						</span>
-					)}
-					{book && (
-						<span className="flex items-center gap-1 truncate text-sm animate-in slide-in-from-top-2">
-							Livro selecionado: {book.volumeInfo.title}
-						</span>
-					)}
 					<Select
 						label="Semestre:"
 						placeholder="Selecione:"

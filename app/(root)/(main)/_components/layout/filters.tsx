@@ -36,6 +36,8 @@ export const Filters: React.FC = memo(function Component() {
 					{ value: "6", label: "6º Semestre" },
 					{ value: "7", label: "7º Semestre" },
 					{ value: "8", label: "8º Semestre" },
+					{ value: "9", label: "9º Semestre" },
+					{ value: "10", label: "10º Semestre" },
 				]}
 				defaultValue={semester.toString()}
 			/>

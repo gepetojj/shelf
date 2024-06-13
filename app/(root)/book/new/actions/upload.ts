@@ -3,7 +3,6 @@
 import { z } from "zod";
 
 import { megaToBytes } from "@/lib/bytes";
-import { query } from "@/lib/query";
 import { createBook } from "@/pages/api/post/createBook";
 import { uploadFile } from "@/pages/api/post/uploadFile";
 
@@ -21,29 +20,14 @@ const inputs = z.object({
 			message: "O arquivo enviado não é um PDF.",
 		}),
 	book: z.object({
-		id: z.string(),
-		volumeInfo: z.object({
-			title: z.string(),
-			subtitle: z.string().optional(),
-			authors: z.array(z.string()),
-			publisher: z.string(),
-			description: z.string(),
-			pageCount: z.coerce.number(),
-			industryIdentifiers: z
-				.array(
-					z.object({
-						type: z.string(),
-						identifier: z.string(),
-					}),
-				)
-				.optional(),
-			imageLinks: z
-				.object({
-					smallThumbnail: z.string().url().optional(),
-					thumbnail: z.string().url().optional(),
-				})
-				.optional(),
-		}),
+		title: z.string(),
+		subtitle: z.string().optional().nullable(),
+		authors: z.array(z.string()),
+		publishers: z.array(z.string()).optional().nullable(),
+		description: z.string().optional().nullable(),
+		pages: z.coerce.number(),
+		globalIdentifier: z.string().optional().nullable(),
+		thumbnailUrl: z.string().url().optional().nullable(),
 	}),
 });
 
@@ -67,18 +51,18 @@ export const upload = async (form: Omit<z.infer<typeof inputs>, "file"> & { blob
 			bookId: book.id,
 		});
 
-		try {
-			await query("books")
-				.id(book.id)
-				.create({
-					...book,
-					files: [file],
-				});
-		} catch (err) {
-			console.error("Erro ao tentar criar o registro do livro.");
-			console.debug(err);
-			await rollback();
-		}
+		// try {
+		// 	await query("books")
+		// 		.id(book.id)
+		// 		.create({
+		// 			...book,
+		// 			files: [file],
+		// 		});
+		// } catch (err) {
+		// 	console.error("Erro ao tentar criar o registro do livro.");
+		// 	console.debug(err);
+		// 	await rollback();
+		// }
 
 		return { success: true, message: "Livro enviado com sucesso." };
 	} catch (err: any) {
