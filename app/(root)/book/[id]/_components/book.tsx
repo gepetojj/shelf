@@ -2,13 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { memo } from "react";
 
-import type { Book as IBook } from "@/entities/Book";
+import { BookProps } from "@/core/domain/entities/book";
 
-export interface BookProps {
-	book: IBook;
+export interface BookComponentProps {
+	book: BookProps;
 }
 
-export const Book: React.FC<BookProps> = memo(function Component({ book }) {
+export const Book: React.FC<BookComponentProps> = memo(function Book({ book }) {
 	return (
 		<>
 			<div className="sticky top-10 flex w-fit flex-col items-start gap-3 rounded-md bg-main-foreground p-3">
@@ -19,7 +19,7 @@ export const Book: React.FC<BookProps> = memo(function Component({ book }) {
 					height={180}
 				/>
 				<div className="flex w-full flex-col truncate text-sm text-neutral-100">
-					<span className="truncate">Upload: {book.uploader.name.split(" ").slice(0, 2).join(" ")}</span>
+					<span className="truncate">Upload: {book.uploaderId}</span>
 					<span className="truncate">Páginas: {book.pages}</span>
 					<span className="truncate">
 						{new Intl.ListFormat("pt-br", {

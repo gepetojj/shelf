@@ -19,7 +19,7 @@ type ISBNSearchProps = {
 	setSelected: (val: FileExternalProps | undefined) => void;
 };
 
-export const ISBNSearch: React.FC<ISBNSearchProps> = memo(function ISBNFetch({ selected, setSelected }) {
+export const ISBNSearch: React.FC<ISBNSearchProps> = memo(function ISBNSearch({ selected, setSelected }) {
 	const {
 		register,
 		getValues,
@@ -44,7 +44,6 @@ export const ISBNSearch: React.FC<ISBNSearchProps> = memo(function ISBNFetch({ s
 			return;
 		}
 
-		console.log(books);
 		setOptions(books);
 		open();
 	}, [getValues, setError, open]);

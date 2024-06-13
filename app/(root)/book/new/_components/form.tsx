@@ -7,6 +7,7 @@ import { LuFileCheck2 } from "react-icons/lu";
 import { MdFileUploadOff, MdUpload } from "react-icons/md";
 
 import { FileExternalProps } from "@/core/domain/entities/file-external";
+import { useAuth } from "@clerk/nextjs";
 import { Button, Group, Select, TagsInput } from "@mantine/core";
 import { Dropzone, PDF_MIME_TYPE } from "@mantine/dropzone";
 import { notifications } from "@mantine/notifications";
@@ -27,6 +28,7 @@ export interface FormProps {
 
 export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 	const router = useRouter();
+	const { userId } = useAuth();
 	const {
 		handleSubmit,
 		setValue,
@@ -77,18 +79,28 @@ export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 					color: "red",
 				});
 			}
+			if (!userId) {
+				return notifications.show({
+					title: "Erro",
+					message: "Faça login ou recarregue a página.",
+					color: "red",
+				});
+			}
 
 			const body = new FormData();
 			body.append("file", file);
 
-			const result = await upload({
-				blobs: body,
-				book,
-				isbn: fields.isbn,
-				disciplines: fields.disciplines,
-				topics: fields.topics,
-				semester: fields.semester,
-			});
+			const result = await upload(
+				{
+					blobs: body,
+					book,
+					isbn: fields.isbn,
+					disciplines: fields.disciplines,
+					topics: fields.topics,
+					semester: fields.semester,
+				},
+				userId,
+			);
 
 			if (result.success) {
 				notifications.show({
@@ -104,7 +116,7 @@ export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 				color: "red",
 			});
 		},
-		[book, file, router],
+		[book, file, router, userId],
 	);
 
 	return (

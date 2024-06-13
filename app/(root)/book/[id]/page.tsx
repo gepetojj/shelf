@@ -4,24 +4,15 @@ import { MdFilePresent } from "react-icons/md";
 
 import { AppHeader } from "@/components/ui/app-header";
 import { Layout } from "@/components/ui/layout";
-import type { Book as IBook } from "@/entities/Book";
-import type { Comment as IComment } from "@/entities/Comment";
-import { query, resolver } from "@/lib/query";
+import { api } from "@/trpc/server";
 import { Spoiler } from "@mantine/core";
 
-import { Book } from "./_components/Book";
-import { Comment } from "./_components/Comment";
-import { CreateComment } from "./_components/CreateComment";
+import { Book } from "./_components/book";
+import { Comment } from "./_components/comment";
+import { CreateComment } from "./_components/create-comment";
 
 export default async function Page({ params }: Readonly<{ params: { id: string } }>) {
-	const [booksRef, commentsRef] = await Promise.all([
-		query<IBook>("books").id(params.id).get(),
-		query<IComment>("comments").where("bookId", "==", params.id).get(),
-	]);
-
-	const book = booksRef.data();
-	const comments = resolver(commentsRef.docs);
-	if (!booksRef.exists || !book) return notFound();
+	const { book, comments } = await api.files.one({ id: params.id }).catch(() => notFound());
 
 	return (
 		<Layout>
@@ -49,7 +40,7 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 							</Spoiler>
 						</div>
 						<div className="text-light break-words text-sm text-neutral-300">
-							<h4 className="break-words">ISBN: {book.isbn13 || book.isbn10}</h4>
+							<h4 className="break-words">ISBN: {book.isbn || "Não informado"}</h4>
 							<h4 className="break-words">Semestre: {book.semester}º Semestre</h4>
 							<h4 className="break-words">
 								Disciplina(s):{" "}
@@ -85,8 +76,7 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 								>
 									<MdFilePresent className="text-xl" />
 									<span className="break-words font-light">
-										{book.title.toLocaleLowerCase("en").replaceAll(" ", "-")}.
-										{file.fullname.split(".")[1]}
+										{file.filename}.{file.extension}
 									</span>
 								</li>
 							))}
@@ -98,13 +88,13 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 						<ul className="flex w-full flex-col gap-2 pt-2">
 							{comments.length ? (
 								comments
-									.filter(comment => !comment.parentId)
+									.filter(comment => !comment.parentCommentId)
 									.map(comment => (
 										<Comment
 											key={comment.id}
 											{...{
 												comment,
-												responses: comments.filter(val => val.parentId === comment.id),
+												responses: comments.filter(val => val.parentCommentId === comment.id),
 											}}
 										/>
 									))

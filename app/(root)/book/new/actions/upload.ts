@@ -1,10 +1,17 @@
 "use server";
 
+import { fileTypeFromBuffer } from "file-type";
+import { Logger } from "winston";
 import { z } from "zod";
 
+import { Book } from "@/core/domain/entities/book";
+import { FileReference } from "@/core/domain/entities/file-reference";
+import { DatabaseRepository } from "@/core/domain/repositories/database.repository";
+import { StorageRepository } from "@/core/domain/repositories/storage.repository";
+import { Registry } from "@/core/infra/container/registry";
+import { container } from "@/core/infra/container/server-only";
 import { megaToBytes } from "@/lib/bytes";
-import { createBook } from "@/pages/api/post/createBook";
-import { uploadFile } from "@/pages/api/post/uploadFile";
+import { now } from "@/lib/time";
 
 const inputs = z.object({
 	isbn: z.string(),
@@ -38,31 +45,73 @@ type Outputs = {
 	message: string;
 };
 
-export const upload = async (form: Omit<z.infer<typeof inputs>, "file"> & { blobs: FormData }): Promise<Outputs> => {
+const database = container.get<DatabaseRepository>(Registry.DatabaseRepository);
+const storage = container.get<StorageRepository>(Registry.StorageRepository);
+const logger = container.get<Logger>(Registry.Logger);
+
+export const upload = async (
+	form: Omit<z.infer<typeof inputs>, "file"> & { blobs: FormData },
+	uid: string,
+): Promise<Outputs> => {
 	try {
 		const blobs = Object.fromEntries(form.blobs);
-		console.log(blobs);
 		const data = inputs.parse({ ...form, file: blobs.file });
 
-		const book = createBook({ data });
-		const { file, rollback } = await uploadFile({
-			file: data.file,
-			uploader: "asd",
-			bookId: book.id,
+		const bookId = crypto.randomUUID();
+		const filename = data.book.title.toLocaleLowerCase("en").replaceAll(" ", "-");
+
+		const file = Buffer.from(await data.file.arrayBuffer());
+		const fileType = await fileTypeFromBuffer(file);
+		const extension = fileType?.ext || "pdf";
+
+		const reference = FileReference.fromJSON({
+			id: crypto.randomUUID(),
+			referenceId: bookId,
+			filename,
+			extension,
+			path: `pdfs/${filename}.${extension}`,
+			mimetype: data.file.type,
+			byteSize: data.file.size,
+			uploadedById: uid,
+			uploadedAt: now(),
 		});
 
-		// try {
-		// 	await query("books")
-		// 		.id(book.id)
-		// 		.create({
-		// 			...book,
-		// 			files: [file],
-		// 		});
-		// } catch (err) {
-		// 	console.error("Erro ao tentar criar o registro do livro.");
-		// 	console.debug(err);
-		// 	await rollback();
-		// }
+		const book = Book.fromJSON({
+			id: bookId,
+			title: data.book.title,
+			description: data.book.description || "",
+			authors: data.book.authors,
+			pages: data.book.pages,
+			semester: data.semester,
+			disciplines: data.disciplines,
+			topics: data.topics,
+			defaultFile: reference.id,
+			files: [reference],
+			uploaderId: uid,
+			uploadedAt: now(),
+			subtitle: data.book.subtitle || "",
+			publishers: data.book.publishers || [],
+			isbn: data.book.globalIdentifier || "",
+			thumbnail: {
+				small: data.book.thumbnailUrl || "",
+				large: data.book.thumbnailUrl || "",
+			},
+		});
+
+		try {
+			await storage.create(reference.path, file);
+		} catch (err: any) {
+			logger.error("Failed to create file in storage", { reference, err });
+			return { success: false, message: err.message || "Houve um erro inesperado." };
+		}
+
+		try {
+			await database.create("books", book.id, book);
+		} catch (err: any) {
+			logger.error("Failed to register file", { book, err });
+			await storage.delete(reference.path);
+			return { success: false, message: err.message || "Houve um erro inesperado." };
+		}
 
 		return { success: true, message: "Livro enviado com sucesso." };
 	} catch (err: any) {

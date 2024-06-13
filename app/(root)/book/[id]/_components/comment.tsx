@@ -6,26 +6,26 @@ import { memo } from "react";
 import { MdArrowDropDown } from "react-icons/md";
 
 import { Time } from "@/components/ui/time";
-import type { Comment as IComment } from "@/entities/Comment";
+import { FileCommentProps } from "@/core/domain/entities/file-comment";
 import { Collapse, Popover } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
-import { CreateComment } from "./CreateComment";
+import { CreateComment } from "./create-comment";
 
 export interface CommentProps {
-	comment: IComment;
-	responses?: IComment[];
+	comment: FileCommentProps;
+	responses?: FileCommentProps[];
 }
 
-export const Comment: React.FC<CommentProps> = memo(function Component({ comment, responses }) {
+export const Comment: React.FC<CommentProps> = memo(function Comment({ comment, responses }) {
 	const [responsesOpen, { toggle }] = useDisclosure(false);
 
 	return (
 		<li className="flex w-full gap-2 py-1 text-sm">
 			<div className="flex h-full items-start justify-start">
 				<Image
-					alt={`Imagem da conta de ${comment.creator.name}`}
-					src={comment.creator.iconUrl}
+					alt={`Imagem da conta de ${comment.creatorId}`}
+					src={comment.creatorId}
 					width={32}
 					height={32}
 					className="rounded-full"
@@ -33,7 +33,7 @@ export const Comment: React.FC<CommentProps> = memo(function Component({ comment
 			</div>
 			<div className="flex flex-col">
 				<header className="flex w-full gap-1 truncate">
-					<span className="font-semibold">{comment.creator.name}</span>
+					<span className="font-semibold">{comment.creatorId}</span>
 					<span className="text-neutral-400">
 						<Time milliseconds={comment.createdAt} />
 					</span>
@@ -54,8 +54,8 @@ export const Comment: React.FC<CommentProps> = memo(function Component({ comment
 						</Popover.Target>
 						<Popover.Dropdown>
 							<CreateComment
-								bookId={comment.bookId}
-								parentId={comment.parentId || comment.id}
+								bookId={comment.fileId}
+								parentId={comment.parentCommentId || comment.id}
 								asResponse
 							/>
 						</Popover.Dropdown>
@@ -65,6 +65,7 @@ export const Comment: React.FC<CommentProps> = memo(function Component({ comment
 					<>
 						<div>
 							<button
+								type="button"
 								onClick={toggle}
 								className="flex items-center gap-1 rounded-2xl px-3 py-2 text-[var(--mantine-color-anchor)] duration-150 hover:bg-main-foreground"
 							>

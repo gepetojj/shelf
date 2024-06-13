@@ -6,7 +6,7 @@ export type FileReferenceProps = {
 	extension: string;
 	path: string;
 
-	mimetype: `${string}/${string}`;
+	mimetype: string;
 	byteSize: number;
 
 	uploadedById: string;

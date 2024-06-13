@@ -19,7 +19,11 @@ export interface CreateCommentProps {
 	asResponse?: boolean;
 }
 
-export const CreateComment: React.FC<CreateCommentProps> = memo(function Component({ bookId, parentId, asResponse }) {
+export const CreateComment: React.FC<CreateCommentProps> = memo(function CreateComment({
+	bookId,
+	parentId,
+	asResponse,
+}) {
 	const { register, handleSubmit } = useForm<Fields>({ defaultValues: { bookId, parentId } });
 	const [loading, setLoading] = useState(false);
 	const { refresh } = useRouter();

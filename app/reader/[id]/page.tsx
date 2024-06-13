@@ -2,22 +2,11 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { PDFViewer } from "@/components/ui/pdf-viewer";
-import type { Book } from "@/entities/Book";
-import { query } from "@/lib/query";
+import { api } from "@/trpc/server";
 import { Loader } from "@mantine/core";
 
-import { Reader } from "./_components/Reader";
-
 export default async function Page({ params }: Readonly<{ params: { id: string } }>) {
-	const info = await query<Book>("books").id(params.id).get();
-	const book = info.data();
-
-	if (!info.exists || !book) return notFound();
-
-	// const progressInfo = await query<Progress>("progress")
-	// 	.id(session.user.id || "")
-	// 	.get();
-	// const progress = progressInfo.data();
+	const { book } = await api.files.one({ id: params.id }).catch(() => notFound());
 
 	return (
 		<div className="flex flex-col gap-5">
@@ -59,7 +48,7 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 						book={book}
 						location={undefined}
 					/> */}
-					<PDFViewer location={book.files[0].location} />
+					<PDFViewer location={book.files[0].path} />
 				</Suspense>
 			</section>
 		</div>
