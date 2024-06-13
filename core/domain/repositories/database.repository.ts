@@ -1,9 +1,11 @@
 import { BookProps } from "../entities/book";
 import { FileCommentProps } from "../entities/file-comment";
+import { UserProps } from "../entities/user";
 
 export interface Collections {
 	books: BookProps;
 	file_comments: FileCommentProps;
+	users: UserProps;
 }
 
 export type Collection = keyof Collections;

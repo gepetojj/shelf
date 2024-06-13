@@ -21,9 +21,10 @@ export default async function Layout({
 								elements: {
 									rootBox: "w-full flex justify-end",
 									userButtonBox: "flex items-center justify-end w-full flex-row-reverse",
-									userButtonOuterIdentifier: "hidden home-break:inline",
+									userButtonOuterIdentifier:
+										"hidden home-break:inline text-white !text-base font-nunito-sans",
 									userButtonTrigger:
-										"home-break:w-full rounded-2xl shadow-sm px-4 py-1.5 text-white bg-neutral-900/50 duration-200 hover:brightness-110",
+										"rounded-3xl shadow-sm px-4 py-1.5 duration-200 hover:bg-neutral-800 home-break:w-full",
 								},
 							}}
 						/>
