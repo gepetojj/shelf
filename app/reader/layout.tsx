@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import logo from "@/public/logo.svg";
+import logo from "@/public/logo.png";
 
 import { Settings } from "./_components/Settings";
 
@@ -16,11 +16,14 @@ export default async function Layout({
 				id="reader-header"
 				className="flex w-full items-center justify-between px-7 py-5"
 			>
-				<Link href="/app">
+				<Link href="/">
 					<Image
 						src={logo}
-						alt="Logo do Shelf. Descrição: Ícone amarelo formado por círculos e retângulos desenhando a letra 'S', ao lado esquerdo do texto escrito 'Shelf.'."
+						alt="Logo do Shelf."
+						aria-description="Ícone amarelo formado por círculos e retângulos desenhando a letra 'S', ao lado esquerdo do texto escrito 'Shelf'."
 						className="max-w-[100px] select-none"
+						placeholder="blur"
+						priority
 					/>
 				</Link>
 				<Settings />

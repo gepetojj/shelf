@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { memo } from "react";
 
-import logo from "@/public/logo.svg";
+import logo from "@/public/logo.png";
 import { Tooltip } from "@mantine/core";
 
 export const AppHeader: React.FC = memo(function AppHeader({}) {
@@ -9,8 +9,11 @@ export const AppHeader: React.FC = memo(function AppHeader({}) {
 		<header className="flex w-full select-none items-center justify-center pb-6 pt-2">
 			<Image
 				src={logo}
-				alt="Logo do Shelf. Descrição: Ícone amarelo formado por círculos e retângulos desenhando a letra 'S', ao lado esquerdo do texto escrito 'Shelf.'."
+				alt="Logo do Shelf."
+				aria-description="Ícone amarelo formado por círculos e retângulos desenhando a letra 'S', ao lado esquerdo do texto escrito 'Shelf'."
 				className="max-w-[110px]"
+				placeholder="blur"
+				priority
 			/>
 			<div className="flex h-full justify-start pl-2">
 				<Tooltip
