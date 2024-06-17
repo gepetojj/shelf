@@ -27,6 +27,16 @@ export class Book extends File {
 		this.thumbnail = props.thumbnail;
 	}
 
+	toJSON(): BookProps {
+		return {
+			...super.toJSON(),
+			subtitle: this.subtitle,
+			publishers: this.publishers,
+			isbn: this.isbn,
+			thumbnail: this.thumbnail,
+		};
+	}
+
 	static fromJSON(json: BookProps): Book {
 		return new Book(json);
 	}

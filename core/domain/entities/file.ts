@@ -69,19 +69,6 @@ export abstract class File {
 	}
 
 	toJSON(): FileProps {
-		return {
-			id: this.id,
-			title: this.title,
-			description: this.description,
-			authors: this.authors,
-			pages: this.pages,
-			semester: this.semester,
-			disciplines: this.disciplines,
-			topics: this.topics,
-			defaultFile: this.defaultFile,
-			files: this.files,
-			uploaderId: this.uploaderId,
-			uploadedAt: this.uploadedAt,
-		};
+		return this.props;
 	}
 }

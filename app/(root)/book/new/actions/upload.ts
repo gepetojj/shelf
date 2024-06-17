@@ -14,7 +14,6 @@ import { megaToBytes } from "@/lib/bytes";
 import { now } from "@/lib/time";
 
 const inputs = z.object({
-	isbn: z.string(),
 	semester: z.coerce.number().min(1).max(10),
 	disciplines: z.array(z.string()),
 	topics: z.array(z.string()),
@@ -69,7 +68,7 @@ export const upload = async (
 			referenceId: bookId,
 			filename,
 			extension,
-			path: `pdfs/${filename}.${extension}`,
+			path: `files/${bookId}/${filename}.${extension}`,
 			mimetype: data.file.type,
 			byteSize: data.file.size,
 			uploadedById: uid,
@@ -86,7 +85,7 @@ export const upload = async (
 			disciplines: data.disciplines,
 			topics: data.topics,
 			defaultFile: reference.id,
-			files: [reference],
+			files: [reference.toJSON()],
 			uploaderId: uid,
 			uploadedAt: now(),
 			subtitle: data.book.subtitle || "",
@@ -106,7 +105,7 @@ export const upload = async (
 		}
 
 		try {
-			await database.create("books", book.id, book);
+			await database.create("books", book.id, book.toJSON() as any);
 		} catch (err: any) {
 			logger.error("Failed to register file", { book, err });
 			await storage.delete(reference.path);
@@ -121,6 +120,7 @@ export const upload = async (
 				message: err.errors[0].message || "Verifique os dados enviados e tente novamente.",
 			};
 		}
+		logger.error("Failed to upload book", { uid, err });
 		return { success: false, message: err?.message || "Não foi possível fazer upload do livro. Tente novamente." };
 	}
 };

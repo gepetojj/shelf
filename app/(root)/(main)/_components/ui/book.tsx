@@ -58,7 +58,7 @@ export const Book: React.FC<BookComponentProps> = memo(function Book({ book }) {
 									type: "conjunction",
 								}).format(book.authors)}
 							</span>
-							<span>ISBN: {book.isbn13 || book.isbn10}</span>
+							<span>ISBN: {book.isbn}</span>
 						</div>
 						<div className="flex flex-col">
 							<span>Semestre: {book.semester}º Semestre</span>

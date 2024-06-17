@@ -92,12 +92,11 @@ export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
 
 			const result = await upload(
 				{
-					blobs: body,
-					book,
-					isbn: fields.isbn,
+					semester: fields.semester,
 					disciplines: fields.disciplines,
 					topics: fields.topics,
-					semester: fields.semester,
+					blobs: body,
+					book,
 				},
 				userId,
 			);

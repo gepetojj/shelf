@@ -79,7 +79,7 @@ export const ISBNSearch: React.FC<ISBNSearchProps> = memo(function ISBNSearch({ 
 								key={option.globalIdentifier}
 								className="flex w-full flex-col break-words rounded-md p-2 text-left text-sm leading-tight duration-200 hover:bg-main-foreground"
 								onClick={() => {
-									setSelected(option);
+									setSelected(option.toJSON());
 									setValue("title", option.title);
 									close();
 								}}
