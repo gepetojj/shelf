@@ -22,7 +22,7 @@ export default async function Layout({
 									rootBox: "w-full flex justify-end",
 									userButtonBox: "flex items-center justify-end w-full flex-row-reverse",
 									userButtonOuterIdentifier:
-										"hidden home-break:inline text-white !text-base font-nunito-sans",
+										"hidden home-break:inline text-white !text-base font-nunito-sans truncate",
 									userButtonTrigger:
 										"rounded-3xl shadow-sm px-4 py-1.5 duration-200 hover:bg-neutral-800 home-break:w-full",
 								},

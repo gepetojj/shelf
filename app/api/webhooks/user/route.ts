@@ -86,4 +86,4 @@ router.get(async req => {
 });
 
 const handler = router.handler(handlerConfig);
-export { handler as GET };
+export { handler as POST };

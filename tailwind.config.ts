@@ -13,9 +13,9 @@ const config = {
 		extend: {
 			colors: {
 				main: {
-					DEFAULT: "#ffcb74",
-					background: "#111111",
-					foreground: "#2f2f2f",
+					DEFAULT: "#F5E02F",
+					background: "#1C1C1C",
+					foreground: "#262626",
 					contrast: "#f6f6f6",
 				},
 			},
