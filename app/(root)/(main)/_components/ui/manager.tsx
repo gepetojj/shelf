@@ -53,9 +53,10 @@ export const Manager: React.FC = memo(function Manager() {
 					}
 				>
 					{content.length > 0 ? (
-						content.map(book => (
+						content.map((book, index) => (
 							<Book
 								key={book.id}
+								index={index}
 								{...{ book }}
 							/>
 						))

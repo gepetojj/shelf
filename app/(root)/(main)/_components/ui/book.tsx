@@ -8,9 +8,10 @@ import { IconDots } from "@tabler/icons-react";
 
 type BookComponentProps = {
 	book: BookProps;
+	index: number;
 };
 
-export const Book: React.FC<BookComponentProps> = memo(function Book({ book }) {
+export const Book: React.FC<BookComponentProps> = memo(function Book({ book, index }) {
 	return (
 		<li className="relative flex w-full flex-col gap-4 rounded-xl bg-main-foreground p-4 duration-100 animate-in fade-in-20 hover:brightness-90">
 			<div className="z-[1] h-full w-full">
@@ -22,6 +23,7 @@ export const Book: React.FC<BookComponentProps> = memo(function Book({ book }) {
 							width={34}
 							height={34}
 							className="rounded-full"
+							loading="lazy"
 						/>
 						<span className="truncate pl-1">
 							{
@@ -86,6 +88,7 @@ export const Book: React.FC<BookComponentProps> = memo(function Book({ book }) {
 								width={100}
 								height={136}
 								className="max-h-[136px] max-w-[100px] rounded-sm object-cover"
+								loading={index <= 5 ? "eager" : "lazy"}
 							/>
 						)}
 					</div>
@@ -100,6 +103,7 @@ export const Book: React.FC<BookComponentProps> = memo(function Book({ book }) {
 						width={120}
 						height={163}
 						className="h-full w-full rounded-xl object-cover opacity-10"
+						loading={index <= 5 ? "eager" : "lazy"}
 					/>
 				</div>
 			)}
