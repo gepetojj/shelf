@@ -22,7 +22,7 @@ const getHandlerHeaders = z.object({
 const database = container.get<DatabaseRepository>(Registry.DatabaseRepository);
 const logger = container.get<Logger>(Registry.Logger);
 
-router.get(async req => {
+router.post(async req => {
 	const payloadHeaders = headers();
 	const { id, timestamp, signature } = getHandlerHeaders.parse({
 		id: payloadHeaders.get("svix-id"),
