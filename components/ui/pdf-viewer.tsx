@@ -6,18 +6,12 @@ import { MdArrowLeft, MdArrowRight } from "react-icons/md";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
+import { useSwipeable } from "react-swipeable";
 
 import { getURL } from "@/lib/url";
 import { Loader } from "@mantine/core";
 import { useHotkeys } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-
-type RefProxy = {
-	num: number;
-	gen: number;
-};
-type ResolvedDest = (RefProxy | number)[];
-type Dest = Promise<ResolvedDest> | ResolvedDest | string | null;
 
 export type PDFViewerProps = {
 	location: string;
@@ -99,6 +93,12 @@ export const PDFViewer: React.FC<PDFViewerProps> = memo(function PDFViewer({ loc
 		["ArrowRight", next],
 	]);
 
+	const swipeHandlers = useSwipeable({
+		onSwipedLeft: next,
+		onSwipedRight: prev,
+		preventScrollOnSwipe: true,
+	});
+
 	useEffect(() => {
 		if (typeof window === "undefined") return;
 		const readerProgress = document.getElementById("reader-progress");
@@ -114,7 +114,10 @@ export const PDFViewer: React.FC<PDFViewerProps> = memo(function PDFViewer({ loc
 		<>
 			<button
 				type="button"
-				className="fixed left-0 z-10 flex h-full w-[40%] items-center justify-center rounded-md p-1 duration-200 break-reader:static break-reader:h-auto break-reader:w-auto break-reader:hover:bg-main-foreground"
+				className={
+					"hidden h-full w-[40%] items-center justify-center rounded-md p-1 duration-200" +
+					"break-reader:static break-reader:flex break-reader:h-auto break-reader:w-auto break-reader:hover:bg-main-foreground"
+				}
 				onClick={prev}
 			>
 				<span className="sr-only">Botão para ir à página anterior</span>
@@ -124,6 +127,7 @@ export const PDFViewer: React.FC<PDFViewerProps> = memo(function PDFViewer({ loc
 				/>
 			</button>
 			<div
+				{...swipeHandlers}
 				className="h-full w-full max-w-[800px]"
 				style={{ height: `${availableHeight}px` }}
 			>
@@ -170,7 +174,10 @@ export const PDFViewer: React.FC<PDFViewerProps> = memo(function PDFViewer({ loc
 						loading={
 							<div
 								className="bg-white"
-								style={{ height: `${availableHeight}px`, width: `${availableHeight * 0.66}px` }}
+								style={{
+									height: `${availableHeight}px`,
+									width: `${availableHeight * 0.66}px`,
+								}}
 							/>
 						}
 						noData={<Placeholder height={availableHeight} />}
@@ -186,7 +193,10 @@ export const PDFViewer: React.FC<PDFViewerProps> = memo(function PDFViewer({ loc
 			</div>
 			<button
 				type="button"
-				className="fixed right-0 z-10 flex h-full w-[40%] items-center justify-center rounded-md p-1 duration-200 break-reader:static break-reader:h-auto break-reader:w-auto break-reader:hover:bg-main-foreground"
+				className={
+					"hidden h-full w-[40%] items-center justify-center rounded-md p-1 duration-200" +
+					"break-reader:static break-reader:flex break-reader:h-auto break-reader:w-auto break-reader:hover:bg-main-foreground"
+				}
 				onClick={next}
 			>
 				<span className="sr-only">Botão para ir à página seguinte</span>
