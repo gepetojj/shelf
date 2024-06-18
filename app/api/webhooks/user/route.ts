@@ -83,6 +83,8 @@ router.post(async req => {
 				await database.update("users", user.id, user);
 			}
 	}
+
+	return new Response("OK", { status: 200 });
 });
 
 const handler = router.handler(handlerConfig);
