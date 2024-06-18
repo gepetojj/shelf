@@ -11,6 +11,7 @@ export default async function Layout({
 }>) {
 	return (
 		<section className="flex h-full min-h-screen w-full gap-4 py-10">
+			{/* Navegação para telas maiores */}
 			<aside className="sticky hidden w-full max-w-[8rem] flex-col items-end justify-between home-break-mobile:flex home-break:w-[30%] home-break:max-w-full">
 				<AppNav />
 				<div className="sticky bottom-10 flex w-full max-w-56 select-none justify-end home-break:w-52">
@@ -52,6 +53,7 @@ export default async function Layout({
 				</div>
 			</aside>
 
+			{/* Navegação para telas menores */}
 			<div className="fixed bottom-0 z-10 inline w-full border-t border-t-white/10 bg-main-foreground p-2 animate-in slide-in-from-bottom-2 home-break-mobile:hidden">
 				<AppNav />
 			</div>

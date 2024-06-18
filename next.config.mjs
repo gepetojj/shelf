@@ -17,7 +17,7 @@ const nextConfig = {
 		],
 	},
 	experimental: {
-		optimizePackageImports: ["@mantine/core", "@mantine/hooks"],
+		optimizePackageImports: ["@mantine/core", "@mantine/hooks", "react-pdf", "pdfjs-dist"],
 	},
 	webpack: config => {
 		config.resolve.alias.canvas = false;

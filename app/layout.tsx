@@ -6,6 +6,7 @@ import { ThemesProvider } from "@/components/logic/themes-provider";
 import { TRPCReactProvider } from "@/trpc/react";
 import { ptBR } from "@clerk/localizations";
 import { ClerkProvider } from "@clerk/nextjs";
+import { ColorSchemeScript } from "@mantine/core";
 import "@mantine/core/styles.css";
 import { Notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";
@@ -34,6 +35,9 @@ export default async function Layout({
 	return (
 		<ClerkProvider localization={ptBR}>
 			<html lang="pt-br">
+				<head>
+					<ColorSchemeScript />
+				</head>
 				<TRPCReactProvider>
 					<body className={clsx("min-h-screen bg-main-background text-white antialiased", nunito.className)}>
 						<ThemesProvider>
