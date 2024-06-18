@@ -7,7 +7,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { api } from "@/trpc/react";
 import { Drawer, Loader } from "@mantine/core";
 
-import { useContext } from "../Context";
+import { useContext } from "../context";
 import { Book } from "./book";
 
 const Filters = dynamic(() => import("../layout/filters").then(mod => mod.Filters));

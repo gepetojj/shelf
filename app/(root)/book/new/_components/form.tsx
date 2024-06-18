@@ -26,7 +26,7 @@ export interface FormProps {
 	isbn?: string;
 }
 
-export const Form: React.FC<FormProps> = memo(function Component({ isbn }) {
+export const Form: React.FC<FormProps> = memo(function Form({ isbn }) {
 	const router = useRouter();
 	const { userId } = useAuth();
 	const {

@@ -5,9 +5,9 @@ import { memo } from "react";
 import { unique } from "@/lib/unique";
 import { Select } from "@mantine/core";
 
-import { useContext } from "../Context";
+import { useContext } from "../context";
 
-export const Filters: React.FC = memo(function Component() {
+export const Filters: React.FC = memo(function Filters() {
 	const { semester, discipline, topic } = useContext();
 
 	// const disciplines = useMemo(

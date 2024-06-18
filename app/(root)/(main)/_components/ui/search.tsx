@@ -5,7 +5,7 @@ import { memo, useCallback } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { MdSearch, MdSettings } from "react-icons/md";
 
-import { useContext } from "../Context";
+import { useContext } from "../context";
 
 interface Fields {
 	query: string;

@@ -1,7 +1,7 @@
 import { AppHeader } from "@/components/ui/app-header";
 import { Layout } from "@/components/ui/layout";
 
-import { ContextProvider } from "./_components/Context";
+import { ContextProvider } from "./_components/context";
 import { Filters } from "./_components/layout/filters";
 import { Search } from "./_components/ui/search";
 

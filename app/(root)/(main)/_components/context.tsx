@@ -25,7 +25,7 @@ export interface ContextProps {
 
 export const Context = createContext<Context>(undefined!);
 
-export const ContextProvider: React.FC<React.PropsWithChildren<ContextProps>> = memo(function Component({
+export const ContextProvider: React.FC<React.PropsWithChildren<ContextProps>> = memo(function ContextProvider({
 	children,
 	value,
 }) {
