@@ -13,14 +13,6 @@ import { CreateComment } from "./_components/create-comment";
 
 export const revalidate = 60;
 
-export async function generateStaticParams() {
-	const { books } = await api.files.list({ offset: 20 }).catch(() => ({ books: [] }));
-
-	return books.map(book => ({
-		slug: book.id,
-	}));
-}
-
 export default async function Page({ params }: Readonly<{ params: { id: string } }>) {
 	const { book, comments } = await api.files.one({ id: params.id }).catch(() => notFound());
 
