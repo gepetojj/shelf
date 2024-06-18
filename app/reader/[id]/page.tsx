@@ -15,10 +15,10 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 				className="flex flex-col items-center px-6"
 			>
 				<span className="w-full truncate text-center text-sm text-neutral-400">
-					Você está lendo {book.title}
+					Você está lendo &quot;{book.title}&quot;
 				</span>
-				<div className="hidden w-full max-w-xs items-center gap-2">
-					<div className="h-4 w-full rounded-xl bg-main-foreground duration-100">
+				<div className="flex w-full max-w-xs items-center gap-2">
+					<div className="h-3 w-full rounded-xl bg-main-foreground duration-100">
 						<div
 							id="reader-progress"
 							className="h-full w-0 animate-progress-in rounded-xl bg-main duration-100"
@@ -44,10 +44,6 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 						</div>
 					}
 				>
-					{/* <Reader
-						book={book}
-						location={undefined}
-					/> */}
 					<PDFViewer location={book.files[0].path} />
 				</Suspense>
 			</section>
