@@ -1,10 +1,10 @@
 "use client";
 
-import { memo, useCallback } from "react";
-import { MdMenu } from "react-icons/md";
+import { memo } from "react";
 
 import { Drawer } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { IconMenu } from "@tabler/icons-react";
 
 export const Settings: React.FC = memo(function Component({}) {
 	const [opened, { toggle, close }] = useDisclosure(false);
@@ -22,8 +22,8 @@ export const Settings: React.FC = memo(function Component({}) {
 				onClick={toggle}
 			>
 				<span className="sr-only">Botão para abrir as opções de leitura.</span>
-				<MdMenu
-					className="text-xl"
+				<IconMenu
+					size={20}
 					aria-hidden="true"
 				/>
 			</button>

@@ -1,8 +1,7 @@
-import { IoMdLogIn } from "react-icons/io";
-
 import { AppNav } from "@/components/ui/app-nav";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Button } from "@mantine/core";
+import { IconLogin2 } from "@tabler/icons-react";
 
 export default async function Layout({
 	children,
@@ -37,14 +36,14 @@ export default async function Layout({
 									<Button
 										className="min-w-full shadow-sm"
 										radius="xl"
-										rightSection={<IoMdLogIn className="text-xl" />}
+										rightSection={<IconLogin2 size={20} />}
 									>
 										Entre já
 									</Button>
 								</div>
 								<div className="home-break:hidden">
 									<Button radius="xl">
-										<IoMdLogIn className="text-xl" />
+										<IconLogin2 size={20} />
 									</Button>
 								</div>
 							</div>

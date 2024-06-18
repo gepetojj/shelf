@@ -3,7 +3,8 @@
 import { useRouter } from "next/navigation";
 import { memo, useCallback } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
-import { MdSearch, MdSettings } from "react-icons/md";
+
+import { IconSearch, IconSettings } from "@tabler/icons-react";
 
 import { useContext } from "../context";
 
@@ -43,7 +44,7 @@ export const Search: React.FC = memo(function Search() {
 					className="flex items-center justify-center rounded-r-xl bg-main p-1 px-1.5 text-black duration-200 hover:brightness-90"
 				>
 					<span className="sr-only">Botão para executar pesquisa.</span>
-					<MdSearch className="text-xl" />
+					<IconSearch size={20} />
 				</button>
 			</div>
 			<div className="inline home-break:hidden">
@@ -53,7 +54,7 @@ export const Search: React.FC = memo(function Search() {
 					onClick={drawerActions.toggle}
 					className="rounded-md p-2 duration-200 hover:bg-neutral-800"
 				>
-					<MdSettings className="text-xl" />
+					<IconSettings size={20} />
 				</button>
 			</div>
 		</form>

@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { MdFilePresent } from "react-icons/md";
 
 import { AppHeader } from "@/components/ui/app-header";
 import { Layout } from "@/components/ui/layout";
 import { api } from "@/trpc/server";
 import { Spoiler } from "@mantine/core";
+import { IconFile } from "@tabler/icons-react";
 
 import { Book } from "./_components/book";
 import { Comment } from "./_components/comment";
@@ -74,7 +74,7 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 									key={file.id}
 									className="flex items-center gap-2 rounded-xl bg-main-foreground px-3 py-2"
 								>
-									<MdFilePresent className="text-xl" />
+									<IconFile size={20} />
 									<span className="break-words font-light">
 										{file.filename}.{file.extension}
 									</span>

@@ -1,9 +1,11 @@
+import dynamic from "next/dynamic";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
-import { PDFViewer } from "@/components/ui/pdf-viewer";
 import { api } from "@/trpc/server";
 import { Loader } from "@mantine/core";
+
+const PDFViewer = dynamic(import("@/components/ui/pdf-viewer").then(mod => mod.PDFViewer));
 
 export default async function Page({ params }: Readonly<{ params: { id: string } }>) {
 	const { book } = await api.files.one({ id: params.id }).catch(() => notFound());

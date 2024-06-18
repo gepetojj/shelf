@@ -1,10 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { memo } from "react";
-import { MdMoreHoriz } from "react-icons/md";
 
 import { Time } from "@/components/ui/time";
 import { BookProps } from "@/core/domain/entities/book";
+import { IconDots } from "@tabler/icons-react";
 
 type BookComponentProps = {
 	book: BookProps;
@@ -38,7 +38,7 @@ export const Book: React.FC<BookComponentProps> = memo(function Book({ book }) {
 						type="button"
 						title="Configurações do post"
 					>
-						<MdMoreHoriz
+						<IconDots
 							className="text-2xl text-neutral-400"
 							aria-hidden="true"
 						/>

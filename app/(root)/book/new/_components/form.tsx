@@ -3,16 +3,14 @@
 import { useRouter } from "next/navigation";
 import { memo, useCallback, useState } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
-import { LuFileCheck2 } from "react-icons/lu";
-import { MdFileUploadOff, MdUpload } from "react-icons/md";
 
 import { FileExternalProps } from "@/core/domain/entities/file-external";
 import { useAuth } from "@clerk/nextjs";
 import { Button, Group, Select, TagsInput } from "@mantine/core";
 import { Dropzone, PDF_MIME_TYPE } from "@mantine/dropzone";
 import { notifications } from "@mantine/notifications";
+import { IconFileCheck, IconFileIsr, IconFileX } from "@tabler/icons-react";
 
-import { upload } from "../actions/upload";
 import { ISBNSearch } from "./isbn-search";
 
 interface Fields {
@@ -90,6 +88,7 @@ export const Form: React.FC<FormProps> = memo(function Form({ isbn }) {
 			const body = new FormData();
 			body.append("file", file);
 
+			const { upload } = await import("../actions/upload");
 			const result = await upload(
 				{
 					semester: fields.semester,
@@ -201,13 +200,13 @@ export const Form: React.FC<FormProps> = memo(function Form({ isbn }) {
 							mih={100}
 						>
 							<Dropzone.Accept>
-								<LuFileCheck2 className="text-5xl" />
+								<IconFileCheck size={48} />
 							</Dropzone.Accept>
 							<Dropzone.Reject>
-								<MdFileUploadOff className="text-5xl" />
+								<IconFileX size={48} />
 							</Dropzone.Reject>
 							<Dropzone.Idle>
-								<MdUpload className="text-5xl" />
+								<IconFileIsr size={48} />
 							</Dropzone.Idle>
 
 							<div className="flex flex-col">

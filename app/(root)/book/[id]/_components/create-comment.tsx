@@ -3,9 +3,9 @@
 import { useRouter } from "next/navigation";
 import { memo, useCallback, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { MdSend } from "react-icons/md";
 
 import { notifications } from "@mantine/notifications";
+import { IconSend2 } from "@tabler/icons-react";
 
 interface Fields {
 	bookId: string;
@@ -70,8 +70,8 @@ export const CreateComment: React.FC<CreateCommentProps> = memo(function CreateC
 				className="mt-5 rounded-md p-2 duration-200 hover:bg-main-foreground disabled:cursor-wait disabled:brightness-90"
 			>
 				<span className="sr-only">Botão para enviar comentário.</span>
-				<MdSend
-					className="text-xl"
+				<IconSend2
+					size={20}
 					aria-hidden
 				/>
 			</button>

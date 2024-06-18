@@ -3,12 +3,12 @@
 import clsx from "clsx/lite";
 import Image from "next/image";
 import { memo } from "react";
-import { MdArrowDropDown } from "react-icons/md";
 
 import { Time } from "@/components/ui/time";
 import { FileCommentProps } from "@/core/domain/entities/file-comment";
 import { Collapse, Popover } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { IconChevronDown } from "@tabler/icons-react";
 
 import { CreateComment } from "./create-comment";
 
@@ -69,11 +69,9 @@ export const Comment: React.FC<CommentProps> = memo(function Comment({ comment, 
 								onClick={toggle}
 								className="flex items-center gap-1 rounded-2xl px-3 py-2 text-[var(--mantine-color-anchor)] duration-150 hover:bg-main-foreground"
 							>
-								<MdArrowDropDown
-									className={clsx(
-										"text-xl transition-transform duration-100",
-										responsesOpen && "rotate-180",
-									)}
+								<IconChevronDown
+									size={20}
+									className={clsx("transition-transform duration-100", responsesOpen && "rotate-180")}
 								/>
 								{responses.length !== 1 ? `${responses.length} Respostas` : `1 Resposta`}
 							</button>

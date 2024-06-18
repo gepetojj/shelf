@@ -1,8 +1,6 @@
 "use client";
 
-import type { PDFDocumentProxy } from "pdfjs-dist/types/src/pdf";
 import { memo, useCallback, useEffect, useState } from "react";
-import { MdArrowLeft, MdArrowRight } from "react-icons/md";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -12,6 +10,7 @@ import { getURL } from "@/lib/url";
 import { Loader } from "@mantine/core";
 import { useHotkeys } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
+import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 
 export type PDFViewerProps = {
 	location: string;
@@ -72,7 +71,7 @@ export const PDFViewer: React.FC<PDFViewerProps> = memo(function PDFViewer({ loc
 		setLoading(percentage);
 	}, []);
 
-	const onLoadSuccess = useCallback((pdf: PDFDocumentProxy) => {
+	const onLoadSuccess = useCallback((pdf: { numPages: number }) => {
 		setPages(pdf.numPages);
 	}, []);
 
@@ -121,8 +120,9 @@ export const PDFViewer: React.FC<PDFViewerProps> = memo(function PDFViewer({ loc
 				onClick={prev}
 			>
 				<span className="sr-only">Botão para ir à página anterior</span>
-				<MdArrowLeft
-					className="hidden text-3xl break-reader:inline"
+				<IconChevronLeft
+					size={30}
+					className="hidden break-reader:inline"
 					aria-hidden
 				/>
 			</button>
@@ -200,8 +200,9 @@ export const PDFViewer: React.FC<PDFViewerProps> = memo(function PDFViewer({ loc
 				onClick={next}
 			>
 				<span className="sr-only">Botão para ir à página seguinte</span>
-				<MdArrowRight
-					className="hidden text-3xl break-reader:inline"
+				<IconChevronRight
+					size={30}
+					className="hidden break-reader:inline"
 					aria-hidden
 				/>
 			</button>

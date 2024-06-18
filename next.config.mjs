@@ -1,3 +1,5 @@
+import withBundleAnalyzer from "@next/bundle-analyzer";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 	reactStrictMode: true,
@@ -17,7 +19,7 @@ const nextConfig = {
 		],
 	},
 	experimental: {
-		optimizePackageImports: ["@mantine/core", "@mantine/hooks", "react-pdf", "pdfjs-dist"],
+		optimizePackageImports: ["@mantine/core", "@mantine/hooks", "react-pdf", "@tabler/icons-react"],
 	},
 	webpack: config => {
 		config.resolve.alias.canvas = false;
@@ -25,4 +27,6 @@ const nextConfig = {
 	},
 };
 
-export default nextConfig;
+export default withBundleAnalyzer({
+	enabled: process.env.ANALYZE === "true",
+})(nextConfig);
