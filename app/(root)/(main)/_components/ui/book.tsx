@@ -88,7 +88,8 @@ export const Book: React.FC<BookComponentProps> = memo(function Book({ book, ind
 								width={100}
 								height={136}
 								className="max-h-[136px] max-w-[100px] rounded-sm object-cover"
-								loading={index <= 5 ? "eager" : "lazy"}
+								loading={index <= 4 ? "eager" : "lazy"}
+								priority={index <= 2}
 							/>
 						)}
 					</div>
@@ -103,7 +104,8 @@ export const Book: React.FC<BookComponentProps> = memo(function Book({ book, ind
 						width={120}
 						height={163}
 						className="h-full w-full rounded-xl object-cover opacity-10"
-						loading={index <= 5 ? "eager" : "lazy"}
+						loading={index <= 4 ? "eager" : "lazy"}
+						priority={index <= 1}
 					/>
 				</div>
 			)}
