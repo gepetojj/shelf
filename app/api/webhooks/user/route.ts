@@ -11,6 +11,8 @@ import { container } from "@/core/infra/container/server-only";
 import { api, handlerConfig } from "@/models/api";
 import { WebhookEvent } from "@clerk/nextjs/server";
 
+export const dynamic = "force-dynamic";
+
 const router = api();
 
 const getHandlerHeaders = z.object({

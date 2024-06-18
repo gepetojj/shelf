@@ -7,6 +7,8 @@ import { Registry } from "@/core/infra/container/registry";
 import { container } from "@/core/infra/container/server-only";
 import { api, handlerConfig } from "@/models/api";
 
+export const dynamic = "force-dynamic";
+
 const router = api().use(async (_req, _event, next) => {
 	const start = Date.now();
 	const res = await next();
