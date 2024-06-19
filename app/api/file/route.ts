@@ -1,5 +1,3 @@
-// import { fileTypeFromBuffer } from "file-type";
-import { Logger } from "winston";
 import { z } from "zod";
 
 import { StorageRepository } from "@/core/domain/repositories/storage.repository";
@@ -7,16 +5,7 @@ import { Registry } from "@/core/infra/container/registry";
 import { container } from "@/core/infra/container/server-only";
 import { api, handlerConfig } from "@/models/api";
 
-const router = api().use(async (_req, _event, next) => {
-	const start = Date.now();
-	const res = await next();
-	const end = Date.now();
-
-	const logger = container.get<Logger>(Registry.Logger);
-	logger.debug(`API de leitura levou ${end - start}ms`);
-
-	return res;
-});
+const router = api();
 
 const getHandlerInputs = z.object({
 	location: z.string(),
