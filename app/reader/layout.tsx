@@ -3,7 +3,8 @@ import Link from "next/link";
 
 import logo from "@/public/logo.png";
 
-import { Settings } from "./_components/Settings";
+import { Settings } from "./_components/settings";
+import { SettingsProvider } from "./_components/settings-context";
 
 export default async function Layout({
 	children,
@@ -11,7 +12,7 @@ export default async function Layout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<>
+		<SettingsProvider>
 			<header
 				id="reader-header"
 				className="flex w-full items-center justify-between px-7 py-5"
@@ -34,6 +35,6 @@ export default async function Layout({
 			>
 				{children}
 			</main>
-		</>
+		</SettingsProvider>
 	);
 }

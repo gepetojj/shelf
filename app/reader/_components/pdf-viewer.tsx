@@ -12,6 +12,8 @@ import { useHotkeys } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 
+import { useSettings } from "./settings-context";
+
 export type PDFViewerProps = {
 	location: string;
 	startPage?: number;
@@ -33,8 +35,7 @@ const Placeholder: React.FC<{ height: number }> = ({ height }) => {
 };
 
 export const PDFViewer: React.FC<PDFViewerProps> = memo(function PDFViewer({ location, startPage }) {
-	const [pages, setPages] = useState(0);
-	const [current, setCurrent] = useState(startPage || 1);
+	const { currentPage, totalPages, progress, zoom, setCurrentPage, setTotalPages } = useSettings();
 	const [loading, setLoading] = useState(0);
 	const [availableHeight, setAvailableHeight] = useState(
 		typeof document !== "undefined" ? window.screen.availHeight : 1000,
@@ -71,21 +72,27 @@ export const PDFViewer: React.FC<PDFViewerProps> = memo(function PDFViewer({ loc
 		setLoading(percentage);
 	}, []);
 
-	const onLoadSuccess = useCallback((pdf: { numPages: number }) => {
-		setPages(pdf.numPages);
-	}, []);
+	const onLoadSuccess = useCallback(
+		(pdf: { numPages: number }) => {
+			setTotalPages(pdf.numPages);
+		},
+		[setTotalPages],
+	);
 
 	const next = useCallback(() => {
-		setCurrent(prev => Math.min(prev + 1, pages));
-	}, [pages]);
+		setCurrentPage(Math.min(currentPage + 1, totalPages));
+	}, [currentPage, setCurrentPage, totalPages]);
 
 	const prev = useCallback(() => {
-		setCurrent(prev => Math.max(prev - 1, 1));
-	}, []);
+		setCurrentPage(Math.max(currentPage - 1, 1));
+	}, [currentPage, setCurrentPage]);
 
-	const goTo = useCallback((page: number) => {
-		setCurrent(page);
-	}, []);
+	const goTo = useCallback(
+		(page: number) => {
+			setCurrentPage(page);
+		},
+		[setCurrentPage],
+	);
 
 	useHotkeys([
 		["ArrowLeft", prev],
@@ -103,11 +110,10 @@ export const PDFViewer: React.FC<PDFViewerProps> = memo(function PDFViewer({ loc
 		const readerProgress = document.getElementById("reader-progress");
 		const readerProgressCount = document.getElementById("reader-progress-count");
 		if (readerProgress && readerProgressCount) {
-			const percentage = Math.round((current / pages) * 100);
-			readerProgress.style.width = `${percentage}%`;
-			readerProgressCount.textContent = `${percentage}%`;
+			readerProgress.style.width = `${progress}%`;
+			readerProgressCount.textContent = `${progress}%`;
 		}
-	}, [current, pages]);
+	}, [progress]);
 
 	return (
 		<>
@@ -162,15 +168,16 @@ export const PDFViewer: React.FC<PDFViewerProps> = memo(function PDFViewer({ loc
 					noData={<Placeholder height={availableHeight} />}
 					error={<Placeholder height={availableHeight} />}
 				>
-					{current - 1 > 0 && (
+					{currentPage - 1 > 0 && (
 						<Page
-							pageNumber={current - 1}
+							pageNumber={currentPage - 1}
 							className="hidden"
 						/>
 					)}
 					<Page
-						pageNumber={current}
+						pageNumber={currentPage}
 						height={availableHeight}
+						scale={zoom}
 						loading={
 							<div
 								className="bg-white"
@@ -183,9 +190,9 @@ export const PDFViewer: React.FC<PDFViewerProps> = memo(function PDFViewer({ loc
 						noData={<Placeholder height={availableHeight} />}
 						error={<Placeholder height={availableHeight} />}
 					/>
-					{current + 1 <= pages && (
+					{currentPage + 1 <= totalPages && (
 						<Page
-							pageNumber={current + 1}
+							pageNumber={currentPage + 1}
 							className="hidden"
 						/>
 					)}
