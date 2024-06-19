@@ -12,6 +12,7 @@ import { useHotkeys } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 
+import { SelectionMenu } from "./selection-menu";
 import { useSettings } from "./settings-context";
 
 export type PDFViewerProps = {
@@ -117,6 +118,8 @@ export const PDFViewer: React.FC<PDFViewerProps> = memo(function PDFViewer({ loc
 
 	return (
 		<>
+			<SelectionMenu target={`.reader-page-${currentPage}-selection`} />
+
 			<button
 				type="button"
 				className={
@@ -175,6 +178,7 @@ export const PDFViewer: React.FC<PDFViewerProps> = memo(function PDFViewer({ loc
 						/>
 					)}
 					<Page
+						className={`reader-page-${currentPage}-selection`}
 						pageNumber={currentPage}
 						height={availableHeight}
 						scale={zoom}
