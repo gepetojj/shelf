@@ -34,7 +34,6 @@ export const SelectionMenu: React.FC<React.PropsWithChildren<SelectionMenuProps>
 
 		setSelection(selection.toString());
 		setLocation(selection.getRangeAt(0).getBoundingClientRect());
-		console.log(selection.getRangeAt(0).getBoundingClientRect());
 		handlers.open();
 	}, 500);
 
