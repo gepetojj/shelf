@@ -11,6 +11,7 @@ import "@mantine/core/styles.css";
 import { Notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";
 import "@ungap/with-resolvers";
+import { Analytics } from "@vercel/analytics/react";
 
 import "./globals.css";
 
@@ -43,6 +44,7 @@ export default async function Layout({
 						<ThemesProvider>
 							<Notifications position="top-right" />
 							{children}
+							<Analytics />
 						</ThemesProvider>
 					</body>
 				</TRPCReactProvider>
