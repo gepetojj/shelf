@@ -118,8 +118,6 @@ export const PDFViewer: React.FC<PDFViewerProps> = memo(function PDFViewer({ loc
 
 	return (
 		<>
-			<SelectionMenu target={`.reader-page-${currentPage}-selection`} />
-
 			<button
 				type="button"
 				className={
@@ -177,23 +175,24 @@ export const PDFViewer: React.FC<PDFViewerProps> = memo(function PDFViewer({ loc
 							className="hidden"
 						/>
 					)}
-					<Page
-						className={`reader-page-${currentPage}-selection`}
-						pageNumber={currentPage}
-						height={availableHeight}
-						scale={zoom}
-						loading={
-							<div
-								className="bg-white"
-								style={{
-									height: `${availableHeight}px`,
-									width: `${availableHeight * 0.66}px`,
-								}}
-							/>
-						}
-						noData={<Placeholder height={availableHeight} />}
-						error={<Placeholder height={availableHeight} />}
-					/>
+					<SelectionMenu>
+						<Page
+							pageNumber={currentPage}
+							height={availableHeight}
+							scale={zoom}
+							loading={
+								<div
+									className="bg-white"
+									style={{
+										height: `${availableHeight}px`,
+										width: `${availableHeight * 0.66}px`,
+									}}
+								/>
+							}
+							noData={<Placeholder height={availableHeight} />}
+							error={<Placeholder height={availableHeight} />}
+						/>
+					</SelectionMenu>
 					{currentPage + 1 <= totalPages && (
 						<Page
 							pageNumber={currentPage + 1}
