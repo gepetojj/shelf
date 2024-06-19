@@ -14,7 +14,6 @@ export default function Page() {
 			value={{
 				isDrawerOpen: false,
 				query: "",
-				semester: 1,
 				discipline: "",
 				topic: "",
 			}}

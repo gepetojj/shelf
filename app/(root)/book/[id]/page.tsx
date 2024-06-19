@@ -43,7 +43,6 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 						</div>
 						<div className="text-light break-words text-sm text-neutral-300">
 							<h4 className="break-words">ISBN: {book.isbn || "Não informado"}</h4>
-							<h4 className="break-words">Semestre: {book.semester}º Semestre</h4>
 							<h4 className="break-words">
 								Disciplina(s):{" "}
 								{new Intl.ListFormat("pt-br", {

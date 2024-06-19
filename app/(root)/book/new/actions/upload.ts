@@ -14,7 +14,6 @@ import { megaToBytes } from "@/lib/bytes";
 import { now } from "@/lib/time";
 
 const inputs = z.object({
-	semester: z.coerce.number().min(1).max(10),
 	disciplines: z.array(z.string()),
 	topics: z.array(z.string()),
 	file: z
@@ -81,7 +80,6 @@ export const upload = async (
 			description: data.book.description || "",
 			authors: data.book.authors,
 			pages: data.book.pages,
-			semester: data.semester,
 			disciplines: data.disciplines,
 			topics: data.topics,
 			defaultFile: reference.id,

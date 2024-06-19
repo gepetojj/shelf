@@ -7,7 +7,6 @@ export type FileProps = {
 	authors: string[];
 	pages: number;
 
-	semester: number;
 	disciplines: string[];
 	topics: string[];
 
@@ -38,10 +37,6 @@ export abstract class File {
 
 	get pages() {
 		return this.props.pages;
-	}
-
-	get semester() {
-		return this.props.semester;
 	}
 
 	get disciplines() {

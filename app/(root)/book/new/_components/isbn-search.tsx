@@ -8,7 +8,7 @@ import { FileExternal, FileExternalProps } from "@/core/domain/entities/file-ext
 import { container } from "@/core/infra/container";
 import { Registry } from "@/core/infra/container/registry";
 import { Modal, TextInput } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { useDebouncedCallback, useDisclosure } from "@mantine/hooks";
 
 type Fields = {
 	title: string;
@@ -48,6 +48,12 @@ export const ISBNSearch: React.FC<ISBNSearchProps> = memo(function ISBNSearch({ 
 		open();
 	}, [getValues, setError, open]);
 
+	const openModal = useDebouncedCallback(() => {
+		clearErrors("title");
+		if (!getValues("title")) return;
+		search();
+	}, 700);
+
 	return (
 		<>
 			<TextInput
@@ -56,11 +62,7 @@ export const ISBNSearch: React.FC<ISBNSearchProps> = memo(function ISBNSearch({ 
 				placeholder="Digite aqui:"
 				{...register("title", {
 					required: true,
-					onBlur: () => {
-						clearErrors("title");
-						if (!getValues("title")) return;
-						search();
-					},
+					onChange: openModal,
 				})}
 				error={errors.title?.message}
 			/>

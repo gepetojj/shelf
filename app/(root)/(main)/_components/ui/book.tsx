@@ -63,7 +63,6 @@ export const Book: React.FC<BookComponentProps> = memo(function Book({ book, ind
 							<span>ISBN: {book.isbn}</span>
 						</div>
 						<div className="flex flex-col">
-							<span>Semestre: {book.semester}º Semestre</span>
 							<span>
 								Disciplina(s):{" "}
 								{new Intl.ListFormat("pt-br", {

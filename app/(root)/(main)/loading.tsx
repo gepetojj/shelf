@@ -11,7 +11,6 @@ export default async function Loading() {
 			value={{
 				isDrawerOpen: false,
 				query: "",
-				semester: 1,
 				discipline: "",
 				topic: "",
 			}}

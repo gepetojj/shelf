@@ -15,7 +15,6 @@ import { ISBNSearch } from "./isbn-search";
 
 interface Fields {
 	isbn: string;
-	semester: number;
 	disciplines: string[];
 	topics: string[];
 }
@@ -31,12 +30,11 @@ export const Form: React.FC<FormProps> = memo(function Form({ isbn }) {
 		handleSubmit,
 		setValue,
 		formState: { isSubmitting, errors },
-	} = useForm<Fields>({ defaultValues: { isbn, semester: 1 } });
+	} = useForm<Fields>({ defaultValues: { isbn } });
 
 	const [book, setBook] = useState<FileExternalProps | undefined>(undefined);
 	const [file, setFile] = useState<File | undefined>(undefined);
 
-	const [semester, setSemester] = useState("1");
 	const [disciplines, setDisciplines] = useState<string[]>([]);
 	const [topics, setTopics] = useState<string[]>([]);
 
@@ -53,13 +51,6 @@ export const Form: React.FC<FormProps> = memo(function Form({ isbn }) {
 				return notifications.show({
 					title: "Erro",
 					message: "Selecione o arquivo do livro antes de postar.",
-					color: "red",
-				});
-			}
-			if (!fields.semester) {
-				return notifications.show({
-					title: "Erro",
-					message: "Selecione o semestre antes de postar.",
 					color: "red",
 				});
 			}
@@ -91,7 +82,6 @@ export const Form: React.FC<FormProps> = memo(function Form({ isbn }) {
 			const { upload } = await import("../actions/upload");
 			const result = await upload(
 				{
-					semester: fields.semester,
 					disciplines: fields.disciplines,
 					topics: fields.topics,
 					blobs: body,
@@ -129,28 +119,6 @@ export const Form: React.FC<FormProps> = memo(function Form({ isbn }) {
 					<ISBNSearch
 						selected={book}
 						setSelected={setBook}
-					/>
-					<Select
-						label="Semestre:"
-						placeholder="Selecione:"
-						data={[
-							{ value: "1", label: "1º Semestre" },
-							{ value: "2", label: "2º Semestre" },
-							{ value: "3", label: "3º Semestre" },
-							{ value: "4", label: "4º Semestre" },
-							{ value: "5", label: "5º Semestre" },
-							{ value: "6", label: "6º Semestre" },
-							{ value: "7", label: "7º Semestre" },
-							{ value: "8", label: "8º Semestre" },
-						]}
-						clearable={false}
-						allowDeselect={false}
-						value={semester}
-						onChange={selected => {
-							setSemester(selected || "1");
-							setValue("semester", Number(selected) || 1);
-						}}
-						checkIconPosition="right"
 					/>
 					<TagsInput
 						label="Matérias:"
