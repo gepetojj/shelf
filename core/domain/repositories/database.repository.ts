@@ -40,13 +40,17 @@ export interface DatabaseRepository {
 	findMany<Name extends Collection>(col: Name): Promise<Collections[Name][]>;
 	findMany<Name extends Collection>(col: Name, query: DatabaseQuery<Collections[Name]>): Promise<Collections[Name][]>;
 
-	create<Name extends Collection>(col: Name, id: string, data: Omit<Collections[Name], "id">): Promise<void>;
+	create<Name extends Collection>(
+		col: Name,
+		id: string,
+		data: Omit<Collections[Name], "id">,
+	): Promise<Collections[Name]>;
 
 	update<Name extends Collection>(
 		col: Name,
 		id: string,
 		data: Partial<Collections[Name]> | Record<string, any>,
-	): Promise<void>;
+	): Promise<Partial<Collections[Name]> | Record<string, any>>;
 
 	delete<Name extends Collection>(col: Name, id: string): Promise<void>;
 }

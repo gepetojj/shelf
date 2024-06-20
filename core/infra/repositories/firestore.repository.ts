@@ -89,10 +89,15 @@ export class FirestoreRepository implements DatabaseRepository {
 		}
 	}
 
-	async create<Name extends Collection>(name: Name, id: string, data: Omit<Collections[Name], "id">): Promise<void> {
+	async create<Name extends Collection>(
+		name: Name,
+		id: string,
+		data: Omit<Collections[Name], "id">,
+	): Promise<Collections[Name]> {
 		try {
 			const col = firestore.collection(name);
 			await col.doc(id).create({ id, ...data });
+			return { id, ...data };
 		} catch (err: any) {
 			this.logger.error("Failed to create item", {
 				collection: name,
@@ -110,10 +115,11 @@ export class FirestoreRepository implements DatabaseRepository {
 		name: Name,
 		id: string,
 		data: Partial<Collections[Name]> | Record<string, any>,
-	): Promise<void> {
+	): Promise<Partial<Collections[Name]> | Record<string, any>> {
 		try {
 			const col = firestore.collection(name);
 			await col.doc(id).update({ ...data });
+			return { ...data };
 		} catch (err: any) {
 			this.logger.error("Failed to update item", {
 				collection: name,

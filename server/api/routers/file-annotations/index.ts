@@ -53,7 +53,7 @@ export const fileAnnotationsRouter = createTRPCRouter({
 			}
 
 			const id = crypto.randomUUID();
-			await database.create("file_annotations", id, {
+			return await database.create("file_annotations", id, {
 				userId: ctx.auth.userId,
 				fileId: input.fileId,
 				page: input.page,
@@ -91,7 +91,7 @@ export const fileAnnotationsRouter = createTRPCRouter({
 			}
 
 			const id = crypto.randomUUID();
-			await database.create("file_annotations", id, {
+			return await database.create("file_annotations", id, {
 				userId: ctx.auth.userId,
 				fileId: input.fileId,
 				page: input.page,

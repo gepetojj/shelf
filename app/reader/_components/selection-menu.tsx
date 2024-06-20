@@ -20,6 +20,7 @@ export const SelectionMenu: React.FC<React.PropsWithChildren<SelectionMenuProps>
 	const { currentPage, fileId } = useSettings();
 	const createHighlight = api.fileAnnotations.highlight.useMutation();
 	const createAnnotation = api.fileAnnotations.comment.useMutation();
+	const annotationUtils = api.useUtils().fileAnnotations.list;
 
 	const [open, handlers] = useDisclosure(false);
 	const [modalOpen, modalHandlers] = useDisclosure(false);
@@ -101,6 +102,12 @@ export const SelectionMenu: React.FC<React.PropsWithChildren<SelectionMenuProps>
 										comment: modalAnnotation,
 									},
 									{
+										onSuccess: data => {
+											annotationUtils.setData({ fileId }, annotations => [
+												...(annotations || []),
+												data,
+											]);
+										},
 										onError: error => {
 											notifications.show({
 												title: "Erro ao anotar trecho",
@@ -151,6 +158,12 @@ export const SelectionMenu: React.FC<React.PropsWithChildren<SelectionMenuProps>
 										createHighlight.mutate(
 											{ fileId, page: currentPage, text: selection, substrings },
 											{
+												onSuccess: data => {
+													annotationUtils.setData({ fileId }, annotations => [
+														...(annotations || []),
+														data,
+													]);
+												},
 												onError: error => {
 													notifications.show({
 														title: "Erro ao marcar trecho",

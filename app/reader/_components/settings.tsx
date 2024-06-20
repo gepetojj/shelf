@@ -11,9 +11,11 @@ import { IconExternalLink, IconMenu, IconTrash } from "@tabler/icons-react";
 import { useSettings } from "./settings-context";
 
 export const Settings: React.FC = memo(function Settings({}) {
-	const { currentPage, totalPages, zoom, annotations, setCurrentPage, setZoom } = useSettings();
+	const { currentPage, totalPages, zoom, annotations, fileId, setCurrentPage, setZoom } = useSettings();
 	const [opened, { toggle, close }] = useDisclosure(false);
+
 	const deleteAnnotation = api.fileAnnotations.delete.useMutation();
+	const annotationUtils = api.useUtils().fileAnnotations.list;
 
 	const currentAnnotations = useMemo(() => {
 		return annotations.filter(a => a.page === currentPage);
@@ -28,6 +30,9 @@ export const Settings: React.FC = memo(function Settings({}) {
 			deleteAnnotation.mutate(
 				{ id },
 				{
+					onSuccess: () => {
+						annotationUtils.setData({ fileId }, data => data?.filter(a => a.id !== id) || []);
+					},
 					onError: error => {
 						notifications.show({
 							title: "Erro ao deletar anotação",
@@ -38,7 +43,7 @@ export const Settings: React.FC = memo(function Settings({}) {
 				},
 			);
 		},
-		[deleteAnnotation],
+		[annotationUtils, deleteAnnotation, fileId],
 	);
 
 	return (
