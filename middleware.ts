@@ -10,5 +10,5 @@ export default clerkMiddleware((auth, req) => {
 });
 
 export const config = {
-	matcher: ["/", "/((?!api|_next|$).*)"],
+	matcher: ["/", "/((?!_next|$).*)"],
 };

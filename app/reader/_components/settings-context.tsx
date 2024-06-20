@@ -3,34 +3,59 @@
 import { createContext, useContext, useMemo, useState } from "react";
 import { memo } from "react";
 
+import { FileAnnotationProps } from "@/core/domain/entities/file-annotation";
+import { api } from "@/trpc/react";
+
 export type SettingsContextProps = {
 	totalPages: number;
 	currentPage: number;
 	progress: number;
 	zoom: number;
+	annotations: FileAnnotationProps[];
+	fileId: string;
 
 	setTotalPages: (totalPages: number) => void;
 	setCurrentPage: (currentPage: number) => void;
 	setZoom: (zoom: number) => void;
 };
 
+export type SettingsProviderProps = {
+	fileId: string;
+};
+
 const context = createContext<SettingsContextProps>(undefined!);
 
-export const SettingsProvider: React.FC<React.PropsWithChildren> = memo(function SettingsProvider({ children }) {
-	const [totalPages, setTotalPages] = useState(0);
-	const [currentPage, setCurrentPage] = useState(1);
-	const [zoom, setZoom] = useState(1);
+export const SettingsProvider: React.FC<React.PropsWithChildren<SettingsProviderProps>> = memo(
+	function SettingsProvider({ fileId, children }) {
+		const annotations = api.fileAnnotations.list.useQuery({ fileId }).data ?? [];
 
-	const progress = useMemo(() => {
-		if (totalPages === 0) return 0;
-		return Math.round((currentPage / totalPages) * 100);
-	}, [currentPage, totalPages]);
+		const [totalPages, setTotalPages] = useState(0);
+		const [currentPage, setCurrentPage] = useState(1);
+		const [zoom, setZoom] = useState(1);
 
-	return (
-		<context.Provider value={{ totalPages, currentPage, progress, zoom, setTotalPages, setCurrentPage, setZoom }}>
-			{children}
-		</context.Provider>
-	);
-});
+		const progress = useMemo(() => {
+			if (totalPages === 0) return 0;
+			return Math.round((currentPage / totalPages) * 100);
+		}, [currentPage, totalPages]);
+
+		return (
+			<context.Provider
+				value={{
+					totalPages,
+					currentPage,
+					progress,
+					zoom,
+					annotations,
+					fileId,
+					setTotalPages,
+					setCurrentPage,
+					setZoom,
+				}}
+			>
+				{children}
+			</context.Provider>
+		);
+	},
+);
 
 export const useSettings = () => useContext(context);

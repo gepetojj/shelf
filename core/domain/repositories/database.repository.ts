@@ -1,9 +1,11 @@
 import { BookProps } from "../entities/book";
+import { FileAnnotationProps } from "../entities/file-annotation";
 import { FileCommentProps } from "../entities/file-comment";
 import { UserProps } from "../entities/user";
 
 export interface Collections {
 	books: BookProps;
+	file_annotations: FileAnnotationProps;
 	file_comments: FileCommentProps;
 	users: UserProps;
 }

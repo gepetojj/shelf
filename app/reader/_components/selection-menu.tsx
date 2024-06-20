@@ -3,15 +3,22 @@
 import clsx from "clsx";
 import { memo, useCallback, useEffect, useState } from "react";
 
+import { api } from "@/trpc/react";
 import { ActionIcon, Tooltip, Transition } from "@mantine/core";
 import { useClickOutside, useDebouncedCallback, useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 import { IconCopy, IconHighlight, IconMessagePlus } from "@tabler/icons-react";
+
+import { useSettings } from "./settings-context";
 
 export type SelectionMenuProps = {};
 
 export const SelectionMenu: React.FC<React.PropsWithChildren<SelectionMenuProps>> = memo(function SelectionMenu({
 	children,
 }) {
+	const { currentPage, fileId } = useSettings();
+	const createHighlight = api.fileAnnotations.highlight.useMutation();
+
 	const [open, handlers] = useDisclosure(false);
 	const menuRef = useClickOutside(() => close());
 	const [selection, setSelection] = useState("");
@@ -72,6 +79,18 @@ export const SelectionMenu: React.FC<React.PropsWithChildren<SelectionMenuProps>
 							<ActionIcon
 								variant="light"
 								onClick={() => {
+									createHighlight.mutate(
+										{ fileId, page: currentPage, text: selection },
+										{
+											onError: error => {
+												notifications.show({
+													title: "Erro ao marcar trecho",
+													message: error.message || "Houve um erro desconhecido.",
+													color: "red",
+												});
+											},
+										},
+									);
 									close();
 								}}
 							>

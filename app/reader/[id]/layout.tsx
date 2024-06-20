@@ -3,16 +3,18 @@ import Link from "next/link";
 
 import logo from "@/public/logo.png";
 
-import { Settings } from "./_components/settings";
-import { SettingsProvider } from "./_components/settings-context";
+import { Settings } from "../_components/settings";
+import { SettingsProvider } from "../_components/settings-context";
 
 export default async function Layout({
 	children,
+	params,
 }: Readonly<{
 	children: React.ReactNode;
+	params: { id: string };
 }>) {
 	return (
-		<SettingsProvider>
+		<SettingsProvider fileId={params.id}>
 			<header
 				id="reader-header"
 				className="flex w-full items-center justify-between px-7 py-5"
