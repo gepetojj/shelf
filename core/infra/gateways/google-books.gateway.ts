@@ -72,8 +72,10 @@ export class GoogleBooksGateway implements FileExternalGateway {
 			if (!result.data.items.length) {
 				throw new ResourceNotFound({ location: "gateways:google_books:find_relevant" });
 			}
-			const data = result.data.items.map(val =>
-				FileExternal.fromJSON({
+			const data = result.data.items.map(val => {
+				const largeThumbnail = new URL(val.volumeInfo.imageLinks?.thumbnail || "");
+				if (val.volumeInfo.imageLinks?.thumbnail) largeThumbnail.searchParams.set("zoom", "2");
+				return FileExternal.fromJSON({
 					title: val.volumeInfo.title,
 					subtitle: val.volumeInfo.subtitle,
 					description: val.volumeInfo.description,
@@ -82,8 +84,9 @@ export class GoogleBooksGateway implements FileExternalGateway {
 					pages: val.volumeInfo.pageCount,
 					globalIdentifier: val.volumeInfo.industryIdentifiers?.[0].identifier || null,
 					thumbnailUrl: val.volumeInfo.imageLinks?.thumbnail || null,
-				}),
-			);
+					thumbnailAltUrl: largeThumbnail.toString() || null,
+				});
+			});
 			return data;
 		} catch (err: any) {
 			if (err instanceof ResourceNotFound) throw err;

@@ -18,18 +18,15 @@ export const Book: React.FC<BookComponentProps> = memo(function Book({ book, ind
 				<header className="flex items-center justify-between gap-2">
 					<div className="flex items-center gap-2 font-light">
 						<Image
-							alt="Imagem do usuário, vinda da conta Google vinculada."
-							src={"https://randomuser.me/api/portraits/lego/1.jpg"}
+							alt="Imagem do usuário."
+							src={book.uploaderFallback.avatarUrl || "https://randomuser.me/api/portraits/lego/1.jpg"}
 							width={34}
 							height={34}
 							className="rounded-full"
 							loading="lazy"
 						/>
 						<span className="truncate pl-1">
-							{
-								// book.uploader.name.split(" ").slice(0, 2).join(" ")
-								"Uploader"
-							}
+							{book.uploaderFallback.name.split(" ").slice(0, 2).join(" ")}
 						</span>
 						<span className="text-sm text-neutral-400">·</span>
 						<span className="truncate text-sm text-neutral-400">

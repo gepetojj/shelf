@@ -19,7 +19,6 @@ export const Book: React.FC<BookComponentProps> = memo(function Book({ book }) {
 					height={180}
 				/>
 				<div className="flex w-full flex-col truncate text-sm text-neutral-100">
-					<span className="truncate">Upload: {book.uploaderId}</span>
 					<span className="truncate">Páginas: {book.pages}</span>
 					<span className="truncate">
 						{new Intl.ListFormat("pt-br", {

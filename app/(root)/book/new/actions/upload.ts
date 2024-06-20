@@ -33,6 +33,7 @@ const inputs = z.object({
 		pages: z.coerce.number(),
 		globalIdentifier: z.string().optional().nullable(),
 		thumbnailUrl: z.string().url().optional().nullable(),
+		thumbnailAltUrl: z.string().url().optional().nullable(),
 	}),
 });
 
@@ -49,7 +50,7 @@ const logger = container.get<Logger>(Registry.Logger);
 
 export const upload = async (
 	form: Omit<z.infer<typeof inputs>, "file"> & { blobs: FormData },
-	uid: string,
+	user: { id: string; name: string; avatarUrl: string },
 ): Promise<Outputs> => {
 	try {
 		const blobs = Object.fromEntries(form.blobs);
@@ -70,7 +71,7 @@ export const upload = async (
 			path: `files/${bookId}/${filename}.${extension}`,
 			mimetype: data.file.type,
 			byteSize: data.file.size,
-			uploadedById: uid,
+			uploadedById: user.id,
 			uploadedAt: now(),
 		});
 
@@ -80,18 +81,20 @@ export const upload = async (
 			description: data.book.description || "",
 			authors: data.book.authors,
 			pages: data.book.pages,
+			collections: [],
 			disciplines: data.disciplines,
 			topics: data.topics,
 			defaultFile: reference.id,
 			files: [reference.toJSON()],
-			uploaderId: uid,
+			uploaderId: user.id,
+			uploaderFallback: { name: user.name, avatarUrl: user.avatarUrl },
 			uploadedAt: now(),
 			subtitle: data.book.subtitle || "",
 			publishers: data.book.publishers || [],
 			isbn: data.book.globalIdentifier || "",
 			thumbnail: {
 				small: data.book.thumbnailUrl || "",
-				large: data.book.thumbnailUrl || "",
+				large: data.book.thumbnailAltUrl || "",
 			},
 		});
 
@@ -118,7 +121,7 @@ export const upload = async (
 				message: err.errors[0].message || "Verifique os dados enviados e tente novamente.",
 			};
 		}
-		logger.error("Failed to upload book", { uid, err });
+		logger.error("Failed to upload book", { user, err });
 		return { success: false, message: err?.message || "Não foi possível fazer upload do livro. Tente novamente." };
 	}
 };

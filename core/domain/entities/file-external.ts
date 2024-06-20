@@ -7,6 +7,7 @@ export type FileExternalProps = {
 	pages: number;
 	globalIdentifier: string | null;
 	thumbnailUrl: string | null;
+	thumbnailAltUrl: string | null;
 };
 
 export class FileExternal {
@@ -42,6 +43,10 @@ export class FileExternal {
 
 	get thumbnailUrl() {
 		return this.props.thumbnailUrl;
+	}
+
+	get thumbnailAltUrl() {
+		return this.props.thumbnailAltUrl;
 	}
 
 	toJSON(): FileExternalProps {

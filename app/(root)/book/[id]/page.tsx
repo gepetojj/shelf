@@ -5,7 +5,6 @@ import { AppHeader } from "@/components/ui/app-header";
 import { Layout } from "@/components/ui/layout";
 import { api } from "@/trpc/server";
 import { Spoiler } from "@mantine/core";
-import { IconFile } from "@tabler/icons-react";
 
 import { Book } from "./_components/book";
 import { Comment } from "./_components/comment";
@@ -59,7 +58,7 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 							</h4>
 						</div>
 					</div>
-					<div className="w-full home-break-mobile:hidden">
+					<div className="w-full home-break:hidden">
 						<Link
 							href={`/reader/${book.id}`}
 							className="flex w-full items-center justify-center gap-3 rounded-2xl bg-main px-6 py-1 text-center leading-tight text-black duration-200 hover:brightness-90"
@@ -67,7 +66,7 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 							Iniciar leitura
 						</Link>
 					</div>
-					<div className="flex flex-col gap-2">
+					{/* <div className="flex flex-col gap-2">
 						<h2 className="text-2xl font-bold text-zinc-200">Anexos</h2>
 						<ul className="flex w-full gap-2">
 							{book.files.map(file => (
@@ -82,7 +81,7 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 								</li>
 							))}
 						</ul>
-					</div>
+					</div> */}
 					<div className="flex flex-col gap-2">
 						<h2 className="text-2xl font-bold text-zinc-200">Comentários</h2>
 						<CreateComment bookId={book.id} />

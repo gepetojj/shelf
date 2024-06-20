@@ -5,8 +5,8 @@ import { memo, useCallback, useState } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 
 import { FileExternalProps } from "@/core/domain/entities/file-external";
-import { useAuth } from "@clerk/nextjs";
-import { Button, Group, Select, TagsInput } from "@mantine/core";
+import { useUser } from "@clerk/nextjs";
+import { Button, Group, TagsInput } from "@mantine/core";
 import { Dropzone, PDF_MIME_TYPE } from "@mantine/dropzone";
 import { notifications } from "@mantine/notifications";
 import { IconFileCheck, IconFileIsr, IconFileX } from "@tabler/icons-react";
@@ -25,7 +25,7 @@ export interface FormProps {
 
 export const Form: React.FC<FormProps> = memo(function Form({ isbn }) {
 	const router = useRouter();
-	const { userId } = useAuth();
+	const { user } = useUser();
 	const {
 		handleSubmit,
 		setValue,
@@ -68,7 +68,7 @@ export const Form: React.FC<FormProps> = memo(function Form({ isbn }) {
 					color: "red",
 				});
 			}
-			if (!userId) {
+			if (!user) {
 				return notifications.show({
 					title: "Erro",
 					message: "Faça login ou recarregue a página.",
@@ -87,7 +87,11 @@ export const Form: React.FC<FormProps> = memo(function Form({ isbn }) {
 					blobs: body,
 					book,
 				},
-				userId,
+				{
+					id: user.id,
+					name: user.fullName || user.username || "Usuário sem nome",
+					avatarUrl: user.imageUrl,
+				},
 			);
 
 			if (result.success) {
@@ -104,7 +108,7 @@ export const Form: React.FC<FormProps> = memo(function Form({ isbn }) {
 				color: "red",
 			});
 		},
-		[book, file, router, userId],
+		[book, file, router, user],
 	);
 
 	return (

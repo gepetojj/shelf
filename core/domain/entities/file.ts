@@ -7,12 +7,14 @@ export type FileProps = {
 	authors: string[];
 	pages: number;
 
+	collections: string[]; // IDs das estantes que o livro está
 	disciplines: string[];
 	topics: string[];
 
 	defaultFile: FileReferenceProps["id"];
 	files: FileReferenceProps[];
 	uploaderId: string;
+	uploaderFallback: { name: string; avatarUrl: string };
 	uploadedAt: number;
 };
 
@@ -39,6 +41,10 @@ export abstract class File {
 		return this.props.pages;
 	}
 
+	get collections() {
+		return this.props.collections;
+	}
+
 	get disciplines() {
 		return this.props.disciplines;
 	}
@@ -57,6 +63,10 @@ export abstract class File {
 
 	get uploaderId() {
 		return this.props.uploaderId;
+	}
+
+	get uploaderFallback() {
+		return this.props.uploaderFallback;
 	}
 
 	get uploadedAt() {
