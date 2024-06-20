@@ -57,7 +57,7 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
 
 const isAuthed = t.middleware(({ next, ctx }) => {
 	if (!ctx.auth.userId) {
-		throw new TRPCError({ code: "UNAUTHORIZED" });
+		throw new TRPCError({ code: "UNAUTHORIZED", message: "Você não tem permissão para fazer isso." });
 	}
 	return next({
 		ctx: {

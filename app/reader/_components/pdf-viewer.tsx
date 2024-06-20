@@ -182,6 +182,7 @@ export const PDFViewer: React.FC<PDFViewerProps> = memo(function PDFViewer({ loc
 							height={availableHeight}
 							scale={zoom}
 							customTextRenderer={textRenderer(annotations.filter(val => val.page === currentPage))}
+							className="duration-200 animate-in fade-in-20"
 							loading={
 								<div
 									className="bg-white"

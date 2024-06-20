@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useCallback } from "react";
+import { memo, useCallback, useMemo } from "react";
 
 import { api } from "@/trpc/react";
 import { ActionIcon, Divider, Drawer, NumberInput, Stack, Text } from "@mantine/core";
@@ -14,6 +14,14 @@ export const Settings: React.FC = memo(function Settings({}) {
 	const { currentPage, totalPages, zoom, annotations, setCurrentPage, setZoom } = useSettings();
 	const [opened, { toggle, close }] = useDisclosure(false);
 	const deleteAnnotation = api.fileAnnotations.delete.useMutation();
+
+	const currentAnnotations = useMemo(() => {
+		return annotations.filter(a => a.page === currentPage);
+	}, [annotations, currentPage]);
+
+	const otherAnnotations = useMemo(() => {
+		return annotations.filter(a => a.page !== currentPage);
+	}, [annotations, currentPage]);
 
 	const onDeleteAnnotation = useCallback(
 		(id: string) => {
@@ -35,7 +43,7 @@ export const Settings: React.FC = memo(function Settings({}) {
 
 	return (
 		<>
-			<button
+			<ActionIcon
 				className="rounded-md bg-main p-1 text-black"
 				onClick={toggle}
 			>
@@ -44,7 +52,7 @@ export const Settings: React.FC = memo(function Settings({}) {
 					size={20}
 					aria-hidden="true"
 				/>
-			</button>
+			</ActionIcon>
 
 			<Drawer
 				opened={opened}
@@ -95,7 +103,7 @@ export const Settings: React.FC = memo(function Settings({}) {
 							size="sm"
 							className="pb-1"
 						>
-							Anotações:
+							Marcações e Anotações:
 						</Text>
 						<div className="flex h-fit w-full flex-col overflow-y-auto">
 							<Stack>
@@ -106,9 +114,8 @@ export const Settings: React.FC = memo(function Settings({}) {
 									Na página atual
 								</Text>
 								<ul className="flex flex-col gap-4">
-									{annotations
-										.filter(a => a.page === currentPage && a.comment)
-										.map(a => (
+									{currentAnnotations.length ? (
+										currentAnnotations.map(a => (
 											<li
 												key={a.id}
 												className="flex flex-col gap-1 duration-200 animate-in fade-in-20"
@@ -129,7 +136,14 @@ export const Settings: React.FC = memo(function Settings({}) {
 													<p className="break-words text-justify text-sm">{a.comment}</p>
 												</div>
 											</li>
-										))}
+										))
+									) : (
+										<li className="flex w-full items-center justify-center">
+											<span className="break-words text-center text-sm">
+												Faça uma anotação nessa página e ela aparecerá aqui.
+											</span>
+										</li>
+									)}
 								</ul>
 							</Stack>
 							<Divider className="my-2" />
@@ -141,9 +155,8 @@ export const Settings: React.FC = memo(function Settings({}) {
 									Todas nesse documento
 								</Text>
 								<ul className="flex flex-col gap-4">
-									{annotations
-										.filter(a => a.page !== currentPage && a.comment)
-										.map(a => (
+									{otherAnnotations.length ? (
+										otherAnnotations.map(a => (
 											<li
 												key={a.id}
 												className="flex flex-col gap-1 duration-200 animate-in fade-in-20"
@@ -177,7 +190,14 @@ export const Settings: React.FC = memo(function Settings({}) {
 													<p className="break-words text-justify text-sm">{a.comment}</p>
 												</div>
 											</li>
-										))}
+										))
+									) : (
+										<li className="flex w-full items-center justify-center">
+											<span className="break-words text-center text-sm">
+												Faça uma anotação e ela aparecerá aqui.
+											</span>
+										</li>
+									)}
 								</ul>
 							</Stack>
 						</div>
