@@ -28,7 +28,17 @@ export const fileAnnotationsRouter = createTRPCRouter({
 	}),
 
 	highlight: protectedProcedure
-		.input(z.object({ fileId: z.string().uuid(), page: z.coerce.number().min(1).max(9999), text: z.string() }))
+		.input(
+			z.object({
+				fileId: z.string().uuid(),
+				page: z.coerce.number().min(1).max(9999),
+				text: z.string(),
+				substrings: z.record(
+					z.coerce.number().min(0),
+					z.object({ start: z.number().min(0), end: z.number().min(0) }),
+				),
+			}),
+		)
 		.mutation(async ({ input, ctx }) => {
 			const annotation = await database
 				.findOne("file_annotations", [
@@ -47,7 +57,8 @@ export const fileAnnotationsRouter = createTRPCRouter({
 				userId: ctx.auth.userId,
 				fileId: input.fileId,
 				page: input.page,
-				textContent: input.text,
+				textContent: input.text.replaceAll("\n", " "),
+				substrings: input.substrings,
 				comment: null,
 				createdAt: now(),
 			});
@@ -59,6 +70,10 @@ export const fileAnnotationsRouter = createTRPCRouter({
 				fileId: z.string().uuid(),
 				page: z.coerce.number().min(1).max(9999),
 				text: z.string(),
+				substrings: z.record(
+					z.coerce.number().min(0),
+					z.object({ start: z.number().min(0), end: z.number().min(0) }),
+				),
 				comment: z.string().trim().min(1).max(500),
 			}),
 		)
@@ -80,7 +95,8 @@ export const fileAnnotationsRouter = createTRPCRouter({
 				userId: ctx.auth.userId,
 				fileId: input.fileId,
 				page: input.page,
-				textContent: input.text,
+				textContent: input.text.replaceAll("\n", " "),
+				substrings: input.substrings,
 				comment: input.comment,
 				createdAt: now(),
 			});

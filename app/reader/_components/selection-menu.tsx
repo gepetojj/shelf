@@ -9,6 +9,7 @@ import { useClickOutside, useDebouncedCallback, useDisclosure } from "@mantine/h
 import { notifications } from "@mantine/notifications";
 import { IconCopy, IconHighlight, IconMessagePlus, IconSend } from "@tabler/icons-react";
 
+import { Substrings, getSelectedNodes } from "./annotations/nodes";
 import { useSettings } from "./settings-context";
 
 export type SelectionMenuProps = {};
@@ -27,24 +28,30 @@ export const SelectionMenu: React.FC<React.PropsWithChildren<SelectionMenuProps>
 	const menuRef = useClickOutside(() => close());
 	const [selection, setSelection] = useState("");
 	const [location, setLocation] = useState<DOMRect | undefined>(undefined);
+	const [substrings, setSubstrings] = useState<Substrings>({});
 
 	const close = useCallback(() => {
 		handlers.close();
 	}, [handlers]);
 
 	const handleSelection = useDebouncedCallback(() => {
-		setSelection("");
 		const selection = window.getSelection();
+		if (!selection) return close();
 
-		let parent = selection?.anchorNode?.parentElement;
+		let parent = selection.anchorNode?.parentElement;
 		while (parent && !parent.id.includes("select-menu-bounds")) {
 			parent = parent.parentElement;
 		}
+		const metadata = selection.focusNode?.parentElement;
+
 		if (!parent?.id.includes("select-menu-bounds")) return close();
-		if (!selection?.toString()) return close();
+		if (!metadata) return close();
+		if (!selection.toString()) return close();
 
 		setSelection(selection.toString());
 		setLocation(selection.getRangeAt(0).getBoundingClientRect());
+		const substrings = getSelectedNodes(selection.toString(), selection.getRangeAt(0));
+		setSubstrings(substrings);
 		handlers.open();
 	}, 500);
 
@@ -59,7 +66,10 @@ export const SelectionMenu: React.FC<React.PropsWithChildren<SelectionMenuProps>
 		<>
 			<Modal
 				opened={modalOpen}
-				onClose={modalHandlers.close}
+				onClose={() => {
+					modalHandlers.close();
+					setModalAnnotation("");
+				}}
 				title="Adicionar anotação"
 				centered
 			>
@@ -87,6 +97,7 @@ export const SelectionMenu: React.FC<React.PropsWithChildren<SelectionMenuProps>
 										fileId,
 										page: currentPage,
 										text: selection,
+										substrings,
 										comment: modalAnnotation,
 									},
 									{
@@ -101,6 +112,7 @@ export const SelectionMenu: React.FC<React.PropsWithChildren<SelectionMenuProps>
 								);
 								close();
 								modalHandlers.close();
+								setModalAnnotation("");
 							}}
 						>
 							Adicionar
@@ -137,7 +149,7 @@ export const SelectionMenu: React.FC<React.PropsWithChildren<SelectionMenuProps>
 									variant="light"
 									onClick={() => {
 										createHighlight.mutate(
-											{ fileId, page: currentPage, text: selection },
+											{ fileId, page: currentPage, text: selection, substrings },
 											{
 												onError: error => {
 													notifications.show({

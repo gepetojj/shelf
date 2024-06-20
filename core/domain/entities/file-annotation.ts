@@ -4,6 +4,7 @@ export type FileAnnotationProps = {
 	fileId: string;
 	page: number;
 	textContent: string;
+	substrings: { [index: number]: { start: number; end: number } };
 	comment: string | null;
 	createdAt: number;
 };
@@ -29,6 +30,10 @@ export class FileAnnotation {
 
 	get textContent() {
 		return this.props.textContent;
+	}
+
+	get substrings() {
+		return this.props.substrings;
 	}
 
 	get comment() {

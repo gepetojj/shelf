@@ -7,3 +7,7 @@
 button {
 	@apply select-none;
 }
+
+.reader-highlight {
+	@apply bg-main/40;
+}

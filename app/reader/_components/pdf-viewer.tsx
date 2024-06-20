@@ -12,6 +12,7 @@ import { useHotkeys } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 
+import { textRenderer } from "./annotations/text-renderer";
 import { SelectionMenu } from "./selection-menu";
 import { useSettings } from "./settings-context";
 
@@ -36,7 +37,7 @@ const Placeholder: React.FC<{ height: number }> = ({ height }) => {
 };
 
 export const PDFViewer: React.FC<PDFViewerProps> = memo(function PDFViewer({ location, startPage }) {
-	const { currentPage, totalPages, progress, zoom, setCurrentPage, setTotalPages } = useSettings();
+	const { currentPage, totalPages, progress, zoom, annotations, setCurrentPage, setTotalPages } = useSettings();
 	const [loading, setLoading] = useState(0);
 	const [availableHeight, setAvailableHeight] = useState(
 		typeof document !== "undefined" ? window.screen.availHeight : 1000,
@@ -180,6 +181,7 @@ export const PDFViewer: React.FC<PDFViewerProps> = memo(function PDFViewer({ loc
 							pageNumber={currentPage}
 							height={availableHeight}
 							scale={zoom}
+							customTextRenderer={textRenderer(annotations.filter(val => val.page === currentPage))}
 							loading={
 								<div
 									className="bg-white"
