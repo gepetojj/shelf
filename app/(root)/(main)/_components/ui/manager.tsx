@@ -13,7 +13,7 @@ import { Book } from "./book";
 const Filters = dynamic(() => import("../layout/filters").then(mod => mod.Filters));
 
 export const Manager: React.FC = memo(function Manager() {
-	const { isDrawerOpen, drawerActions } = useContext();
+	const { isDrawerOpen, drawerActions, searchResults } = useContext();
 	const [query, queryActions] = api.files.list.useSuspenseInfiniteQuery(
 		{ offset: 10 },
 		{
@@ -39,6 +39,19 @@ export const Manager: React.FC = memo(function Manager() {
 			>
 				<Filters />
 			</Drawer>
+
+			{searchResults && searchResults.length > 0 && (
+				<section className="h-fit w-full gap-2 px-4 py-2 home-break-mobile:px-12">
+					<span className="text-xs text-neutral-400">Resultados da pesquisa:</span>
+					{searchResults.map((book, index) => (
+						<Book
+							key={book.id}
+							index={index}
+							{...{ book }}
+						/>
+					))}
+				</section>
+			)}
 
 			<section className="h-full w-full gap-2 px-4 py-7 home-break-mobile:px-12">
 				<InfiniteScroll

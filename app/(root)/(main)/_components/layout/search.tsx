@@ -1,9 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { memo, useCallback } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 
+import { api } from "@/trpc/react";
+import { notifications } from "@mantine/notifications";
 import { IconSearch, IconSettings } from "@tabler/icons-react";
 
 import { useContext } from "../context";
@@ -13,18 +14,26 @@ interface Fields {
 }
 
 export const Search: React.FC = memo(function Search() {
-	const router = useRouter();
-	const { query, drawerActions } = useContext();
-	const { register, handleSubmit } = useForm<Fields>({ defaultValues: { query } });
+	const { drawerActions, setSearchResults } = useContext();
+	const { register, handleSubmit } = useForm<Fields>();
+	const search = api.useUtils().files.search;
 
 	const onSubmit: SubmitHandler<Fields> = useCallback(
 		async fields => {
+			setSearchResults(undefined);
 			const query = fields.query;
-			const url = new URL(window.location.href);
-			url.searchParams.set("q", encodeURIComponent(query));
-			router.push(url.toString());
+			const result = await search.fetch({ query }, { retry: false }).catch(() => undefined);
+			if (!result || result.books.length === 0) {
+				notifications.show({
+					title: "Nenhum resultado encontrado.",
+					message: "Tente novamente com outra pesquisa.",
+					color: "red",
+				});
+				return;
+			}
+			setSearchResults(result.books);
 		},
-		[router],
+		[search, setSearchResults],
 	);
 
 	return (
@@ -34,7 +43,7 @@ export const Search: React.FC = memo(function Search() {
 		>
 			<div className="flex w-full max-w-md">
 				<input
-					placeholder="Busque por título, autor, ISBN, tema:"
+					placeholder="Busque por título, autor, tema:"
 					autoComplete="none"
 					className="w-full rounded-l-xl bg-neutral-800 p-2 px-3 outline-none placeholder:text-neutral-600"
 					{...register("query", { required: true })}

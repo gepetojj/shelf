@@ -2,19 +2,20 @@
 
 import { createContext, memo, useContext as useReactContext, useState } from "react";
 
+import { BookProps } from "@/core/domain/entities/book";
 import { useDisclosure } from "@mantine/hooks";
 
 export interface Context {
-	query: string;
 	discipline: string;
 	topic: string;
+	searchResults: BookProps[] | undefined;
 
 	isDrawerOpen: boolean;
 	drawerActions: ReturnType<typeof useDisclosure>[1];
 
-	setQuery: (query: string) => void;
 	setDiscipline: (discipline: string) => void;
 	setTopic: (topic: string) => void;
+	setSearchResults: (results: BookProps[] | undefined) => void;
 }
 
 export interface ContextProps {
@@ -27,22 +28,22 @@ export const ContextProvider: React.FC<React.PropsWithChildren<ContextProps>> = 
 	children,
 	value,
 }) {
-	const [query, setQuery] = useState(value.query);
 	const [discipline, setDiscipline] = useState(value.discipline);
 	const [topic, setTopic] = useState(value.topic);
+	const [searchResults, setSearchResults] = useState(value.searchResults);
 	const [isDrawerOpen, drawerActions] = useDisclosure(false);
 
 	return (
 		<Context.Provider
 			value={{
-				query,
 				discipline,
 				topic,
+				searchResults,
 				isDrawerOpen,
 				drawerActions,
-				setQuery,
 				setDiscipline,
 				setTopic,
+				setSearchResults,
 			}}
 		>
 			{children}

@@ -25,11 +25,23 @@ export const filesRouter = createTRPCRouter({
 			}),
 		)
 		.query(async ({ input }) => {
-			// TODO: List all files
+			// TODO: List all types of files
 			const books = await database.findMany("books", [
 				{ offset: input.offset, page: input.cursor, orderBy: "uploadedAt", sort: "desc" },
 			]);
 
 			return { books };
 		}),
+
+	search: publicProcedure.input(z.object({ query: z.string() })).query(async ({ input }) => {
+		const books = await database.findMany("books", [
+			{
+				key: "searchableKeywords",
+				comparator: "array-contains-any",
+				value: input.query.toLowerCase().split(" ").slice(0, 20),
+			},
+		]);
+
+		return { books };
+	}),
 });

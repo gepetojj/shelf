@@ -21,7 +21,7 @@ type Leaves<T> = T extends object
 export type QueryLanguage<Keys> =
 	| {
 			key: Leaves<Keys>;
-			comparator: "==" | "<" | "<=" | ">" | ">=" | "array-contains" | "in";
+			comparator: "==" | "<" | "<=" | ">" | ">=" | "array-contains" | "array-contains-any" | "in";
 			value: any;
 			ignore?: boolean;
 	  }

@@ -32,6 +32,7 @@ export const Filters: React.FC = memo(function Filters() {
 					...unique([]).map(item => ({ value: item.toLowerCase(), label: item })),
 				]}
 				defaultValue={discipline}
+				className="w-full"
 			/>
 			<Select
 				id="topic"
@@ -41,6 +42,7 @@ export const Filters: React.FC = memo(function Filters() {
 					...unique([]).map(item => ({ value: item.toLowerCase(), label: item })),
 				]}
 				defaultValue={topic}
+				className="w-full"
 			/>
 		</div>
 	);

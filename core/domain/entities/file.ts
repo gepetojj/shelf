@@ -10,6 +10,7 @@ export type FileProps = {
 	collections: string[]; // IDs das estantes que o livro está
 	disciplines: string[];
 	topics: string[];
+	searchableKeywords: string[];
 
 	defaultFile: FileReferenceProps["id"];
 	files: FileReferenceProps[];
@@ -51,6 +52,10 @@ export abstract class File {
 
 	get topics() {
 		return this.props.topics;
+	}
+
+	get searchableKeywords() {
+		return this.props.searchableKeywords;
 	}
 
 	get defaultFile() {

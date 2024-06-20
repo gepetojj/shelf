@@ -5,8 +5,8 @@ import { Layout } from "@/components/ui/layout";
 
 import { ContextProvider } from "./_components/context";
 import { Filters } from "./_components/layout/filters";
+import { Search } from "./_components/layout/search";
 import { Manager } from "./_components/ui/manager";
-import { Search } from "./_components/ui/search";
 
 export default function Page() {
 	return (

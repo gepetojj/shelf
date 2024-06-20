@@ -3,7 +3,7 @@ import { Layout } from "@/components/ui/layout";
 
 import { ContextProvider } from "./_components/context";
 import { Filters } from "./_components/layout/filters";
-import { Search } from "./_components/ui/search";
+import { Search } from "./_components/layout/search";
 
 export default async function Loading() {
 	return (

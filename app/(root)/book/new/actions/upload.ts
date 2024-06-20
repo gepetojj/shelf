@@ -75,6 +75,12 @@ export const upload = async (
 			uploadedAt: now(),
 		});
 
+		const searchableKeywords = [];
+		searchableKeywords.push(...data.book.title.trim().toLowerCase().split(" "));
+		searchableKeywords.push(...data.book.authors.map(author => author.trim().toLowerCase().split(" ")).flat(2));
+		searchableKeywords.push(...data.disciplines.map(discip => discip.trim().toLowerCase().split(" ")).flat(2));
+		searchableKeywords.push(...data.topics.map(topic => topic.trim().toLowerCase().split(" ")).flat(2));
+
 		const book = Book.fromJSON({
 			id: bookId,
 			title: data.book.title,
@@ -84,6 +90,7 @@ export const upload = async (
 			collections: [],
 			disciplines: data.disciplines,
 			topics: data.topics,
+			searchableKeywords,
 			defaultFile: reference.id,
 			files: [reference.toJSON()],
 			uploaderId: user.id,
