@@ -11,3 +11,7 @@ button {
 .reader-highlight {
 	@apply bg-main/40;
 }
+
+.reader-annotation {
+	@apply bg-orange-400/40;
+}

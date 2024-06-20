@@ -20,7 +20,7 @@ export const generateHighlight = (value: string, index: number, substring: { sta
 export const generateAnnotation = (value: string, index: number, substring: { start: number; end: number }) => {
 	const element = generateText(value, index);
 	const highlight = document.createElement("span");
-	highlight.classList.add("reader-highlight");
+	highlight.classList.add("reader-annotation");
 	highlight.innerText = value.substring(substring.start, substring.end);
 	element.innerHTML = element.innerHTML.replace(value.substring(substring.start, substring.end), highlight.outerHTML);
 	return element.outerHTML;
