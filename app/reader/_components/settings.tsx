@@ -103,7 +103,7 @@ export const Settings: React.FC = memo(function Settings({}) {
 									size="xs"
 									className="text-neutral-300"
 								>
-									Da página atual
+									Na página atual
 								</Text>
 								<ul className="flex flex-col gap-4">
 									{annotations
