@@ -7,7 +7,6 @@ export const getURL = (): string => {
 
 	if (["preview"].includes(process.env.NEXT_PUBLIC_VERCEL_ENV || "")) {
 		if (!process.env.NEXT_PUBLIC_WEBSERVER_URL) console.error("Preview environment missing custom URL!");
-		url = `https://${process.env.NEXT_PUBLIC_WEBSERVER_URL}`;
 	}
 
 	return url;
