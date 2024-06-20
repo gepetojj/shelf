@@ -97,7 +97,7 @@ export class FirestoreRepository implements DatabaseRepository {
 		try {
 			const col = firestore.collection(name);
 			await col.doc(id).create({ id, ...data });
-			return { id, ...data };
+			return { id, ...data } as Collections[Name];
 		} catch (err: any) {
 			this.logger.error("Failed to create item", {
 				collection: name,
