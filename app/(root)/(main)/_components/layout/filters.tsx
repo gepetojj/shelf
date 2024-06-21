@@ -1,26 +1,23 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useMemo } from "react";
 
-import { unique } from "@/lib/unique";
+import { api } from "@/trpc/react";
 import { Select } from "@mantine/core";
 
 import { useContext } from "../context";
 
 export const Filters: React.FC = memo(function Filters() {
-	const { discipline, topic } = useContext();
+	const { discipline, topic, setDiscipline, setTopic } = useContext();
+	const tags = api.fileTags.list.useQuery().data;
 
-	// const disciplines = useMemo(
-	// 	() =>
-	// 		books.length > 0
-	// 			? books.map(book => book.disciplines).reduce((prev, current) => [...prev, ...current])
-	// 			: [],
-	// 	[books],
-	// );
-	// const topics = useMemo(
-	// 	() => (books.length > 0 ? books.map(book => book.topics).reduce((prev, current) => [...prev, ...current]) : []),
-	// 	[books],
-	// );
+	const disciplines = useMemo(() => {
+		return tags?.filter(tag => tag.type === "discipline") || [];
+	}, [tags]);
+
+	const topics = useMemo(() => {
+		return tags?.filter(tag => tag.type === "topic") || [];
+	}, [tags]);
 
 	return (
 		<div className="sticky top-10 flex w-full flex-col items-start gap-6 home-break:w-fit">
@@ -29,20 +26,30 @@ export const Filters: React.FC = memo(function Filters() {
 				label="Disciplina"
 				data={[
 					{ value: "", label: "Qualquer" },
-					...unique([]).map(item => ({ value: item.toLowerCase(), label: item })),
+					...disciplines.map(item => ({ value: item.name, label: item.name })),
 				]}
-				defaultValue={discipline}
+				value={discipline}
+				onChange={value => {
+					setDiscipline(value || "");
+					setTopic("");
+				}}
 				className="w-full"
+				clearable={false}
 			/>
 			<Select
 				id="topic"
 				label="Tema"
 				data={[
 					{ value: "", label: "Qualquer" },
-					...unique([]).map(item => ({ value: item.toLowerCase(), label: item })),
+					...topics.map(item => ({ value: item.name, label: item.name })),
 				]}
-				defaultValue={topic}
+				value={topic}
+				onChange={value => {
+					setTopic(value || "");
+					setDiscipline("");
+				}}
 				className="w-full"
+				clearable={false}
 			/>
 		</div>
 	);

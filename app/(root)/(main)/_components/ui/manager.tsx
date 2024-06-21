@@ -13,9 +13,9 @@ import { Book } from "./book";
 const Filters = dynamic(() => import("../layout/filters").then(mod => mod.Filters));
 
 export const Manager: React.FC = memo(function Manager() {
-	const { isDrawerOpen, drawerActions, searchResults } = useContext();
+	const { isDrawerOpen, drawerActions, searchResults, discipline, topic } = useContext();
 	const [query, queryActions] = api.files.list.useSuspenseInfiniteQuery(
-		{ offset: 10 },
+		{ offset: 10, discipline, topic },
 		{
 			getNextPageParam(last, _, cursor) {
 				return last.books.length < 10 ? undefined : (cursor || 0) + 1;

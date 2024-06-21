@@ -8,8 +8,8 @@ export type FileProps = {
 	pages: number;
 
 	collections: string[]; // IDs das estantes que o livro está
-	disciplines: string[];
-	topics: string[];
+	disciplines: string[]; // IDs das disciplinas
+	topics: string[]; // IDs dos tópicos
 	searchableKeywords: string[];
 
 	defaultFile: FileReferenceProps["id"];

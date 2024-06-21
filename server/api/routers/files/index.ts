@@ -22,12 +22,26 @@ export const filesRouter = createTRPCRouter({
 			z.object({
 				offset: z.coerce.number().min(10).max(20).optional().default(10),
 				cursor: z.coerce.number().min(1).max(9999).optional().default(1),
+				discipline: z.string().optional(),
+				topic: z.string().optional(),
 			}),
 		)
 		.query(async ({ input }) => {
 			// TODO: List all types of files
 			const books = await database.findMany("books", [
 				{ offset: input.offset, page: input.cursor, orderBy: "uploadedAt", sort: "desc" },
+				{
+					key: "disciplines",
+					comparator: "array-contains-any",
+					value: [input.discipline],
+					ignore: !input.discipline,
+				},
+				{
+					key: "topics",
+					comparator: "array-contains-any",
+					value: [input.topic],
+					ignore: !input.topic || !!input.discipline,
+				},
 			]);
 
 			return { books };

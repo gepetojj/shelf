@@ -54,14 +54,14 @@ export const Form: React.FC<FormProps> = memo(function Form({ isbn }) {
 					color: "red",
 				});
 			}
-			if (!fields.disciplines.length) {
+			if (!fields.disciplines?.length) {
 				return notifications.show({
 					title: "Erro",
 					message: "Insira ao menos uma matéria antes de postar.",
 					color: "red",
 				});
 			}
-			if (!fields.topics.length) {
+			if (!fields.topics?.length) {
 				return notifications.show({
 					title: "Erro",
 					message: "Insira ao menos um tópico antes de postar.",

@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { Book } from "@/core/domain/entities/book";
 import { FileReference } from "@/core/domain/entities/file-reference";
+import { FileTag } from "@/core/domain/entities/file-tag";
 import { DatabaseRepository } from "@/core/domain/repositories/database.repository";
 import { StorageRepository } from "@/core/domain/repositories/storage.repository";
 import { Registry } from "@/core/infra/container/registry";
@@ -48,6 +49,49 @@ const database = container.get<DatabaseRepository>(Registry.DatabaseRepository);
 const storage = container.get<StorageRepository>(Registry.StorageRepository);
 const logger = container.get<Logger>(Registry.Logger);
 
+const processTags = async (disciplines: string[], topics: string[]) => {
+	const createTags: Promise<any>[] = [];
+	for (const discipline of disciplines) {
+		const indexable = FileTag.nameToIndexable(discipline);
+		const exists = await database
+			.findOne("file_tags", [
+				{ key: "type", comparator: "==", value: "discipline" },
+				{ key: "indexableName", comparator: "==", value: indexable },
+			])
+			.catch(() => undefined);
+		if (!exists) {
+			const tag = FileTag.fromJSON({
+				id: crypto.randomUUID(),
+				type: "discipline",
+				name: discipline,
+				indexableName: indexable,
+				searchableName: FileTag.nameToSearchable(discipline),
+			});
+			createTags.push(database.create("file_tags", tag.id, tag.toJSON()));
+		}
+	}
+	for (const topic of topics) {
+		const indexable = FileTag.nameToIndexable(topic);
+		const exists = await database
+			.findOne("file_tags", [
+				{ key: "type", comparator: "==", value: "topic" },
+				{ key: "indexableName", comparator: "==", value: indexable },
+			])
+			.catch(() => undefined);
+		if (!exists) {
+			const tag = FileTag.fromJSON({
+				id: crypto.randomUUID(),
+				type: "topic",
+				name: topic,
+				indexableName: indexable,
+				searchableName: FileTag.nameToSearchable(topic),
+			});
+			createTags.push(database.create("file_tags", tag.id, tag.toJSON()));
+		}
+	}
+	return createTags;
+};
+
 export const upload = async (
 	form: Omit<z.infer<typeof inputs>, "file"> & { blobs: FormData },
 	user: { id: string; name: string; avatarUrl: string },
@@ -56,12 +100,24 @@ export const upload = async (
 		const blobs = Object.fromEntries(form.blobs);
 		const data = inputs.parse({ ...form, file: blobs.file });
 
+		if (!data.book.globalIdentifier) {
+			return { success: false, message: "O ISBN do livro é obrigatório." };
+		}
+		const exists = await database
+			.findOne("books", [{ key: "isbn", comparator: "==", value: data.book.globalIdentifier }])
+			.catch(() => undefined);
+		if (exists) {
+			return { success: false, message: "Este livro já foi enviado anteriormente." };
+		}
+
 		const bookId = crypto.randomUUID();
 		const filename = data.book.title.toLocaleLowerCase("en").replaceAll(" ", "-");
 
 		const file = Buffer.from(await data.file.arrayBuffer());
 		const fileType = await fileTypeFromBuffer(file);
 		const extension = fileType?.ext || "pdf";
+
+		const tagsToCreate = await processTags(data.disciplines, data.topics);
 
 		const reference = FileReference.fromJSON({
 			id: crypto.randomUUID(),
@@ -113,7 +169,8 @@ export const upload = async (
 		}
 
 		try {
-			await database.create("books", book.id, book.toJSON() as any);
+			await Promise.all(tagsToCreate);
+			await database.create("books", book.id, book.toJSON());
 		} catch (err: any) {
 			logger.error("Failed to register file", { book, err });
 			await storage.delete(reference.path);
