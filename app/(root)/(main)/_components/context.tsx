@@ -19,7 +19,7 @@ export interface Context {
 }
 
 export interface ContextProps {
-	value: Omit<Context, "setQuery" | "setDiscipline" | "setTopic" | "drawerActions">;
+	value: Omit<Context, "setQuery" | "setDiscipline" | "setTopic" | "setSearchResults" | "drawerActions">;
 }
 
 export const Context = createContext<Context>(undefined!);

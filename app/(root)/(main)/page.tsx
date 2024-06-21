@@ -13,9 +13,9 @@ export default function Page() {
 		<ContextProvider
 			value={{
 				isDrawerOpen: false,
-				query: "",
 				discipline: "",
 				topic: "",
+				searchResults: [],
 			}}
 		>
 			<Layout>

@@ -10,9 +10,9 @@ export default async function Loading() {
 		<ContextProvider
 			value={{
 				isDrawerOpen: false,
-				query: "",
 				discipline: "",
 				topic: "",
+				searchResults: [],
 			}}
 		>
 			<Layout>
