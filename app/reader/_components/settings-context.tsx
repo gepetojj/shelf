@@ -3,15 +3,15 @@
 import { createContext, useContext, useMemo, useState } from "react";
 import { memo } from "react";
 
-import { FileAnnotationProps } from "@/core/domain/entities/file-annotation";
 import { api } from "@/trpc/react";
+import { Prisma } from "@prisma/client";
 
 export type SettingsContextProps = {
 	totalPages: number;
 	currentPage: number;
 	progress: number;
 	zoom: number;
-	annotations: FileAnnotationProps[];
+	annotations: Prisma.AnnotationGetPayload<{}>[];
 	fileId: string;
 
 	setTotalPages: (totalPages: number) => void;

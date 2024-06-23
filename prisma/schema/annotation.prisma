@@ -1,8 +1,7 @@
 model Annotation {
-    id          String   @id @default(uuid())
     page        Int
     textContent String
-    substrings  Json[]
+    substrings  Json
     comment     String?
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
@@ -12,5 +11,6 @@ model Annotation {
     post    Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
     postId  String
 
+    @@id([ownerId, postId, page, textContent])
     @@index([page])
 }

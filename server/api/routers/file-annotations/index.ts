@@ -1,30 +1,17 @@
 import { z } from "zod";
 
-import { DatabaseRepository } from "@/core/domain/repositories/database.repository";
-import { Registry } from "@/core/infra/container/registry";
-import { container } from "@/core/infra/container/server-only";
-import { now } from "@/lib/time";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { PrismaClient } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 
-const database = container.get<DatabaseRepository>(Registry.DatabaseRepository);
+const database = new PrismaClient();
 
 export const fileAnnotationsRouter = createTRPCRouter({
-	one: protectedProcedure.input(z.object({ id: z.string().uuid() })).query(async ({ input, ctx }) => {
-		const annotation = await database.findOne("file_annotations", [
-			{ key: "id", comparator: "==", value: input.id },
-			{ key: "userId", comparator: "==", value: ctx.auth.userId },
-		]);
-		return annotation;
-	}),
-
 	list: protectedProcedure.input(z.object({ fileId: z.string().uuid() })).query(async ({ input, ctx }) => {
-		const annotations = await database.findMany("file_annotations", [
-			{ key: "userId", comparator: "==", value: ctx.auth.userId },
-			{ key: "fileId", comparator: "==", value: input.fileId },
-		]);
-
-		return annotations;
+		const data = await database.annotation.findMany({
+			where: { owner: { externalId: ctx.auth.userId }, postId: input.fileId },
+		});
+		return data;
 	}),
 
 	highlight: protectedProcedure
@@ -40,28 +27,30 @@ export const fileAnnotationsRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ input, ctx }) => {
-			const annotation = await database
-				.findOne("file_annotations", [
-					{ key: "userId", comparator: "==", value: ctx.auth.userId },
-					{ key: "fileId", comparator: "==", value: input.fileId },
-					{ key: "page", comparator: "==", value: input.page },
-					{ key: "textContent", comparator: "==", value: input.text },
-				])
-				.catch(() => undefined);
-			if (annotation) {
-				throw new TRPCError({ code: "CONFLICT", message: "Uma anotação do mesmo trecho já existe." });
-			}
+			const owner = await database.user.findUnique({ where: { externalId: ctx.auth.userId } });
+			if (!owner) throw new TRPCError({ code: "NOT_FOUND", message: "Usuário não encontrado." });
 
-			const id = crypto.randomUUID();
-			return await database.create("file_annotations", id, {
-				userId: ctx.auth.userId,
-				fileId: input.fileId,
-				page: input.page,
-				textContent: input.text.replaceAll("\n", " "),
-				substrings: input.substrings,
-				comment: null,
-				createdAt: now(),
+			const data = await database.annotation.upsert({
+				where: {
+					ownerId_postId_page_textContent: {
+						ownerId: owner.id,
+						postId: input.fileId,
+						page: input.page,
+						textContent: input.text,
+					},
+				},
+				create: {
+					owner: { connect: { externalId: ctx.auth.userId } },
+					post: { connect: { id: input.fileId } },
+					page: input.page,
+					textContent: input.text,
+					substrings: input.substrings,
+				},
+				update: {
+					substrings: input.substrings,
+				},
 			});
+			return data;
 		}),
 
 	comment: protectedProcedure
@@ -78,35 +67,61 @@ export const fileAnnotationsRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ input, ctx }) => {
-			const annotation = await database
-				.findOne("file_annotations", [
-					{ key: "userId", comparator: "==", value: ctx.auth.userId },
-					{ key: "fileId", comparator: "==", value: input.fileId },
-					{ key: "page", comparator: "==", value: input.page },
-					{ key: "textContent", comparator: "==", value: input.text },
-				])
-				.catch(() => undefined);
-			if (annotation) {
-				throw new TRPCError({ code: "CONFLICT", message: "Uma anotação do mesmo trecho já existe." });
-			}
+			const owner = await database.user.findUnique({ where: { externalId: ctx.auth.userId } });
+			if (!owner) throw new TRPCError({ code: "NOT_FOUND", message: "Usuário não encontrado." });
 
-			const id = crypto.randomUUID();
-			return await database.create("file_annotations", id, {
-				userId: ctx.auth.userId,
-				fileId: input.fileId,
-				page: input.page,
-				textContent: input.text.replaceAll("\n", " "),
-				substrings: input.substrings,
-				comment: input.comment,
-				createdAt: now(),
+			const data = await database.annotation.upsert({
+				where: {
+					ownerId_postId_page_textContent: {
+						ownerId: owner.id,
+						postId: input.fileId,
+						page: input.page,
+						textContent: input.text,
+					},
+				},
+				create: {
+					owner: { connect: { externalId: ctx.auth.userId } },
+					post: { connect: { id: input.fileId } },
+					page: input.page,
+					textContent: input.text,
+					comment: input.comment,
+					substrings: input.substrings,
+				},
+				update: {
+					substrings: input.substrings,
+					comment: input.comment,
+				},
 			});
+			return data;
 		}),
 
-	delete: protectedProcedure.input(z.object({ id: z.string().uuid() })).mutation(async ({ input, ctx }) => {
-		const annotation = await database.findOne("file_annotations", [
-			{ key: "id", comparator: "==", value: input.id },
-			{ key: "userId", comparator: "==", value: ctx.auth.userId },
-		]);
-		await database.delete("file_annotations", annotation.id);
-	}),
+	delete: protectedProcedure
+		.input(z.object({ postId: z.string().uuid(), page: z.coerce.number().min(1).max(9999), text: z.string() }))
+		.mutation(async ({ input, ctx }) => {
+			const owner = await database.user.findUnique({ where: { externalId: ctx.auth.userId } });
+			if (!owner) throw new TRPCError({ code: "NOT_FOUND", message: "Usuário não encontrado." });
+
+			const data = await database.annotation.findUnique({
+				where: {
+					ownerId_postId_page_textContent: {
+						ownerId: owner.id,
+						postId: input.postId,
+						page: input.page,
+						textContent: input.text,
+					},
+				},
+			});
+			if (!data) throw new TRPCError({ code: "NOT_FOUND", message: "Anotação não encontrada." });
+
+			await database.annotation.delete({
+				where: {
+					ownerId_postId_page_textContent: {
+						ownerId: owner.id,
+						postId: input.postId,
+						page: input.page,
+						textContent: input.text,
+					},
+				},
+			});
+		}),
 });

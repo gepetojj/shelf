@@ -26,12 +26,15 @@ export const Settings: React.FC = memo(function Settings({}) {
 	}, [annotations, currentPage]);
 
 	const onDeleteAnnotation = useCallback(
-		(id: string) => {
+		(id: { postId: string; page: number; text: string }) => {
 			deleteAnnotation.mutate(
-				{ id },
+				{ postId: id.postId, page: id.page, text: id.text },
 				{
 					onSuccess: () => {
-						annotationUtils.setData({ fileId }, data => data?.filter(a => a.id !== id) || []);
+						annotationUtils.setData(
+							{ fileId },
+							data => data?.filter(a => a.page !== id.page && a.textContent !== id.text) || [],
+						);
 					},
 					onError: error => {
 						notifications.show({
@@ -120,9 +123,9 @@ export const Settings: React.FC = memo(function Settings({}) {
 								</Text>
 								<ul className="flex flex-col gap-4">
 									{currentAnnotations.length ? (
-										currentAnnotations.map(a => (
+										currentAnnotations.map((a, index) => (
 											<li
-												key={a.id}
+												key={`ann-${index}-${a.page}-${a.textContent.slice(0, 10)}`}
 												className="flex flex-col gap-1 duration-200 animate-in fade-in-20"
 											>
 												<header className="flex w-full items-center justify-between">
@@ -131,7 +134,13 @@ export const Settings: React.FC = memo(function Settings({}) {
 													</span>
 													<ActionIcon
 														variant="subtle"
-														onClick={() => onDeleteAnnotation(a.id)}
+														onClick={() =>
+															onDeleteAnnotation({
+																postId: fileId,
+																page: a.page,
+																text: a.textContent,
+															})
+														}
 														color="red"
 													>
 														<IconTrash size={14} />
@@ -161,9 +170,9 @@ export const Settings: React.FC = memo(function Settings({}) {
 								</Text>
 								<ul className="flex flex-col gap-4">
 									{otherAnnotations.length ? (
-										otherAnnotations.map(a => (
+										otherAnnotations.map((a, index) => (
 											<li
-												key={a.id}
+												key={`ann-${index}-${a.page}-${a.textContent.slice(0, 10)}`}
 												className="flex flex-col gap-1 duration-200 animate-in fade-in-20"
 											>
 												<header className="flex w-full items-center justify-between">
@@ -184,7 +193,13 @@ export const Settings: React.FC = memo(function Settings({}) {
 														</ActionIcon>
 														<ActionIcon
 															variant="subtle"
-															onClick={() => onDeleteAnnotation(a.id)}
+															onClick={() =>
+																onDeleteAnnotation({
+																	postId: fileId,
+																	page: a.page,
+																	text: a.textContent,
+																})
+															}
 															color="red"
 														>
 															<IconTrash size={14} />
