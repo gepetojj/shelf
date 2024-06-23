@@ -1,0 +1,31 @@
+services:
+    main-database:
+        image: postgres:16
+        restart: unless-stopped
+        ports:
+            - "7075:5432"
+        environment:
+            - POSTGRES_USER=docker
+            - POSTGRES_PASSWORD=docker
+            - POSTGRES_DB=shelf
+        volumes:
+            - ./data:/var/lib/postgresql/data
+        networks:
+            - pgnet
+
+    pg-admin:
+        image: dpage/pgadmin4
+        restart: unless-stopped
+        ports:
+            - "7076:80"
+        environment:
+            - PGADMIN_DEFAULT_EMAIL=docker@dev.com
+            - PGADMIN_DEFAULT_PASSWORD=docker
+        depends_on:
+            - main-database
+        networks:
+            - pgnet
+
+networks:
+    pgnet:
+        driver: bridge

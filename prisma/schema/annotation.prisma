@@ -1,0 +1,15 @@
+model Annotation {
+    id          String   @id @default(uuid())
+    page        Int
+    textContent String
+    substrings  Json[]
+    comment     String?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    postId      String
+    ownerId     String   @default("deleted")
+    owner       User     @relation(fields: [ownerId], references: [id], onDelete: SetDefault, onUpdate: NoAction)
+    post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+    @@index([page])
+}

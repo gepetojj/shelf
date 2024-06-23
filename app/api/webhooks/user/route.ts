@@ -4,12 +4,11 @@ import { Logger } from "winston";
 import { z } from "zod";
 
 import { config } from "@/config";
-import { User } from "@/core/domain/entities/user";
-import { DatabaseRepository } from "@/core/domain/repositories/database.repository";
 import { Registry } from "@/core/infra/container/registry";
 import { container } from "@/core/infra/container/server-only";
 import { api, handlerConfig } from "@/models/api";
 import { WebhookEvent } from "@clerk/nextjs/server";
+import { PrismaClient } from "@prisma/client";
 
 const router = api();
 
@@ -19,7 +18,7 @@ const getHandlerHeaders = z.object({
 	signature: z.string(),
 });
 
-const database = container.get<DatabaseRepository>(Registry.DatabaseRepository);
+const database = new PrismaClient();
 const logger = container.get<Logger>(Registry.Logger);
 
 router.post(async req => {
@@ -44,7 +43,7 @@ router.post(async req => {
 		}) as WebhookEvent;
 	} catch (err) {
 		logger.error(`Error verifying webhook ${id}`, { err });
-		return new Response("Houve um erro desconhecido.", {
+		return new Response("A identificação do webhook é inválida.", {
 			status: 400,
 		});
 	}
@@ -57,31 +56,42 @@ router.post(async req => {
 			const { username, email_addresses, first_name, last_name, banned, image_url } = data;
 
 			if (evt.type === "user.created") {
-				const user = User.fromJSON({
-					id: crypto.randomUUID(),
-					externalId: uid,
-					firstName: first_name,
-					lastName: last_name,
-					email: email_addresses[0].email_address,
-					username: username || crypto.randomUUID(),
-					profileImageUrl: image_url,
-					banned,
+				await database.user.create({
+					data: {
+						externalId: uid,
+						firstName: first_name,
+						lastName: last_name,
+						email: email_addresses[0].email_address,
+						username: username || crypto.randomUUID(),
+						profileImageUrl: image_url,
+						banned,
+					},
 				});
-				await database.create("users", user.id, user.toJSON());
 			} else {
-				let user = await database.findOne("users", [{ key: "externalId", comparator: "==", value: uid }]);
-				user = {
-					...user,
-					externalId: uid,
-					firstName: first_name,
-					lastName: last_name,
-					email: email_addresses[0].email_address,
-					username: username || user.username,
-					profileImageUrl: image_url,
-					banned,
-				};
-				await database.update("users", user.id, user);
+				await database.user.update({
+					where: {
+						externalId: uid,
+					},
+					data: {
+						externalId: uid,
+						firstName: first_name,
+						lastName: last_name,
+						email: email_addresses[0].email_address,
+						username: username || undefined,
+						profileImageUrl: image_url,
+						banned,
+					},
+				});
 			}
+			break;
+
+		case "user.deleted":
+			const clerkId = evt.data.id;
+			await database.user.delete({
+				where: {
+					externalId: clerkId,
+				},
+			});
 	}
 
 	return new Response("OK", { status: 200 });

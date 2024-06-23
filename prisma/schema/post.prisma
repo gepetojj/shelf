@@ -1,0 +1,23 @@
+model Post {
+    id             String        @id @default(uuid())
+    workIdentifier String?       @unique
+    title          String
+    subtitle       String?
+    description    String
+    authors        String[]
+    publishers     String[]
+    pages          Int
+    largeThumbnail String?
+    smallThumbnail String?
+    createdAt      DateTime      @default(now())
+    updatedAt      DateTime      @updatedAt
+    uploaderId     String        @default("deleted")
+    annotations    Annotation[]
+    comments       Comment[]
+    files          File[]
+    uploader       User          @relation(fields: [uploaderId], references: [id], onDelete: SetDefault, onUpdate: NoAction)
+    tags           TagsOnPosts[]
+
+    @@index([createdAt(sort: Desc)])
+    @@index([workIdentifier, title])
+}

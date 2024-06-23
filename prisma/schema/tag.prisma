@@ -1,0 +1,20 @@
+model Tag {
+    id    String        @id @default(uuid())
+    type  TagType
+    name  String        @unique
+    posts TagsOnPosts[]
+}
+
+model TagsOnPosts {
+    postId String
+    tagId  String
+    post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+    tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+    @@id([postId, tagId])
+}
+
+enum TagType {
+    DISCIPLINE
+    TOPIC
+}

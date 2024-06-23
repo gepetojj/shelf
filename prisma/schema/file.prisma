@@ -1,0 +1,14 @@
+model File {
+    id         String   @id @default(uuid())
+    name       String
+    extension  String
+    path       String
+    mimeType   String
+    bytes      Int
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    postId     String
+    uploaderId String   @default("deleted")
+    post       Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+    uploader   User     @relation(fields: [uploaderId], references: [id], onDelete: SetDefault, onUpdate: NoAction)
+}
