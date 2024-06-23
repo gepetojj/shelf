@@ -1,0 +1,10 @@
+model Collection {
+    id           String   @id @default(uuid())
+    name         String   @unique
+    description  String
+    thumbnailUrl String?
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+
+    posts Post[]
+}

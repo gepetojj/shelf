@@ -3,11 +3,12 @@ model Comment {
     textContent String
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
-    postId      String
-    parentId    String?  @unique
-    ownerId     String   @default("deleted")
-    owner       User     @relation(fields: [ownerId], references: [id], onDelete: SetDefault, onUpdate: NoAction)
-    parent      Comment? @relation("CommentHistory", fields: [parentId], references: [id], onDelete: Cascade)
-    children    Comment? @relation("CommentHistory")
-    post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+    owner    User     @relation(fields: [ownerId], references: [id], onDelete: SetDefault, onUpdate: NoAction)
+    ownerId  String   @default("deleted")
+    parent   Comment? @relation("CommentHistory", fields: [parentId], references: [id], onDelete: Cascade)
+    parentId String?  @unique
+    children Comment? @relation("CommentHistory")
+    post     Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+    postId   String
 }

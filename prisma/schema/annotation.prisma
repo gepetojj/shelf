@@ -6,10 +6,11 @@ model Annotation {
     comment     String?
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
-    postId      String
-    ownerId     String   @default("deleted")
-    owner       User     @relation(fields: [ownerId], references: [id], onDelete: SetDefault, onUpdate: NoAction)
-    post        Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+    owner   User   @relation(fields: [ownerId], references: [id], onDelete: SetDefault, onUpdate: NoAction)
+    ownerId String @default("deleted")
+    post    Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+    postId  String
 
     @@index([page])
 }

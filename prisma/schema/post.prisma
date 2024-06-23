@@ -1,6 +1,6 @@
 model Post {
-    id             String        @id @default(uuid())
-    workIdentifier String?       @unique
+    id             String   @id @default(uuid())
+    workIdentifier String?  @unique
     title          String
     subtitle       String?
     description    String
@@ -9,14 +9,17 @@ model Post {
     pages          Int
     largeThumbnail String?
     smallThumbnail String?
-    createdAt      DateTime      @default(now())
-    updatedAt      DateTime      @updatedAt
-    uploaderId     String        @default("deleted")
-    annotations    Annotation[]
-    comments       Comment[]
-    files          File[]
-    uploader       User          @relation(fields: [uploaderId], references: [id], onDelete: SetDefault, onUpdate: NoAction)
-    tags           TagsOnPosts[]
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
+
+    annotations  Annotation[]
+    comments     Comment[]
+    files        File[]
+    uploader     User          @relation(fields: [uploaderId], references: [id], onDelete: SetDefault, onUpdate: NoAction)
+    uploaderId   String        @default("deleted")
+    tags         TagsOnPosts[]
+    Collection   Collection?   @relation(fields: [collectionId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+    collectionId String?
 
     @@index([createdAt(sort: Desc)])
     @@index([workIdentifier, title])

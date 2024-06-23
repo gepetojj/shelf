@@ -4,23 +4,19 @@ import { fileTypeFromBuffer } from "file-type";
 import { Logger } from "winston";
 import { z } from "zod";
 
-import { Book } from "@/core/domain/entities/book";
-import { FileReference } from "@/core/domain/entities/file-reference";
-import { FileTag } from "@/core/domain/entities/file-tag";
-import { DatabaseRepository } from "@/core/domain/repositories/database.repository";
 import { StorageRepository } from "@/core/domain/repositories/storage.repository";
 import { Registry } from "@/core/infra/container/registry";
 import { container } from "@/core/infra/container/server-only";
 import { megaToBytes } from "@/lib/bytes";
-import { now } from "@/lib/time";
+import { Prisma, PrismaClient } from "@prisma/client";
 
 const inputs = z.object({
-	disciplines: z.array(z.string()),
-	topics: z.array(z.string()),
+	disciplines: z.array(z.string().trim()).min(1).max(5),
+	topics: z.array(z.string().trim()).min(1).max(10),
 	file: z
 		.custom<File>()
-		.refine(file => file && file.size <= megaToBytes(100), {
-			message: "O livro enviado é maior que o limite de 100MB.",
+		.refine(file => file && file.size <= megaToBytes(50), {
+			message: "O livro enviado é maior que o limite de 50MB.",
 		})
 		.refine(file => file && file.type === "application/pdf", {
 			message: "O arquivo enviado não é um PDF.",
@@ -45,52 +41,9 @@ type Outputs = {
 	message: string;
 };
 
-const database = container.get<DatabaseRepository>(Registry.DatabaseRepository);
+const database = new PrismaClient();
 const storage = container.get<StorageRepository>(Registry.StorageRepository);
 const logger = container.get<Logger>(Registry.Logger);
-
-const processTags = async (disciplines: string[], topics: string[]) => {
-	const createTags: Promise<any>[] = [];
-	for (const discipline of disciplines) {
-		const indexable = FileTag.nameToIndexable(discipline);
-		const exists = await database
-			.findOne("file_tags", [
-				{ key: "type", comparator: "==", value: "discipline" },
-				{ key: "indexableName", comparator: "==", value: indexable },
-			])
-			.catch(() => undefined);
-		if (!exists) {
-			const tag = FileTag.fromJSON({
-				id: crypto.randomUUID(),
-				type: "discipline",
-				name: discipline,
-				indexableName: indexable,
-				searchableName: FileTag.nameToSearchable(discipline),
-			});
-			createTags.push(database.create("file_tags", tag.id, tag.toJSON()));
-		}
-	}
-	for (const topic of topics) {
-		const indexable = FileTag.nameToIndexable(topic);
-		const exists = await database
-			.findOne("file_tags", [
-				{ key: "type", comparator: "==", value: "topic" },
-				{ key: "indexableName", comparator: "==", value: indexable },
-			])
-			.catch(() => undefined);
-		if (!exists) {
-			const tag = FileTag.fromJSON({
-				id: crypto.randomUUID(),
-				type: "topic",
-				name: topic,
-				indexableName: indexable,
-				searchableName: FileTag.nameToSearchable(topic),
-			});
-			createTags.push(database.create("file_tags", tag.id, tag.toJSON()));
-		}
-	}
-	return createTags;
-};
 
 export const upload = async (
 	form: Omit<z.infer<typeof inputs>, "file"> & { blobs: FormData },
@@ -103,78 +56,85 @@ export const upload = async (
 		if (!data.book.globalIdentifier) {
 			return { success: false, message: "O ISBN do livro é obrigatório." };
 		}
-		const exists = await database
-			.findOne("books", [{ key: "isbn", comparator: "==", value: data.book.globalIdentifier }])
-			.catch(() => undefined);
+		const exists = await database.post.findFirst({ where: { workIdentifier: data.book.globalIdentifier } });
 		if (exists) {
 			return { success: false, message: "Este livro já foi enviado anteriormente." };
 		}
 
 		const bookId = crypto.randomUUID();
 		const filename = data.book.title.toLocaleLowerCase("en").replaceAll(" ", "-");
-
 		const file = Buffer.from(await data.file.arrayBuffer());
 		const fileType = await fileTypeFromBuffer(file);
 		const extension = fileType?.ext || "pdf";
-
-		const tagsToCreate = await processTags(data.disciplines, data.topics);
-
-		const reference = FileReference.fromJSON({
-			id: crypto.randomUUID(),
-			referenceId: bookId,
-			filename,
-			extension,
-			path: `files/${bookId}/${filename}.${extension}`,
-			mimetype: data.file.type,
-			byteSize: data.file.size,
-			uploadedById: user.id,
-			uploadedAt: now(),
-		});
-
-		const searchableKeywords = [];
-		searchableKeywords.push(...data.book.title.trim().toLowerCase().split(" "));
-		searchableKeywords.push(...data.book.authors.map(author => author.trim().toLowerCase().split(" ")).flat(2));
-		searchableKeywords.push(...data.disciplines.map(discip => discip.trim().toLowerCase().split(" ")).flat(2));
-		searchableKeywords.push(...data.topics.map(topic => topic.trim().toLowerCase().split(" ")).flat(2));
-
-		const book = Book.fromJSON({
-			id: bookId,
-			title: data.book.title,
-			description: data.book.description || "",
-			authors: data.book.authors,
-			pages: data.book.pages,
-			collections: [],
-			disciplines: data.disciplines,
-			topics: data.topics,
-			searchableKeywords,
-			defaultFile: reference.id,
-			files: [reference.toJSON()],
-			uploaderId: user.id,
-			uploaderFallback: { name: user.name, avatarUrl: user.avatarUrl },
-			uploadedAt: now(),
-			subtitle: data.book.subtitle || "",
-			publishers: data.book.publishers || [],
-			isbn: data.book.globalIdentifier || "",
-			thumbnail: {
-				small: data.book.thumbnailUrl || "",
-				large: data.book.thumbnailAltUrl || "",
-			},
-		});
+		const path = `files/${bookId}/${filename}.${extension}`;
 
 		try {
-			await storage.create(reference.path, file);
+			await storage.create(path, file);
 		} catch (err: any) {
-			logger.error("Failed to create file in storage", { reference, err });
+			logger.error("Failed to create file in storage", { path, fileType, extension, err });
 			return { success: false, message: err.message || "Houve um erro inesperado." };
 		}
 
 		try {
-			await Promise.all(tagsToCreate);
-			await database.create("books", book.id, book.toJSON());
+			await database.$transaction(async tx => {
+				const uploader = await tx.user.findFirst({ where: { externalId: user.id } });
+
+				await tx.post.create({
+					data: {
+						id: bookId,
+						workIdentifier: data.book.globalIdentifier,
+						title: data.book.title,
+						subtitle: data.book.subtitle,
+						description: data.book.description || "",
+						authors: data.book.authors,
+						publishers: data.book.publishers || [],
+						pages: data.book.pages,
+						largeThumbnail: data.book.thumbnailAltUrl || "",
+						smallThumbnail: data.book.thumbnailUrl || "",
+						files: {
+							create: {
+								name: filename,
+								extension,
+								path,
+								mimeType: fileType?.mime || "application/pdf",
+								bytes: data.file.size,
+								uploaderId: uploader?.id,
+							},
+						},
+						uploaderId: uploader?.id,
+						tags: {
+							create: [
+								...data.disciplines.map(
+									tag =>
+										({
+											tag: {
+												connectOrCreate: {
+													where: { name: tag },
+													create: { name: tag, type: "DISCIPLINE" },
+												},
+											},
+										}) as Prisma.TagsOnPostsCreateWithoutPostInput,
+								),
+								...data.topics.map(
+									tag =>
+										({
+											tag: {
+												connectOrCreate: {
+													where: { name: tag },
+													create: { name: tag, type: "TOPIC" },
+												},
+											},
+										}) as Prisma.TagsOnPostsCreateWithoutPostInput,
+								),
+							],
+						},
+					},
+				});
+			});
 		} catch (err: any) {
-			logger.error("Failed to register file", { book, err });
-			await storage.delete(reference.path);
-			return { success: false, message: err.message || "Houve um erro inesperado." };
+			logger.error("Failed to register file", { err });
+			await storage.delete(path);
+			return { success: false, message: "Não foi possível registrar o livro." };
 		}
 
 		return { success: true, message: "Livro enviado com sucesso." };
