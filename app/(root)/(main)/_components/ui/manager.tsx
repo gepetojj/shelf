@@ -17,13 +17,13 @@ export const Manager: React.FC = memo(function Manager() {
 	const [query, queryActions] = api.files.list.useSuspenseInfiniteQuery(
 		{ offset: 10, discipline, topic },
 		{
-			getNextPageParam(last, _, cursor) {
-				return last.books.length < 10 ? undefined : (cursor || 0) + 1;
+			getNextPageParam(last) {
+				return last.length < 10 ? undefined : last[last.length - 1].id;
 			},
 		},
 	);
 	const content = useMemo(() => {
-		return query.pages.map(page => page.books).flat();
+		return query.pages.flat(2);
 	}, [query.pages]);
 
 	return (

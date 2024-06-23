@@ -13,7 +13,7 @@ import { CreateComment } from "./_components/create-comment";
 export const revalidate = 60;
 
 export default async function Page({ params }: Readonly<{ params: { id: string } }>) {
-	const { book, comments } = await api.files.one({ id: params.id }).catch(() => notFound());
+	const book = await api.files.one({ id: params.id, comments: true }).catch(() => notFound());
 
 	return (
 		<Layout>
@@ -41,20 +41,22 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 							</Spoiler>
 						</div>
 						<div className="text-light break-words text-sm text-neutral-300">
-							<h4 className="break-words">ISBN: {book.isbn || "Não informado"}</h4>
+							<h4 className="break-words">Identificador: {book.workIdentifier || "Não informado"}</h4>
 							<h4 className="break-words">
 								Disciplina(s):{" "}
 								{new Intl.ListFormat("pt-br", {
 									style: "long",
 									type: "conjunction",
-								}).format(book.disciplines)}
+								}).format(
+									book.tags.filter(val => val.tag.type === "DISCIPLINE").map(val => val.tag.name),
+								)}
 							</h4>
 							<h4 className="break-words">
 								Tema(s):{" "}
 								{new Intl.ListFormat("pt-br", {
 									style: "long",
 									type: "conjunction",
-								}).format(book.topics)}
+								}).format(book.tags.filter(val => val.tag.type === "TOPIC").map(val => val.tag.name))}
 							</h4>
 						</div>
 					</div>
@@ -86,15 +88,15 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 						<h2 className="text-2xl font-bold text-zinc-200">Comentários</h2>
 						<CreateComment bookId={book.id} />
 						<ul className="flex w-full flex-col gap-2 pt-2">
-							{comments.length ? (
-								comments
-									.filter(comment => !comment.parentCommentId)
+							{book.comments.length ? (
+								book.comments
+									.filter(comment => !comment.parentId)
 									.map(comment => (
 										<Comment
 											key={comment.id}
 											{...{
 												comment,
-												responses: comments.filter(val => val.parentCommentId === comment.id),
+												responses: book.comments.filter(val => val.parentId === comment.id),
 											}}
 										/>
 									))

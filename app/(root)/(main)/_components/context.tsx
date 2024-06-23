@@ -2,20 +2,22 @@
 
 import { createContext, memo, useContext as useReactContext, useState } from "react";
 
-import { BookProps } from "@/core/domain/entities/book";
 import { useDisclosure } from "@mantine/hooks";
+import { Prisma } from "@prisma/client";
 
 export interface Context {
 	discipline: string;
 	topic: string;
-	searchResults: BookProps[] | undefined;
+	searchResults:
+		| Prisma.PostGetPayload<{ include: { uploader: true; tags: { include: { tag: true } } } }>[]
+		| undefined;
 
 	isDrawerOpen: boolean;
 	drawerActions: ReturnType<typeof useDisclosure>[1];
 
 	setDiscipline: (discipline: string) => void;
 	setTopic: (topic: string) => void;
-	setSearchResults: (results: BookProps[] | undefined) => void;
+	setSearchResults: (data: Context["searchResults"]) => void;
 }
 
 export interface ContextProps {

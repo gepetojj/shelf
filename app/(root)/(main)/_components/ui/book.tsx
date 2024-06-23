@@ -3,11 +3,12 @@ import Link from "next/link";
 import { memo } from "react";
 
 import { Time } from "@/components/ui/time";
-import { BookProps } from "@/core/domain/entities/book";
+import { name } from "@/lib/name";
+import { Prisma } from "@prisma/client";
 import { IconDots } from "@tabler/icons-react";
 
 type BookComponentProps = {
-	book: BookProps;
+	book: Prisma.PostGetPayload<{ include: { uploader: true; tags: { include: { tag: true } } } }>;
 	index: number;
 };
 
@@ -19,18 +20,22 @@ export const Book: React.FC<BookComponentProps> = memo(function Book({ book, ind
 					<div className="flex items-center gap-2 font-light">
 						<Image
 							alt="Imagem do usuário."
-							src={book.uploaderFallback.avatarUrl || "https://randomuser.me/api/portraits/lego/1.jpg"}
+							src={book.uploader.profileImageUrl || "https://randomuser.me/api/portraits/lego/1.jpg"}
 							width={34}
 							height={34}
 							className="rounded-full"
 							loading="lazy"
 						/>
 						<span className="truncate pl-1">
-							{book.uploaderFallback.name.split(" ").slice(0, 2).join(" ")}
+							{name({
+								first: book.uploader.firstName,
+								last: book.uploader.lastName,
+								username: book.uploader.username,
+							})}
 						</span>
 						<span className="text-sm text-neutral-400">·</span>
 						<span className="truncate text-sm text-neutral-400">
-							postou <Time milliseconds={book.uploadedAt} />
+							postou <Time milliseconds={book.createdAt.valueOf()} />
 						</span>
 					</div>
 					<button
@@ -57,7 +62,7 @@ export const Book: React.FC<BookComponentProps> = memo(function Book({ book, ind
 									type: "conjunction",
 								}).format(book.authors)}
 							</span>
-							<span>ISBN: {book.isbn}</span>
+							<span>Identificador: {book.workIdentifier}</span>
 						</div>
 						<div className="flex flex-col">
 							<span>
@@ -65,22 +70,24 @@ export const Book: React.FC<BookComponentProps> = memo(function Book({ book, ind
 								{new Intl.ListFormat("pt-br", {
 									style: "long",
 									type: "conjunction",
-								}).format(book.disciplines)}
+								}).format(
+									book.tags.filter(val => val.tag.type === "DISCIPLINE").map(val => val.tag.name),
+								)}
 							</span>
 							<span>
 								Tema(s):{" "}
 								{new Intl.ListFormat("pt-br", {
 									style: "long",
 									type: "conjunction",
-								}).format(book.topics)}
+								}).format(book.tags.filter(val => val.tag.type === "TOPIC").map(val => val.tag.name))}
 							</span>
 						</div>
 					</div>
 					<div className="hidden bg-slate-800 home-break-book:inline">
-						{book.thumbnail.small && (
+						{book.smallThumbnail && (
 							<Image
 								alt={`Imagem da capa do livro '${book.title}'.`}
-								src={book.thumbnail.small}
+								src={book.smallThumbnail}
 								width={100}
 								height={136}
 								className="max-h-[136px] max-w-[100px] rounded-sm object-cover"
@@ -91,11 +98,11 @@ export const Book: React.FC<BookComponentProps> = memo(function Book({ book, ind
 				</Link>
 			</div>
 
-			{book.thumbnail.large && (
+			{book.largeThumbnail && (
 				<div className="absolute inset-0 h-full w-full home-break-book:hidden">
 					<Image
 						alt={`Imagem da capa do livro '${book.title}'.`}
-						src={book.thumbnail.large}
+						src={book.largeThumbnail}
 						width={120}
 						height={163}
 						className="h-full w-full rounded-xl object-cover opacity-10"

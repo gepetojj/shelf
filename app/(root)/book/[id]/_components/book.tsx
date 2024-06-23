@@ -2,10 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { memo } from "react";
 
-import { BookProps } from "@/core/domain/entities/book";
+import { Prisma } from "@prisma/client";
 
 export interface BookComponentProps {
-	book: BookProps;
+	book: Prisma.PostGetPayload<{ include: { uploader: true; tags: { include: { tag: true } } } }>;
 }
 
 export const Book: React.FC<BookComponentProps> = memo(function Book({ book }) {
@@ -14,7 +14,8 @@ export const Book: React.FC<BookComponentProps> = memo(function Book({ book }) {
 			<div className="sticky top-10 flex w-fit flex-col items-start gap-3 rounded-md bg-main-foreground p-3">
 				<Image
 					alt={`Imagem da capa do livro '${book.title}'`}
-					src={book.thumbnail.large}
+					// TODO: Handle when book has no image
+					src={book.largeThumbnail || ""}
 					width={200}
 					height={180}
 				/>

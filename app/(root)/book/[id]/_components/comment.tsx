@@ -5,16 +5,17 @@ import Image from "next/image";
 import { memo } from "react";
 
 import { Time } from "@/components/ui/time";
-import { FileCommentProps } from "@/core/domain/entities/file-comment";
+import { name } from "@/lib/name";
 import { Collapse, Popover } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { Prisma } from "@prisma/client";
 import { IconChevronDown } from "@tabler/icons-react";
 
 import { CreateComment } from "./create-comment";
 
 export interface CommentProps {
-	comment: FileCommentProps;
-	responses?: FileCommentProps[];
+	comment: Prisma.CommentGetPayload<{ include: { owner: true } }>;
+	responses?: Prisma.CommentGetPayload<{ include: { owner: true } }>[];
 }
 
 export const Comment: React.FC<CommentProps> = memo(function Comment({ comment, responses }) {
@@ -24,8 +25,8 @@ export const Comment: React.FC<CommentProps> = memo(function Comment({ comment, 
 		<li className="flex w-full gap-2 py-1 text-sm">
 			<div className="flex h-full items-start justify-start">
 				<Image
-					alt={`Imagem da conta de ${comment.creatorId}`}
-					src={comment.creatorId}
+					alt={`Imagem da conta de ${comment.owner.username}`}
+					src={comment.owner.profileImageUrl || "https://randomuser.me/api/portraits/lego/1.jpg"}
 					width={32}
 					height={32}
 					className="rounded-full"
@@ -33,13 +34,19 @@ export const Comment: React.FC<CommentProps> = memo(function Comment({ comment, 
 			</div>
 			<div className="flex flex-col">
 				<header className="flex w-full gap-1 truncate">
-					<span className="font-semibold">{comment.creatorId}</span>
+					<span className="font-semibold">
+						{name({
+							first: comment.owner.firstName,
+							last: comment.owner.lastName,
+							username: comment.owner.username,
+						})}
+					</span>
 					<span className="text-neutral-400">
-						<Time milliseconds={comment.createdAt} />
+						<Time milliseconds={comment.createdAt.valueOf()} />
 					</span>
 				</header>
 				<div>
-					<p>{comment.content}</p>
+					<p>{comment.textContent}</p>
 				</div>
 				<div className="w-full pt-2">
 					<Popover
@@ -48,14 +55,17 @@ export const Comment: React.FC<CommentProps> = memo(function Comment({ comment, 
 						shadow="md"
 					>
 						<Popover.Target>
-							<button className="rounded-2xl px-3 py-2 duration-150 hover:bg-main-foreground">
+							<button
+								type="button"
+								className="rounded-2xl px-3 py-2 duration-150 hover:bg-main-foreground"
+							>
 								Responder
 							</button>
 						</Popover.Target>
 						<Popover.Dropdown>
 							<CreateComment
-								bookId={comment.fileId}
-								parentId={comment.parentCommentId || comment.id}
+								bookId={comment.postId}
+								parentId={comment.parentId || comment.id}
 								asResponse
 							/>
 						</Popover.Dropdown>
@@ -79,7 +89,7 @@ export const Comment: React.FC<CommentProps> = memo(function Comment({ comment, 
 						<Collapse in={responsesOpen}>
 							<ul>
 								{responses
-									.toSorted((a, b) => a.createdAt - b.createdAt)
+									.toSorted((a, b) => a.createdAt.valueOf() - b.createdAt.valueOf())
 									.map(response => (
 										<Comment
 											key={response.id}

@@ -1,61 +1,54 @@
 import { z } from "zod";
 
-import { DatabaseRepository } from "@/core/domain/repositories/database.repository";
-import { Registry } from "@/core/infra/container/registry";
-import { container } from "@/core/infra/container/server-only";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import { PrismaClient } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
 
-const database = container.get<DatabaseRepository>(Registry.DatabaseRepository);
+const database = new PrismaClient();
 
 export const filesRouter = createTRPCRouter({
-	one: publicProcedure.input(z.object({ id: z.string().uuid() })).query(async ({ input }) => {
-		const [book, comments] = await Promise.all([
-			database.findOne("books", [{ key: "id", comparator: "==", value: input.id }]),
-			database.findMany("file_comments", [{ key: "fileId", comparator: "==", value: input.id }]),
-		]);
-
-		return { book, comments };
-	}),
+	one: publicProcedure
+		.input(z.object({ id: z.string().uuid(), comments: z.boolean().optional() }))
+		.query(async ({ input }) => {
+			const data = await database.post.findUnique({
+				where: { id: input.id },
+				include: {
+					comments: { include: { owner: input.comments } },
+					uploader: true,
+					tags: { include: { tag: true } },
+				},
+			});
+			if (!data) throw new TRPCError({ code: "NOT_FOUND", message: "Postagem não encontrada." });
+			return data;
+		}),
 
 	list: publicProcedure
 		.input(
 			z.object({
 				offset: z.coerce.number().min(10).max(20).optional().default(10),
-				cursor: z.coerce.number().min(1).max(9999).optional().default(1),
+				cursor: z.string().uuid().optional(),
 				discipline: z.string().optional(),
 				topic: z.string().optional(),
 			}),
 		)
 		.query(async ({ input }) => {
-			// TODO: List all types of files
-			const books = await database.findMany("books", [
-				{ offset: input.offset, page: input.cursor, orderBy: "uploadedAt", sort: "desc" },
-				{
-					key: "disciplines",
-					comparator: "array-contains-any",
-					value: [input.discipline],
-					ignore: !input.discipline,
-				},
-				{
-					key: "topics",
-					comparator: "array-contains-any",
-					value: [input.topic],
-					ignore: !input.topic || !!input.discipline,
-				},
-			]);
-
-			return { books };
+			const tags = [input.discipline, input.topic].filter(tag => !!tag) as string[];
+			const data = await database.post.findMany({
+				where: { tags: { some: { tag: { name: { contains: tags.length ? tags.join("|") : undefined } } } } },
+				orderBy: { createdAt: "desc" },
+				include: { uploader: true, tags: { include: { tag: true } } },
+				take: input.offset,
+				skip: input.cursor ? 1 : undefined, // Pula o cursor
+				cursor: input.cursor ? { id: input.cursor } : undefined,
+			});
+			return data;
 		}),
 
 	search: publicProcedure.input(z.object({ query: z.string() })).query(async ({ input }) => {
-		const books = await database.findMany("books", [
-			{
-				key: "searchableKeywords",
-				comparator: "array-contains-any",
-				value: input.query.toLowerCase().split(" ").slice(0, 20),
-			},
-		]);
-
-		return { books };
+		const data = await database.post.findMany({
+			where: { title: { search: input.query } },
+			include: { uploader: true, tags: { include: { tag: true } } },
+		});
+		return data;
 	}),
 });
