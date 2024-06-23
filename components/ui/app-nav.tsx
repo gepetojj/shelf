@@ -19,8 +19,22 @@ import {
 
 type NavOption = {
 	href: string;
+	/**
+	 * Href opcional que será usada quando o usuário não estiver logado.
+	 *
+	 * @type {?string}
+	 */
 	signedOutHref?: string;
 	label: string;
+	/**
+	 * Se a opção é uma rota que deve ser considerada ativa quando o usuário
+	 * estiver em algum "filho" seu.
+	 *
+	 * Ex.: Se `true`: ativo quando o usuário estiver em `/shelf` ou `/shelf/1`.
+	 * Se `false`: ativo apenas quando o usuário estiver em `/shelf`.
+	 *
+	 * @type {?boolean}
+	 */
 	deep?: boolean;
 	Icon: any;
 	ActiveIcon: any;
@@ -39,7 +53,7 @@ const NAV_OPTIONS: NavOption[] = [
 	{
 		href: "/shelf",
 		signedOutHref: "/sign-in",
-		label: "Sua estante",
+		label: "Estantes",
 		deep: true,
 		Icon: IconBookmark,
 		ActiveIcon: IconBookmarkFilled,
