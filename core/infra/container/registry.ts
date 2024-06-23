@@ -1,6 +1,5 @@
 export const Registry = {
 	Logger: Symbol.for("Logger"),
-	DatabaseRepository: Symbol.for("DatabaseRepository"),
 	Prisma: Symbol.for("Prisma"),
 	StorageRepository: Symbol.for("StorageRepository"),
 	Http: Symbol.for("Http"),
