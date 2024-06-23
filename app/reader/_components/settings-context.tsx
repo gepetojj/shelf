@@ -49,7 +49,7 @@ export const SettingsProvider: React.FC<React.PropsWithChildren<SettingsProvider
 						console.info("Progresso sincronizado para a página", page);
 					},
 					onError: error => {
-						if (error.message === "Usuário não encontrado.") return;
+						if (error.message === "Você não tem permissão para fazer isso.") return;
 						notifications.show({
 							title: "Erro ao salvar o progresso",
 							message: error.message || "Houve um erro desconhecido.",

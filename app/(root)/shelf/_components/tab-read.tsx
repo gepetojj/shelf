@@ -42,7 +42,7 @@ export const TabRead: React.FC = memo(function TabRead({}) {
 									</Link>
 								</AspectRatio>
 								<div className="flex flex-col">
-									<span className="truncate text-sm">{item.book.title}</span>
+									<span className="truncate text-sm font-medium">{item.book.title}</span>
 									<span className="truncate text-xs text-neutral-200">
 										{new Intl.ListFormat("pt-br", {
 											style: "long",

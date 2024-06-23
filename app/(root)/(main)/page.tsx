@@ -8,13 +8,15 @@ import { Filters } from "./_components/layout/filters";
 import { Search } from "./_components/layout/search";
 import { Manager } from "./_components/ui/manager";
 
-export default function Page() {
+export default function Page({
+	searchParams,
+}: Readonly<{ searchParams: { discipline?: string | string[] | null; topic?: string | string[] | null } }>) {
 	return (
 		<ContextProvider
 			value={{
 				isDrawerOpen: false,
-				discipline: "",
-				topic: "",
+				discipline: typeof searchParams.discipline === "string" ? searchParams.discipline : "",
+				topic: typeof searchParams.topic === "string" ? searchParams.topic : "",
 				searchResults: [],
 			}}
 		>

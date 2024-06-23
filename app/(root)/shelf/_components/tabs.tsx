@@ -4,11 +4,12 @@ import { memo, useState } from "react";
 
 import { SegmentedControl } from "@mantine/core";
 
+import { TabByTags } from "./tab-by-tags";
 import { TabRead } from "./tab-read";
 import { TabReading } from "./tab-reading";
 
 const TabsRegistry: { [key: string]: JSX.Element } = {
-	byTag: <></>,
+	byTag: <TabByTags />,
 	reading: <TabReading />,
 	read: <TabRead />,
 };

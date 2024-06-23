@@ -49,7 +49,7 @@ export const filesRouter = createTRPCRouter({
 				const tags = [input.discipline, input.topic].filter(tag => !!tag) as string[];
 				const data = await database.post.findMany({
 					where: {
-						tags: { some: { tag: { name: { contains: tags.length ? tags.join("|") : undefined } } } },
+						tags: { some: { tag: { id: { contains: tags.length ? tags.join("|") : undefined } } } },
 					},
 					orderBy: { createdAt: "desc" },
 					include: { uploader: true, tags: { include: { tag: true } } },

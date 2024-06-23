@@ -22,9 +22,9 @@ export const fileTagsRouter = createTRPCRouter({
 		}
 	}),
 
-	list: publicProcedure.query(async () => {
+	list: publicProcedure.input(z.object({ books: z.boolean().optional() }).optional()).query(async ({ input }) => {
 		try {
-			const tags = await database.tag.findMany();
+			const tags = await database.tag.findMany({ include: { posts: input?.books } });
 			return tags;
 		} catch (err: any) {
 			logger.error(`[file_tags_router:list] Failed to list tags: ${err.message}`, { err });

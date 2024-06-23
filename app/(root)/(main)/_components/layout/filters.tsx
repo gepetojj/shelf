@@ -26,7 +26,7 @@ export const Filters: React.FC = memo(function Filters() {
 				label="Disciplina"
 				data={[
 					{ value: "", label: "Qualquer" },
-					...disciplines.map(item => ({ value: item.name, label: item.name })),
+					...disciplines.map(item => ({ value: item.id, label: item.name })),
 				]}
 				value={discipline}
 				onChange={value => {
@@ -39,10 +39,7 @@ export const Filters: React.FC = memo(function Filters() {
 			<Select
 				id="topic"
 				label="Tema"
-				data={[
-					{ value: "", label: "Qualquer" },
-					...topics.map(item => ({ value: item.name, label: item.name })),
-				]}
+				data={[{ value: "", label: "Qualquer" }, ...topics.map(item => ({ value: item.id, label: item.name }))]}
 				value={topic}
 				onChange={value => {
 					setTopic(value || "");
