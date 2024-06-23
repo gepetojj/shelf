@@ -8,6 +8,7 @@ import { StorageRepository } from "@/core/domain/repositories/storage.repository
 import { Registry } from "@/core/infra/container/registry";
 import { container } from "@/core/infra/container/server-only";
 import { megaToBytes } from "@/lib/bytes";
+import { promiseHandler } from "@/lib/promise-handler";
 import { Prisma, PrismaClient } from "@prisma/client";
 
 const inputs = z.object({
@@ -53,13 +54,15 @@ export const upload = async (
 		const blobs = Object.fromEntries(form.blobs);
 		const data = inputs.parse({ ...form, file: blobs.file });
 
-		if (!data.book.globalIdentifier) {
-			return { success: false, message: "O ISBN do livro é obrigatório." };
-		}
-		const exists = await database.post.findFirst({ where: { workIdentifier: data.book.globalIdentifier } });
-		if (exists) {
-			return { success: false, message: "Este livro já foi enviado anteriormente." };
-		}
+		if (!data.book.globalIdentifier) return { success: false, message: "O identificador do livro é obrigatório." };
+		const exists = await promiseHandler(
+			database.post.findFirst({ where: { workIdentifier: data.book.globalIdentifier } }),
+			{
+				location: "upload_action:find_post",
+				message: "Não foi possível verificar se o livro já foi enviado anteriormente.",
+			},
+		);
+		if (exists) return { success: false, message: "Este livro já foi enviado anteriormente." };
 
 		const bookId = crypto.randomUUID();
 		const filename = data.book.title.toLocaleLowerCase("en").replaceAll(" ", "-");
@@ -72,7 +75,7 @@ export const upload = async (
 			await storage.create(path, file);
 		} catch (err: any) {
 			logger.error("Failed to create file in storage", { path, fileType, extension, err });
-			return { success: false, message: err.message || "Houve um erro inesperado." };
+			return { success: false, message: "Não foi possível fazer upload do arquivo." };
 		}
 
 		try {
