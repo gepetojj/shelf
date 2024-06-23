@@ -6,5 +6,15 @@ model Collection {
     createdAt    DateTime @default(now())
     updatedAt    DateTime @updatedAt
 
-    posts Post[]
+    posts CollectionsOnPosts[]
+}
+
+model CollectionsOnPosts {
+    collectionId String
+    postId       String
+
+    post       Post       @relation(fields: [postId], references: [id])
+    collection Collection @relation(fields: [collectionId], references: [id])
+
+    @@id([collectionId, postId])
 }

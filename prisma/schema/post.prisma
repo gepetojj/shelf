@@ -12,14 +12,13 @@ model Post {
     createdAt      DateTime @default(now())
     updatedAt      DateTime @updatedAt
 
-    annotations  Annotation[]
-    comments     Comment[]
-    files        File[]
-    uploader     User          @relation(fields: [uploaderId], references: [id], onDelete: SetDefault, onUpdate: NoAction)
-    uploaderId   String        @default("deleted")
-    tags         TagsOnPosts[]
-    Collection   Collection?   @relation(fields: [collectionId], references: [id], onDelete: SetNull, onUpdate: NoAction)
-    collectionId String?
+    annotations Annotation[]
+    comments    Comment[]
+    files       File[]
+    uploader    User                 @relation(fields: [uploaderId], references: [id], onDelete: SetDefault, onUpdate: NoAction)
+    uploaderId  String               @default("deleted")
+    tags        TagsOnPosts[]
+    collections CollectionsOnPosts[]
 
     @@index([createdAt(sort: Desc)])
     @@index([workIdentifier, title])
