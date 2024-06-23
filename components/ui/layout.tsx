@@ -1,6 +1,8 @@
 import React, { memo } from "react";
 
-export const Layout: React.FC<{ children: React.ReactElement[] }> = memo(function Layout({ children }) {
+export const Layout: React.FC<{ children: [React.ReactElement, React.ReactElement] }> = memo(function Layout({
+	children,
+}) {
 	if (children?.length !== 2) {
 		console.warn("O Layout deve receber dois elementos!");
 		return null;

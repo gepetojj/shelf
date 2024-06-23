@@ -1,0 +1,14 @@
+model Progress {
+    userId    String
+    bookId    String
+    fileId    String
+    page      Int
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    book Post @relation(fields: [bookId], references: [id], onDelete: Cascade)
+    file File @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+    @@id([userId, bookId, fileId])
+}

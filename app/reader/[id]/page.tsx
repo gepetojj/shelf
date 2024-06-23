@@ -8,7 +8,10 @@ import { Loader } from "@mantine/core";
 const PDFViewer = dynamic(() => import("@/app/reader/_components/pdf-viewer").then(mod => mod.PDFViewer));
 
 export default async function Page({ params }: Readonly<{ params: { id: string } }>) {
-	const book = await api.files.one({ id: params.id, files: true }).catch(() => notFound());
+	const [book, progress] = await Promise.all([
+		api.files.one({ id: params.id, files: true }).catch(() => notFound()),
+		api.progress.one({ bookId: params.id }).catch(() => undefined),
+	]);
 
 	return (
 		<div className="flex flex-col gap-5">
@@ -46,7 +49,10 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 						</div>
 					}
 				>
-					<PDFViewer location={book.files[0].path} />
+					<PDFViewer
+						location={book.files[0].path}
+						startPage={progress?.page}
+					/>
 				</Suspense>
 			</section>
 		</div>

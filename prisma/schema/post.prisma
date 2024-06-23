@@ -19,6 +19,7 @@ model Post {
     uploaderId  String               @default("deleted")
     tags        TagsOnPosts[]
     collections CollectionsOnPosts[]
+    Progress    Progress[]
 
     @@index([createdAt(sort: Desc)])
     @@index([workIdentifier, title])

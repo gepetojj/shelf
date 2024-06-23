@@ -117,6 +117,13 @@ export const PDFViewer: React.FC<PDFViewerProps> = memo(function PDFViewer({ loc
 		}
 	}, [progress]);
 
+	useEffect(() => {
+		if (!startPage) return;
+		if (startPage >= 1 && startPage <= totalPages) {
+			setCurrentPage(startPage);
+		}
+	}, [setCurrentPage, startPage, totalPages]);
+
 	return (
 		<>
 			<button
