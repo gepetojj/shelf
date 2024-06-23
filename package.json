@@ -11,7 +11,7 @@
 		"analyze": "ANALYZE=true next build",
 		"dev": "next dev",
 		"lint": "next lint",
-		"format": "prettier . --write",
+		"format": "prettier !docker . --write",
 		"emulators": "firebase emulators:start --import=./emulators --export-on-exit",
 		"prisma": "pnpm dlx prisma",
 		"migrate": "pnpm prisma migrate dev"
