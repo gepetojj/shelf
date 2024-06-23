@@ -8,7 +8,7 @@ const database = new PrismaClient();
 
 export const filesRouter = createTRPCRouter({
 	one: publicProcedure
-		.input(z.object({ id: z.string().uuid(), comments: z.boolean().optional() }))
+		.input(z.object({ id: z.string().uuid(), comments: z.boolean().optional(), files: z.boolean().optional() }))
 		.query(async ({ input }) => {
 			const data = await database.post.findUnique({
 				where: { id: input.id },
@@ -16,6 +16,7 @@ export const filesRouter = createTRPCRouter({
 					comments: { include: { owner: input.comments } },
 					uploader: true,
 					tags: { include: { tag: true } },
+					files: input.files,
 				},
 			});
 			if (!data) throw new TRPCError({ code: "NOT_FOUND", message: "Postagem não encontrada." });

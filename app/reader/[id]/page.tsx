@@ -8,7 +8,7 @@ import { Loader } from "@mantine/core";
 const PDFViewer = dynamic(() => import("@/app/reader/_components/pdf-viewer").then(mod => mod.PDFViewer));
 
 export default async function Page({ params }: Readonly<{ params: { id: string } }>) {
-	const { book } = await api.files.one({ id: params.id }).catch(() => notFound());
+	const book = await api.files.one({ id: params.id, files: true }).catch(() => notFound());
 
 	return (
 		<div className="flex flex-col gap-5">

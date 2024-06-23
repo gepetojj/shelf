@@ -12,11 +12,11 @@ export const Filters: React.FC = memo(function Filters() {
 	const tags = api.fileTags.list.useQuery().data;
 
 	const disciplines = useMemo(() => {
-		return tags?.filter(tag => tag.type === "discipline") || [];
+		return tags?.filter(tag => tag.type === "DISCIPLINE") || [];
 	}, [tags]);
 
 	const topics = useMemo(() => {
-		return tags?.filter(tag => tag.type === "topic") || [];
+		return tags?.filter(tag => tag.type === "TOPIC") || [];
 	}, [tags]);
 
 	return (

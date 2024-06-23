@@ -1,47 +1,25 @@
 import { z } from "zod";
 
-import { FileTag } from "@/core/domain/entities/file-tag";
-import { DatabaseRepository } from "@/core/domain/repositories/database.repository";
-import { Registry } from "@/core/infra/container/registry";
-import { container } from "@/core/infra/container/server-only";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import { PrismaClient } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
 
-const database = container.get<DatabaseRepository>(Registry.DatabaseRepository);
+const database = new PrismaClient();
 
 export const fileTagsRouter = createTRPCRouter({
-	one: publicProcedure
-		.input(z.object({ id: z.string().uuid().optional(), name: z.string().optional() }))
-		.query(async ({ input }) => {
-			const tag = await database.findOne("file_tags", [
-				{
-					key: "id",
-					comparator: "==",
-					value: input.id,
-					ignore: !input.id,
-				},
-				{
-					key: "indexableName",
-					comparator: "==",
-					value: FileTag.nameToIndexable(input.name || ""),
-					ignore: !input.name || !!input.id,
-				},
-			]);
-			return tag;
-		}),
+	one: publicProcedure.input(z.object({ id: z.string().uuid().optional() })).query(async ({ input }) => {
+		const data = await database.tag.findUnique({ where: { id: input.id } });
+		if (!data) throw new TRPCError({ code: "NOT_FOUND", message: "Tag não encontrada." });
+		return data;
+	}),
 
 	list: publicProcedure.query(async () => {
-		const tags = await database.findMany("file_tags");
+		const tags = await database.tag.findMany();
 		return tags;
 	}),
 
 	search: publicProcedure.input(z.object({ query: z.string() })).query(async ({ input }) => {
-		const tags = await database.findMany("file_tags", [
-			{
-				key: "searchableName",
-				comparator: "array-contains-any",
-				value: input.query.toLowerCase().split(" ").slice(0, 20),
-			},
-		]);
-		return tags;
+		const data = await database.tag.findMany({ where: { name: { search: input.query } } });
+		return data;
 	}),
 });
