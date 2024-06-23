@@ -7,14 +7,13 @@
 	"packageManager": "pnpm@9.4.0",
 	"scripts": {
 		"start": "next start",
-		"build": "next build && pnpm prisma generate",
+		"build": "next build && prisma generate",
 		"analyze": "ANALYZE=true next build",
 		"dev": "next dev",
 		"lint": "next lint",
 		"format": "prettier !docker . --write",
 		"emulators": "firebase emulators:start --import=./emulators --export-on-exit",
-		"prisma": "pnpm dlx prisma",
-		"migrate": "pnpm prisma migrate dev"
+		"migrate": "prisma migrate dev"
 	},
 	"dependencies": {
 		"@clerk/localizations": "^2.4.4",

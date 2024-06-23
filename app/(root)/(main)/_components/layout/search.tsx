@@ -23,7 +23,7 @@ export const Search: React.FC = memo(function Search() {
 			setSearchResults(undefined);
 			const query = fields.query;
 			const result = await search.fetch({ query }, { retry: false }).catch(() => undefined);
-			if (!result || result.books.length === 0) {
+			if (!result || result.length === 0) {
 				notifications.show({
 					title: "Nenhum resultado encontrado.",
 					message: "Tente novamente com outra pesquisa.",
@@ -31,7 +31,7 @@ export const Search: React.FC = memo(function Search() {
 				});
 				return;
 			}
-			setSearchResults(result.books);
+			setSearchResults(result);
 		},
 		[search, setSearchResults],
 	);

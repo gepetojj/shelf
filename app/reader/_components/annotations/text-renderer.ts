@@ -1,4 +1,4 @@
-import { FileAnnotationProps } from "@/core/domain/entities/file-annotation";
+import { Prisma } from "@prisma/client";
 
 export const generateText = (value: string, index: number) => {
 	const element = document.createElement("span");
@@ -26,12 +26,16 @@ export const generateAnnotation = (value: string, index: number, substring: { st
 	return element.outerHTML;
 };
 
-export const textRenderer = (annotations: FileAnnotationProps[]) => {
+type Substrings = { [index: number]: { start: number; end: number } };
+
+export const textRenderer = (annotations: Prisma.AnnotationGetPayload<{}>[]) => {
 	return ({ str, itemIndex }: { str: string; itemIndex: number }) => {
-		const annotation = annotations.find(annotation => !!annotation.substrings[itemIndex]);
+		const annotation = annotations.find(
+			annotation => annotation.substrings && (annotation.substrings as Substrings)[itemIndex],
+		);
 		if (!annotation) return generateText(str, itemIndex).outerHTML;
 
-		const substring = annotation.substrings[itemIndex];
+		const substring = (annotation.substrings as Substrings)[itemIndex];
 
 		if (annotation.comment) return generateAnnotation(str, itemIndex, substring);
 		return generateHighlight(str, itemIndex, substring);
