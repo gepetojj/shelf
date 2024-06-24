@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { memo, useCallback, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
+import { api } from "@/trpc/react";
+import { TextInput } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { IconSend2 } from "@tabler/icons-react";
 
@@ -27,43 +29,45 @@ export const CreateComment: React.FC<CreateCommentProps> = memo(function CreateC
 	const { register, handleSubmit } = useForm<Fields>({ defaultValues: { bookId, parentId } });
 	const [loading, setLoading] = useState(false);
 	const { refresh } = useRouter();
+	const commentApi = api.comments.create.useMutation();
 
 	const onSubmit: SubmitHandler<Fields> = useCallback(
 		async fields => {
 			setLoading(true);
 
 			const { comment, parentId, bookId } = fields;
-			const res = await fetch("/api/comment", {
-				method: "POST",
-				body: JSON.stringify({ bookId, parentId, content: comment }),
-			});
-			const json = (await res.json()) as { message: string };
-
-			setLoading(false);
-			if (res.ok) {
-				notifications.show({ title: "Sucesso", message: "Comentário criado.", color: "green" });
-				return refresh();
-			}
-
-			notifications.show({
-				title: "Erro",
-				message: json.message || "Não foi possível criar o comentário.",
-				color: "red",
-			});
+			commentApi.mutate(
+				{ bookId, parentId, text: comment },
+				{
+					onSettled: () => setLoading(false),
+					onSuccess: data => {
+						notifications.show({ title: "Sucesso", message: "Comentário criado.", color: "green" });
+						return refresh();
+					},
+					onError: error => {
+						notifications.show({
+							title: "Erro",
+							message: error.message || "Não foi possível criar o comentário.",
+							color: "red",
+						});
+					},
+				},
+			);
 		},
-		[refresh, setLoading],
+		[commentApi, refresh],
 	);
 
 	return (
 		<form
 			onSubmit={handleSubmit(onSubmit)}
-			className="flex w-full items-center gap-2"
+			className="flex w-full items-end gap-2"
 		>
-			{/* <TextInput
-				placeholder={asResponse ? "Escreva sua resposta:" : "Escreva seu comentário:"}
-				autoComplete="none"
+			<TextInput
+				label={asResponse ? "Escreva sua resposta:" : "Escreva seu comentário:"}
+				placeholder="Escreva aqui"
+				className="w-full"
 				{...register("comment", { required: true })}
-			/> */}
+			/>
 			<button
 				type="submit"
 				disabled={loading}

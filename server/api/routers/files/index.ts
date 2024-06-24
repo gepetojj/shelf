@@ -18,7 +18,10 @@ export const filesRouter = createTRPCRouter({
 				const data = await database.post.findUnique({
 					where: { id: input.id },
 					include: {
-						comments: { include: { owner: input.comments } },
+						comments: {
+							include: { owner: input.comments, children: input.comments },
+							orderBy: { createdAt: "desc" },
+						},
 						uploader: true,
 						tags: { include: { tag: true } },
 						files: input.files,

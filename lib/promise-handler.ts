@@ -18,6 +18,7 @@ export const promiseHandler = async <I>(promise: Promise<I>, metadata: PromiseHa
 		logger.error(
 			`[promise_handler:error] Failed to execute promise @ ${metadata.location}: ${metadata.message || err.message}`,
 		);
+		logger.debug("[promise_handler:error] Promise error details:", { err, promise, metadata });
 		throw new UnknownError({
 			message: metadata.message || err.message,
 			location: metadata.location,

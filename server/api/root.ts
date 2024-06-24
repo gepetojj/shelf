@@ -1,3 +1,4 @@
+import { commentsRouter } from "@/server/api/routers/comments";
 import { fileAnnotationsRouter } from "@/server/api/routers/file-annotations";
 import { fileTagsRouter } from "@/server/api/routers/file-tags";
 import { filesRouter } from "@/server/api/routers/files";
@@ -9,6 +10,7 @@ export const appRouter = createTRPCRouter({
 	fileAnnotations: fileAnnotationsRouter,
 	fileTags: fileTagsRouter,
 	progress: progressRouter,
+	comments: commentsRouter,
 });
 
 export type AppRouter = typeof appRouter;

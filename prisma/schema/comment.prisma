@@ -4,11 +4,11 @@ model Comment {
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
 
-    owner    User     @relation(fields: [ownerId], references: [id], onDelete: SetDefault)
-    ownerId  String   @default("deleted")
-    parent   Comment? @relation("CommentHistory", fields: [parentId], references: [id], onDelete: Cascade)
-    parentId String?  @unique
-    children Comment? @relation("CommentHistory")
-    post     Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+    owner    User      @relation(fields: [ownerId], references: [id], onDelete: SetDefault)
+    ownerId  String    @default("deleted")
+    parent   Comment?  @relation("CommentHistory", fields: [parentId], references: [id], onDelete: Cascade)
+    parentId String?
+    children Comment[] @relation("CommentHistory")
+    post     Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
     postId   String
 }
