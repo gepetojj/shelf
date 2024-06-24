@@ -121,11 +121,14 @@ export const CommonForm: React.FC<CommonFormProps> = memo(function CommonForm({}
 				onSubmit={handleSubmit(onSubmit)}
 			>
 				<h1 className="text-2xl font-bold">Fazer uma publicação</h1>
-				<h2>Insira as informações e faça upload do arquivo do arquivo.</h2>
+				<h2>Insira as informações e faça upload do arquivo.</h2>
 				<section className="flex flex-col gap-2 break-words">
+					<span className="pt-2 text-sm text-neutral-300">
+						Campos com <span className="text-red-600">*</span> são obrigatórios.
+					</span>
 					<TextInput
 						label="Identificador:"
-						description="Se o arquivo for um livro/artigo com ISBN, ISSN ou DOI, insira aqui."
+						description="Insira o ISBN, ISSN ou DOI do arquivo (se houver)."
 						placeholder="Digite aqui:"
 						{...register("identifier", {
 							maxLength: { value: 20, message: "O identificador deve ter no máximo 20 caracteres." },
@@ -148,7 +151,7 @@ export const CommonForm: React.FC<CommonFormProps> = memo(function CommonForm({}
 						placeholder="Digite aqui:"
 						withAsterisk
 						{...register("description", {
-							maxLength: { value: 250, message: "O subtítulo deve ter no máximo 250 caracteres." },
+							maxLength: { value: 1000, message: "A descrição deve ter no máximo 1000 caracteres." },
 						})}
 						error={errors.description?.message}
 					/>
