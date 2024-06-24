@@ -11,7 +11,7 @@ export const Layout: React.FC<{ children: [React.ReactElement, React.ReactElemen
 	return (
 		<>
 			<section className="flex w-full max-w-[45rem] flex-col home-break:max-w-full">{children[0]}</section>
-			<aside className="sticky hidden w-1/2 home-break:inline">{children[1]}</aside>
+			<aside className="sticky hidden w-1/2 px-4 home-break:inline">{children[1]}</aside>
 		</>
 	);
 });
