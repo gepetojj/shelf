@@ -41,7 +41,9 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 							</Spoiler>
 						</div>
 						<div className="text-light break-words text-sm text-neutral-300">
-							<h4 className="break-words">Identificador: {book.workIdentifier || "Não informado"}</h4>
+							{book.workIdentifier && (
+								<h4 className="break-words">Identificador: {book.workIdentifier}</h4>
+							)}
 							<h4 className="break-words">
 								Disciplina(s):{" "}
 								{new Intl.ListFormat("pt-br", {

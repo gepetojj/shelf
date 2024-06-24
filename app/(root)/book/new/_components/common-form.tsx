@@ -15,11 +15,9 @@ import { IconFileCheck, IconFileIsr, IconFileX } from "@tabler/icons-react";
 interface Fields {
 	identifier?: string;
 	title: string;
-	subtitle?: string;
 	description: string;
 	authors?: string[];
 	publishers?: string[];
-	pages: number;
 	disciplines: string[];
 	topics: string[];
 }
@@ -86,7 +84,6 @@ export const CommonForm: React.FC<CommonFormProps> = memo(function CommonForm({}
 					blobs: body,
 					book: {
 						title: fields.title,
-						subtitle: fields.subtitle,
 						description: fields.description,
 						authors: fields.authors || [
 							name({ first: user.firstName, last: user.lastName, username: user.username || "" }),
@@ -94,7 +91,6 @@ export const CommonForm: React.FC<CommonFormProps> = memo(function CommonForm({}
 						publishers: fields.publishers || [
 							name({ first: user.firstName, last: user.lastName, username: user.username || "" }),
 						],
-						pages: fields.pages,
 						globalIdentifier: fields.identifier,
 					},
 				},
@@ -146,14 +142,6 @@ export const CommonForm: React.FC<CommonFormProps> = memo(function CommonForm({}
 						})}
 						error={errors.title?.message}
 					/>
-					<TextInput
-						label="Subtítulo:"
-						placeholder="Digite aqui:"
-						{...register("subtitle", {
-							maxLength: { value: 75, message: "O subtítulo deve ter no máximo 75 caracteres." },
-						})}
-						error={errors.subtitle?.message}
-					/>
 					<Textarea
 						label="Descrição:"
 						description="Faça uma descrição objetiva e fiel ao conteúdo do arquivo."
@@ -163,18 +151,6 @@ export const CommonForm: React.FC<CommonFormProps> = memo(function CommonForm({}
 							maxLength: { value: 250, message: "O subtítulo deve ter no máximo 250 caracteres." },
 						})}
 						error={errors.description?.message}
-					/>
-					<TextInput
-						type="number"
-						label="Páginas:"
-						placeholder="Digite aqui:"
-						description="Insira a quantidade de páginas do arquivo."
-						withAsterisk
-						{...register("pages", {
-							min: { value: 1, message: "A quantidade mínima de páginas é 1." },
-							max: { value: 9999, message: "A quantidade máxima de páginas é 9999." },
-						})}
-						error={errors.pages?.message}
 					/>
 					<TagsInput
 						label="Autores:"
