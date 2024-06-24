@@ -6,7 +6,7 @@ model Annotation {
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
 
-    owner   User   @relation(fields: [ownerId], references: [id], onDelete: SetDefault, onUpdate: NoAction)
+    owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
     ownerId String @default("deleted")
     post    Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
     postId  String

@@ -15,7 +15,7 @@ model Post {
     annotations Annotation[]
     comments    Comment[]
     files       File[]
-    uploader    User                 @relation(fields: [uploaderId], references: [id], onDelete: SetDefault, onUpdate: NoAction)
+    uploader    User                 @relation(fields: [uploaderId], references: [id], onDelete: SetDefault)
     uploaderId  String               @default("deleted")
     tags        TagsOnPosts[]
     collections CollectionsOnPosts[]

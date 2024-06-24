@@ -10,7 +10,7 @@ model File {
 
     post       Post       @relation(fields: [postId], references: [id], onDelete: Cascade)
     postId     String
-    uploader   User       @relation(fields: [uploaderId], references: [id], onDelete: SetDefault, onUpdate: NoAction)
+    uploader   User       @relation(fields: [uploaderId], references: [id], onDelete: SetDefault)
     uploaderId String     @default("deleted")
     Progress   Progress[]
 }
