@@ -5,6 +5,7 @@ import { memo, useCallback, useState } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 
 import { FileExternalProps } from "@/core/domain/entities/file-external";
+import { api } from "@/trpc/react";
 import { useUser } from "@clerk/nextjs";
 import { Button, Group, TagsInput } from "@mantine/core";
 import { Dropzone, PDF_MIME_TYPE } from "@mantine/dropzone";
@@ -35,6 +36,7 @@ export const Form: React.FC<FormProps> = memo(function Form({ isbn }) {
 	const [book, setBook] = useState<FileExternalProps | undefined>(undefined);
 	const [file, setFile] = useState<File | undefined>(undefined);
 
+	const tagsApi = api.fileTags.list.useQuery();
 	const [disciplines, setDisciplines] = useState<string[]>([]);
 	const [topics, setTopics] = useState<string[]>([]);
 
@@ -135,6 +137,9 @@ export const Form: React.FC<FormProps> = memo(function Form({ isbn }) {
 						}}
 						clearable
 						error={errors.disciplines?.message}
+						tabIndex={-1}
+						data={tagsApi.data?.filter(tag => tag.type === "DISCIPLINE").map(tag => tag.name) || []}
+						splitChars={[",", "|"]}
 					/>
 					<TagsInput
 						label="Temas:"
@@ -147,6 +152,9 @@ export const Form: React.FC<FormProps> = memo(function Form({ isbn }) {
 						}}
 						clearable
 						error={errors.topics?.message}
+						tabIndex={-1}
+						data={tagsApi.data?.filter(tag => tag.type === "TOPIC").map(tag => tag.name) || []}
+						splitChars={[",", "|"]}
 					/>
 
 					<Dropzone
