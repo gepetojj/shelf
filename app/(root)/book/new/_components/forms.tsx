@@ -13,7 +13,7 @@ const FormsRegistry: { [key: string]: JSX.Element } = {
 };
 
 export const Forms: React.FC = memo(function Forms() {
-	const [tab, setTab] = useState("common");
+	const [tab, setTab] = useState("book");
 
 	return (
 		<div className="flex flex-col gap-7 px-12 py-7">
