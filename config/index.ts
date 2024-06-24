@@ -5,6 +5,7 @@ const schema = z.object({
 	DATABASE_URL: z.string(),
 	CLERK_SECRET_KEY: z.string(),
 	CLERK_USER_WEBHOOK_SECRET: z.string(),
+	GA_TAG_ID: z.string(),
 	FIREBASE_ID: z.string(),
 	FIREBASE_SECRET: z.string(),
 	FIREBASE_EMAIL: z.string(),

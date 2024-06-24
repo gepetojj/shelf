@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Nunito_Sans } from "next/font/google";
 
 import { ThemesProvider } from "@/components/logic/themes-provider";
+import { config } from "@/config";
 import { TRPCReactProvider } from "@/trpc/react";
 import { ptBR } from "@clerk/localizations";
 import { ClerkProvider } from "@clerk/nextjs";
@@ -10,6 +11,7 @@ import { ColorSchemeScript } from "@mantine/core";
 import "@mantine/core/styles.css";
 import { Notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "@ungap/with-resolvers";
 import { Analytics } from "@vercel/analytics/react";
 
@@ -45,6 +47,7 @@ export default async function Layout({
 							<Notifications position="top-right" />
 							{children}
 							<Analytics />
+							<GoogleAnalytics gaId={config.GA_TAG_ID} />
 						</ThemesProvider>
 					</body>
 				</TRPCReactProvider>

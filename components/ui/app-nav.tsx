@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { memo, useCallback } from "react";
 
 import { SignedIn, SignedOut } from "@clerk/nextjs";
+import { sendGAEvent } from "@next/third-parties/google";
 import {
 	IconBell,
 	IconBellFilled,
@@ -73,6 +74,7 @@ const Option = (option: NavOption) => {
 	return (
 		<Link
 			href={option.href}
+			onClick={() => sendGAEvent({ event: `app_nav_page:${option.label.toLowerCase()}:click` })}
 			className={"flex w-fit items-center gap-3 rounded-3xl p-2 px-4 duration-200 hover:bg-neutral-800"}
 		>
 			{isActive(option) ? <option.ActiveIcon className="text-xl" /> : <option.Icon className="text-xl" />}
@@ -105,6 +107,7 @@ export const AppNav: React.FC = memo(function AppNav() {
 			<SignedIn>
 				<Link
 					href="/book/new"
+					onClick={() => sendGAEvent({ event: "new_post_button:click" })}
 					className={clsx(
 						"flex items-center justify-center gap-3 rounded-2xl bg-main p-1 text-black duration-200",
 						"hover:brightness-90 home-break-mobile:mt-4 home-break-mobile:w-full",
