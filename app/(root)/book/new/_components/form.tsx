@@ -140,6 +140,7 @@ export const Form: React.FC<FormProps> = memo(function Form({ isbn }) {
 						tabIndex={-1}
 						data={tagsApi.data?.filter(tag => tag.type === "DISCIPLINE").map(tag => tag.name) || []}
 						splitChars={[",", "|"]}
+						maxTags={10}
 					/>
 					<TagsInput
 						label="Temas:"
@@ -155,6 +156,7 @@ export const Form: React.FC<FormProps> = memo(function Form({ isbn }) {
 						tabIndex={-1}
 						data={tagsApi.data?.filter(tag => tag.type === "TOPIC").map(tag => tag.name) || []}
 						splitChars={[",", "|"]}
+						maxTags={10}
 					/>
 
 					<Dropzone
