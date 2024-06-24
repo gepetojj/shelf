@@ -4,51 +4,48 @@ import { useRouter } from "next/navigation";
 import { memo, useCallback, useState } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 
-import { FileExternalProps } from "@/core/domain/entities/file-external";
+import { name } from "@/lib/name";
 import { api } from "@/trpc/react";
 import { useUser } from "@clerk/nextjs";
-import { Button, Group, TagsInput } from "@mantine/core";
+import { Button, Group, TagsInput, TextInput, Textarea } from "@mantine/core";
 import { Dropzone, PDF_MIME_TYPE } from "@mantine/dropzone";
 import { notifications } from "@mantine/notifications";
 import { IconFileCheck, IconFileIsr, IconFileX } from "@tabler/icons-react";
 
-import { ISBNSearch } from "./isbn-search";
-
 interface Fields {
-	isbn: string;
+	identifier?: string;
+	title: string;
+	subtitle?: string;
+	description: string;
+	authors?: string[];
+	publishers?: string[];
+	pages: number;
 	disciplines: string[];
 	topics: string[];
 }
 
-export interface FormProps {
-	isbn?: string;
-}
+export interface CommonFormProps {}
 
-export const Form: React.FC<FormProps> = memo(function Form({ isbn }) {
+export const CommonForm: React.FC<CommonFormProps> = memo(function CommonForm({}) {
 	const router = useRouter();
 	const { user } = useUser();
 	const {
+		register,
 		handleSubmit,
 		setValue,
 		formState: { isSubmitting, errors },
-	} = useForm<Fields>({ defaultValues: { isbn } });
+	} = useForm<Fields>();
 
-	const [book, setBook] = useState<FileExternalProps | undefined>(undefined);
 	const [file, setFile] = useState<File | undefined>(undefined);
 
 	const tagsApi = api.fileTags.list.useQuery();
+	const [authors, setAuthors] = useState<string[]>([]);
+	const [publishers, setPublishers] = useState<string[]>([]);
 	const [disciplines, setDisciplines] = useState<string[]>([]);
 	const [topics, setTopics] = useState<string[]>([]);
 
 	const onSubmit: SubmitHandler<Fields> = useCallback(
 		async fields => {
-			if (!book) {
-				return notifications.show({
-					title: "Erro",
-					message: "Selecione um livro antes de postar.",
-					color: "red",
-				});
-			}
 			if (!file) {
 				return notifications.show({
 					title: "Erro",
@@ -87,13 +84,21 @@ export const Form: React.FC<FormProps> = memo(function Form({ isbn }) {
 					disciplines: fields.disciplines,
 					topics: fields.topics,
 					blobs: body,
-					book,
+					book: {
+						title: fields.title,
+						subtitle: fields.subtitle,
+						description: fields.description,
+						authors: fields.authors || [
+							name({ first: user.firstName, last: user.lastName, username: user.username || "" }),
+						],
+						publishers: fields.publishers || [
+							name({ first: user.firstName, last: user.lastName, username: user.username || "" }),
+						],
+						pages: fields.pages,
+						globalIdentifier: fields.identifier,
+					},
 				},
-				{
-					id: user.id,
-					name: user.fullName || user.username || "Usuário sem nome",
-					avatarUrl: user.imageUrl,
-				},
+				user.id,
 			);
 
 			if (result.success) {
@@ -110,26 +115,100 @@ export const Form: React.FC<FormProps> = memo(function Form({ isbn }) {
 				color: "red",
 			});
 		},
-		[book, file, router, user],
+		[file, router, user],
 	);
 
 	return (
 		<>
 			<form
-				className="flex flex-col gap-2 px-12 py-7"
+				className="flex flex-col gap-2"
 				onSubmit={handleSubmit(onSubmit)}
 			>
-				<h1 className="text-2xl font-bold">Publicar um livro</h1>
-				<h2>Insira as informações e faça upload do arquivo do livro.</h2>
+				<h1 className="text-2xl font-bold">Fazer uma publicação</h1>
+				<h2>Insira as informações e faça upload do arquivo do arquivo.</h2>
 				<section className="flex flex-col gap-2 break-words">
-					<ISBNSearch
-						selected={book}
-						setSelected={setBook}
+					<TextInput
+						label="Identificador:"
+						description="Se o arquivo for um livro/artigo com ISBN, ISSN ou DOI, insira aqui."
+						placeholder="Digite aqui:"
+						{...register("identifier", {
+							maxLength: { value: 20, message: "O identificador deve ter no máximo 20 caracteres." },
+						})}
+						error={errors.identifier?.message}
+					/>
+					<TextInput
+						label="Título:"
+						placeholder="Digite aqui:"
+						withAsterisk
+						{...register("title", {
+							required: "O título é obrigatório.",
+							maxLength: { value: 75, message: "O título deve ter no máximo 75 caracteres." },
+						})}
+						error={errors.title?.message}
+					/>
+					<TextInput
+						label="Subtítulo:"
+						placeholder="Digite aqui:"
+						{...register("subtitle", {
+							maxLength: { value: 75, message: "O subtítulo deve ter no máximo 75 caracteres." },
+						})}
+						error={errors.subtitle?.message}
+					/>
+					<Textarea
+						label="Descrição:"
+						description="Faça uma descrição objetiva e fiel ao conteúdo do arquivo."
+						placeholder="Digite aqui:"
+						withAsterisk
+						{...register("description", {
+							maxLength: { value: 250, message: "O subtítulo deve ter no máximo 250 caracteres." },
+						})}
+						error={errors.description?.message}
+					/>
+					<TextInput
+						type="number"
+						label="Páginas:"
+						placeholder="Digite aqui:"
+						description="Insira a quantidade de páginas do arquivo."
+						withAsterisk
+						{...register("pages", {
+							min: { value: 1, message: "A quantidade mínima de páginas é 1." },
+							max: { value: 9999, message: "A quantidade máxima de páginas é 9999." },
+						})}
+						error={errors.pages?.message}
+					/>
+					<TagsInput
+						label="Autores:"
+						placeholder="Digite e pressione Enter para adicionar:"
+						description="Não preencha caso a autoria seja sua."
+						value={authors}
+						onChange={values => {
+							setAuthors(values);
+							setValue("authors", values);
+						}}
+						clearable
+						error={errors.authors?.message}
+						tabIndex={-1}
+						splitChars={[",", "|"]}
+						maxTags={10}
+					/>
+					<TagsInput
+						label="Publicadoras:"
+						placeholder="Digite e pressione Enter para adicionar:"
+						description="Não preencha caso a autoria seja sua."
+						value={publishers}
+						onChange={values => {
+							setPublishers(values);
+							setValue("publishers", values);
+						}}
+						clearable
+						error={errors.publishers?.message}
+						tabIndex={-1}
+						splitChars={[",", "|"]}
+						maxTags={10}
 					/>
 					<TagsInput
 						label="Matérias:"
-						placeholder="Digite aqui:"
-						description="Digite uma matéria e pressione Enter para adicionar."
+						placeholder="Digite e pressione Enter para adicionar:"
 						value={disciplines}
 						onChange={values => {
 							setDisciplines(values);
@@ -141,11 +220,11 @@ export const Form: React.FC<FormProps> = memo(function Form({ isbn }) {
 						data={tagsApi.data?.filter(tag => tag.type === "DISCIPLINE").map(tag => tag.name) || []}
 						splitChars={[",", "|"]}
 						maxTags={10}
+						withAsterisk
 					/>
 					<TagsInput
 						label="Temas:"
-						placeholder="Digite aqui:"
-						description="Digite um tópico e pressione Enter para adicionar."
+						placeholder="Digite e pressione Enter para adicionar:"
 						value={topics}
 						onChange={values => {
 							setTopics(values);
@@ -157,6 +236,7 @@ export const Form: React.FC<FormProps> = memo(function Form({ isbn }) {
 						data={tagsApi.data?.filter(tag => tag.type === "TOPIC").map(tag => tag.name) || []}
 						splitChars={[",", "|"]}
 						maxTags={10}
+						withAsterisk
 					/>
 
 					<Dropzone
@@ -198,14 +278,14 @@ export const Form: React.FC<FormProps> = memo(function Form({ isbn }) {
 											Arquivo selecionado: <span className="truncate italic">{file.name}</span>
 										</>
 									) : (
-										<>Arraste e solte o arquivo do livro</>
+										<>Arraste e solte o arquivo desejado</>
 									)}
 								</h2>
 								<span className="text-sm font-light">
 									{file ? (
 										<>Solte ou selecione para trocar o arquivo.</>
 									) : (
-										<>ou clique para selecionar</>
+										<>ou clique para selecionar (máx.: 50MB)</>
 									)}
 								</span>
 							</div>

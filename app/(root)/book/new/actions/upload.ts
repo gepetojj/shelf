@@ -48,21 +48,22 @@ const logger = container.get<Logger>(Registry.Logger);
 
 export const upload = async (
 	form: Omit<z.infer<typeof inputs>, "file"> & { blobs: FormData },
-	user: { id: string; name: string; avatarUrl: string },
+	userId: string,
 ): Promise<Outputs> => {
 	try {
 		const blobs = Object.fromEntries(form.blobs);
 		const data = inputs.parse({ ...form, file: blobs.file });
 
-		if (!data.book.globalIdentifier) return { success: false, message: "O identificador do livro é obrigatório." };
-		const exists = await promiseHandler(
-			database.post.findFirst({ where: { workIdentifier: data.book.globalIdentifier } }),
-			{
-				location: "upload_action:find_post",
-				message: "Não foi possível verificar se o livro já foi enviado anteriormente.",
-			},
-		);
-		if (exists) return { success: false, message: "Este livro já foi enviado anteriormente." };
+		if (data.book.globalIdentifier) {
+			const exists = await promiseHandler(
+				database.post.findFirst({ where: { workIdentifier: data.book.globalIdentifier } }),
+				{
+					location: "upload_action:find_post",
+					message: "Não foi possível verificar se o livro já foi enviado anteriormente.",
+				},
+			);
+			if (exists) return { success: false, message: "Este livro já foi enviado anteriormente." };
+		}
 
 		const bookId = crypto.randomUUID();
 		const filename = data.book.title.toLocaleLowerCase("en").replaceAll(" ", "-");
@@ -80,7 +81,7 @@ export const upload = async (
 
 		try {
 			await database.$transaction(async tx => {
-				const uploader = await tx.user.findFirst({ where: { externalId: user.id } });
+				const uploader = await tx.user.findFirst({ where: { externalId: userId } });
 
 				await tx.post.create({
 					data: {
@@ -148,7 +149,7 @@ export const upload = async (
 				message: err.errors[0].message || "Verifique os dados enviados e tente novamente.",
 			};
 		}
-		logger.error("Failed to upload book", { user, err });
+		logger.error("Failed to upload book", { userId, err });
 		return { success: false, message: err?.message || "Não foi possível fazer upload do livro. Tente novamente." };
 	}
 };

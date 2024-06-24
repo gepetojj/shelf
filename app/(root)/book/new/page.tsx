@@ -2,14 +2,14 @@ import { AppHeader } from "@/components/ui/app-header";
 import { Layout } from "@/components/ui/layout";
 import "@mantine/dropzone/styles.css";
 
-import { Form } from "./_components/form";
+import { Forms } from "./_components/forms";
 
-export default async function Page({ searchParams }: Readonly<{ searchParams: { isbn?: string } }>) {
+export default async function Page() {
 	return (
 		<Layout>
 			<>
 				<AppHeader />
-				<Form isbn={searchParams.isbn} />
+				<Forms />
 			</>
 			<></>
 		</Layout>

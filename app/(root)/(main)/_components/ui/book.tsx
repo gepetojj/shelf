@@ -62,7 +62,7 @@ export const Book: React.FC<BookComponentProps> = memo(function Book({ book, ind
 									type: "conjunction",
 								}).format(book.authors)}
 							</span>
-							<span>Identificador: {book.workIdentifier}</span>
+							{book.workIdentifier && <span>Identificador: {book.workIdentifier}</span>}
 						</div>
 						<div className="flex flex-col">
 							<span>
