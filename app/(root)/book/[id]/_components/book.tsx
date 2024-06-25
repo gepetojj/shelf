@@ -31,12 +31,14 @@ export const Book: React.FC<BookComponentProps> = memo(function Book({ book }) {
 				</AspectRatio>
 				<div className="flex w-full flex-col truncate text-sm text-neutral-100">
 					<span className="truncate">Páginas: {book.pages}</span>
-					<span className="truncate">
-						{new Intl.ListFormat("pt-br", {
-							style: "long",
-							type: "conjunction",
-						}).format(book.publishers)}
-					</span>
+					{book.publishers.length > 0 && (
+						<span className="truncate">
+							{new Intl.ListFormat("pt-br", {
+								style: "long",
+								type: "conjunction",
+							}).format(book.publishers)}
+						</span>
+					)}
 				</div>
 				<div className="w-full">
 					<Link

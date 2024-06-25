@@ -88,10 +88,8 @@ export const CommonForm: React.FC<CommonFormProps> = memo(function CommonForm({}
 						authors: fields.authors || [
 							name({ first: user.firstName, last: user.lastName, username: user.username || "" }),
 						],
-						publishers: fields.publishers || [
-							name({ first: user.firstName, last: user.lastName, username: user.username || "" }),
-						],
-						globalIdentifier: fields.identifier,
+						publishers: undefined,
+						globalIdentifier: undefined,
 					},
 				},
 				user.id,
