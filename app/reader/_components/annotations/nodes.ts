@@ -43,12 +43,12 @@ function sanitizeText(text: string) {
 
 export type Substrings = { [index: string]: { start: number; end: number } };
 
-export function getSelectedNodes(text: string, range: Range): Substrings {
+export function getSelectedNodes(text: string, range: Range): Substrings | undefined {
 	const nodes = getRangeSelectedNodes(range).filter(node => !!node && node.nodeType === Node.TEXT_NODE) as Node[];
 	const parentNodes = nodes.map(node => ({
 		content: node.parentNode?.textContent || "",
 		metadata: ((node.parentNode as HTMLSpanElement | null)?.dataset || undefined) as
-			| { index: string; length: string }
+			| { index: string; length: string; ignore?: string }
 			| undefined,
 	}));
 
@@ -56,6 +56,7 @@ export function getSelectedNodes(text: string, range: Range): Substrings {
 	const substrings: Substrings = {};
 
 	for (const node of parentNodes) {
+		if (node.metadata?.ignore && node.metadata.ignore === "true") return undefined;
 		if (!node.content || !node.metadata) continue;
 
 		let added = 0;

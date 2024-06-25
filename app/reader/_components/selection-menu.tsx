@@ -29,7 +29,7 @@ export const SelectionMenu: React.FC<React.PropsWithChildren<SelectionMenuProps>
 	const menuRef = useClickOutside(() => close());
 	const [selection, setSelection] = useState("");
 	const [location, setLocation] = useState<DOMRect | undefined>(undefined);
-	const [substrings, setSubstrings] = useState<Substrings>({});
+	const [substrings, setSubstrings] = useState<Substrings | undefined>(undefined);
 
 	const close = useCallback(() => {
 		handlers.close();
@@ -93,6 +93,14 @@ export const SelectionMenu: React.FC<React.PropsWithChildren<SelectionMenuProps>
 							size="xs"
 							rightSection={<IconSend size={18} />}
 							onClick={() => {
+								if (!substrings) {
+									return notifications.show({
+										title: "Erro ao anotar trecho",
+										message: "Você não pode anotar trechos que já foram marcados.",
+										color: "red",
+									});
+								}
+
 								createAnnotation.mutate(
 									{
 										fileId,
@@ -155,6 +163,14 @@ export const SelectionMenu: React.FC<React.PropsWithChildren<SelectionMenuProps>
 								<ActionIcon
 									variant="light"
 									onClick={() => {
+										if (!substrings) {
+											return notifications.show({
+												title: "Erro ao anotar trecho",
+												message: "Você não pode marcar trechos que já foram marcados.",
+												color: "red",
+											});
+										}
+
 										createHighlight.mutate(
 											{ fileId, page: currentPage, text: selection, substrings },
 											{

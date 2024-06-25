@@ -13,6 +13,7 @@ export const generateHighlight = (value: string, index: number, substring: { sta
 	const highlight = document.createElement("span");
 	highlight.classList.add("reader-highlight");
 	highlight.innerText = value.substring(substring.start, substring.end);
+	highlight.dataset.ignore = "true";
 	element.innerHTML = element.innerHTML.replace(value.substring(substring.start, substring.end), highlight.outerHTML);
 	return element.outerHTML;
 };
@@ -22,6 +23,7 @@ export const generateAnnotation = (value: string, index: number, substring: { st
 	const highlight = document.createElement("span");
 	highlight.classList.add("reader-annotation");
 	highlight.innerText = value.substring(substring.start, substring.end);
+	highlight.dataset.ignore = "true";
 	element.innerHTML = element.innerHTML.replace(value.substring(substring.start, substring.end), highlight.outerHTML);
 	return element.outerHTML;
 };
