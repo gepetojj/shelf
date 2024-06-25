@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useCallback, useMemo } from "react";
+import { memo, useCallback, useEffect, useMemo } from "react";
 
 import { api } from "@/trpc/react";
 import { ActionIcon, Divider, Drawer, NumberInput, Stack, Text } from "@mantine/core";
@@ -48,6 +48,16 @@ export const Settings: React.FC = memo(function Settings({}) {
 		},
 		[annotationUtils, deleteAnnotation, fileId],
 	);
+
+	useEffect(() => {
+		const openDrawer = () => {
+			toggle();
+		};
+		document.addEventListener("reader-open-drawer", openDrawer);
+		return () => {
+			document.removeEventListener("reader-open-drawer", openDrawer);
+		};
+	}, [toggle]);
 
 	return (
 		<>
