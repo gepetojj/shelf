@@ -218,7 +218,13 @@ export const SelectionMenu: React.FC<React.PropsWithChildren<SelectionMenuProps>
 								<ActionIcon
 									variant="light"
 									onClick={() => {
-										// setClipboard(selectedText);
+										window.navigator.clipboard.writeText(selection).catch(() => {
+											notifications.show({
+												title: "Erro ao copiar trecho",
+												message: "Seu navegador não permitiu a cópia, tente manualmente.",
+												color: "red",
+											});
+										});
 										close();
 									}}
 								>
