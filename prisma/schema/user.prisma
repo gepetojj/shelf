@@ -15,4 +15,5 @@ model User {
     files       File[]
     posts       Post[]
     Progress    Progress[]
+    Report      Report[]
 }

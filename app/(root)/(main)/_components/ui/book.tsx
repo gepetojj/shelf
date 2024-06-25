@@ -5,7 +5,8 @@ import { memo } from "react";
 import { Time } from "@/components/ui/time";
 import { name } from "@/lib/name";
 import { Prisma } from "@prisma/client";
-import { IconDots } from "@tabler/icons-react";
+
+import { BookSettings } from "./book-settings";
 
 type BookComponentProps = {
 	book: Prisma.PostGetPayload<{ include: { uploader: true; tags: { include: { tag: true } } } }>;
@@ -38,15 +39,7 @@ export const Book: React.FC<BookComponentProps> = memo(function Book({ book, ind
 							postou <Time milliseconds={book.createdAt.valueOf()} />
 						</span>
 					</div>
-					<button
-						type="button"
-						title="Configurações do post"
-					>
-						<IconDots
-							className="text-2xl text-neutral-400"
-							aria-hidden="true"
-						/>
-					</button>
+					<BookSettings book={book} />
 				</header>
 				<Link
 					href={`/book/${book.id}`}

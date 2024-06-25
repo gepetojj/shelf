@@ -1,0 +1,20 @@
+model Report {
+    id          String   @id @default(uuid())
+    motive      Motive
+    description String?
+    createdAt   DateTime @default(now())
+
+    user   User   @relation(fields: [userId], references: [id])
+    userId String
+    post   Post   @relation(fields: [postId], references: [id])
+    postId String
+
+    @@index([createdAt])
+}
+
+enum Motive {
+    OFFENSIVE
+    INAPPROPRIATE
+    SPAM
+    OTHER
+}

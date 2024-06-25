@@ -3,7 +3,8 @@ import { z } from "zod";
 
 import { Registry } from "@/core/infra/container/registry";
 import { container } from "@/core/infra/container/server-only";
-import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import { promiseHandler } from "@/lib/promise-handler";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { PrismaClient } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 
@@ -37,6 +38,27 @@ export const filesRouter = createTRPCRouter({
 				});
 			}
 		}),
+
+	oneDependents: publicProcedure.input(z.object({ id: z.string().uuid() })).query(async ({ input }) => {
+		try {
+			const data = await database.post.findUnique({
+				where: { id: input.id },
+				include: {
+					Progress: true,
+				},
+			});
+			if (!data) throw new TRPCError({ code: "NOT_FOUND", message: "Postagem não encontrada." });
+
+			// Quantidade de pessoas que iniciaram a leitura
+			return data.Progress.length;
+		} catch (err: any) {
+			logger.error(`[files_router:oneDependents] Failed to find post: ${err.message}`, { input, err });
+			throw new TRPCError({
+				code: "INTERNAL_SERVER_ERROR",
+				message: "Não foi possível encontrar a postagem.",
+			});
+		}
+	}),
 
 	list: publicProcedure
 		.input(
@@ -82,6 +104,31 @@ export const filesRouter = createTRPCRouter({
 			throw new TRPCError({
 				code: "INTERNAL_SERVER_ERROR",
 				message: "Não foi possível buscar as postagens.",
+			});
+		}
+	}),
+
+	delete: protectedProcedure.input(z.object({ id: z.string().uuid() })).mutation(async ({ input, ctx }) => {
+		const post = await promiseHandler(
+			database.post.findUnique({ where: { id: input.id }, include: { uploader: true } }),
+			{
+				location: "files_router:delete:find_post",
+				message: "Não foi possível encontrar a postagem.",
+			},
+		);
+
+		if (post?.uploader.externalId !== ctx.auth.userId) {
+			throw new TRPCError({ code: "FORBIDDEN", message: "Só é possível deletar postagens suas." });
+		}
+
+		try {
+			const data = await database.post.delete({ where: { id: input.id } });
+			return data;
+		} catch (err: any) {
+			logger.error(`[files_router:delete] Failed to delete post: ${err.message}`, { input, err });
+			throw new TRPCError({
+				code: "INTERNAL_SERVER_ERROR",
+				message: "Não foi possível deletar a postagem.",
 			});
 		}
 	}),

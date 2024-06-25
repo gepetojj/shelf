@@ -127,15 +127,6 @@ export const CommonForm: React.FC<CommonFormProps> = memo(function CommonForm({}
 						Campos com <span className="text-red-600">*</span> são obrigatórios.
 					</span>
 					<TextInput
-						label="Identificador:"
-						description="Insira o ISBN, ISSN ou DOI do arquivo (se houver)."
-						placeholder="Digite aqui:"
-						{...register("identifier", {
-							maxLength: { value: 20, message: "O identificador deve ter no máximo 20 caracteres." },
-						})}
-						error={errors.identifier?.message}
-					/>
-					<TextInput
 						label="Título:"
 						placeholder="Digite aqui:"
 						withAsterisk
@@ -166,21 +157,6 @@ export const CommonForm: React.FC<CommonFormProps> = memo(function CommonForm({}
 						}}
 						clearable
 						error={errors.authors?.message}
-						tabIndex={-1}
-						splitChars={[",", "|"]}
-						maxTags={10}
-					/>
-					<TagsInput
-						label="Publicadoras:"
-						placeholder="Digite e pressione Enter para adicionar:"
-						description="Não preencha caso a autoria seja sua."
-						value={publishers}
-						onChange={values => {
-							setPublishers(values);
-							setValue("publishers", values);
-						}}
-						clearable
-						error={errors.publishers?.message}
 						tabIndex={-1}
 						splitChars={[",", "|"]}
 						maxTags={10}

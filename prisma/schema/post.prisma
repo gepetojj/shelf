@@ -20,6 +20,7 @@ model Post {
     tags        TagsOnPosts[]
     collections CollectionsOnPosts[]
     Progress    Progress[]
+    Report      Report[]
 
     @@index([createdAt(sort: Desc)])
     @@index([workIdentifier, title])

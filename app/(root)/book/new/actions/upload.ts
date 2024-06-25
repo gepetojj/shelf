@@ -99,7 +99,6 @@ export const upload = async (
 				};
 			}
 		} catch (err) {
-			console.log(err);
 			logger.error("Failed to read file as a PDF", { path, fileType, extension, err });
 			return { success: false, message: "Não foi possível verificar as páginas do arquivo." };
 		}
