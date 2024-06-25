@@ -52,7 +52,7 @@ export const TabReading: React.FC = memo(function TabReading({}) {
 									<div className="mt-2 h-2 w-full rounded-2xl bg-main-background">
 										<div
 											className="h-full rounded-full bg-main"
-											style={{ width: `${Math.round((item.page / item.book.pages) * 100)}px` }}
+											style={{ width: `${Math.round((item.page / item.book.pages) * 100)}%` }}
 										/>
 									</div>
 								</div>
