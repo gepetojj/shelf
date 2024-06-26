@@ -31,14 +31,18 @@ export const TabRead: React.FC = memo(function TabRead({}) {
 										className="flex items-center justify-center"
 										passHref
 									>
-										<Image
-											src={item.book.smallThumbnail || item.book.largeThumbnail || ""}
-											alt={`Imagem de capa do livro '${item.book.title}'`}
-											width={182.5}
-											height={250}
-											className="max-h-[250px] max-w-[182.5px] rounded-sm object-cover"
-											loading={index <= 4 ? "eager" : "lazy"}
-										/>
+										{item.book.smallThumbnail || item.book.largeThumbnail ? (
+											<Image
+												src={item.book.smallThumbnail || item.book.largeThumbnail || ""}
+												alt={`Imagem de capa do livro '${item.book.title}'`}
+												width={182.5}
+												height={250}
+												className="max-h-[250px] max-w-[182.5px] rounded-sm object-cover"
+												loading={index <= 4 ? "eager" : "lazy"}
+											/>
+										) : (
+											<div className="h-full w-full bg-gradient-to-br from-slate-700 to-slate-900" />
+										)}
 									</Link>
 								</AspectRatio>
 								<div className="flex flex-col">
@@ -52,7 +56,9 @@ export const TabRead: React.FC = memo(function TabRead({}) {
 									<div className="mt-2 h-2 w-full rounded-2xl bg-main-background">
 										<div
 											className="h-full rounded-full bg-main"
-											style={{ width: `${Math.round((item.page / item.book.pages) * 100)}%` }}
+											style={{
+												width: `${Math.min(Math.round((item.page / item.book.pages) * 100), 100)}%`,
+											}}
 										/>
 									</div>
 								</div>

@@ -143,6 +143,8 @@ export const CommonForm: React.FC<CommonFormProps> = memo(function CommonForm({}
 							maxLength: { value: 1000, message: "A descrição deve ter no máximo 1000 caracteres." },
 						})}
 						error={errors.description?.message}
+						autosize
+						minRows={2}
 					/>
 					<TagsInput
 						label="Autores:"
