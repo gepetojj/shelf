@@ -15,7 +15,7 @@ type BookComponentProps = {
 
 export const Book: React.FC<BookComponentProps> = memo(function Book({ book, index }) {
 	return (
-		<li className="relative flex w-full flex-col gap-4 rounded-xl bg-main-foreground p-4 duration-100 animate-in fade-in-20 hover:brightness-90">
+		<div className="relative flex w-full flex-col gap-4 rounded-xl bg-main-foreground p-4 duration-100 animate-in fade-in-20 hover:brightness-90">
 			<div className="z-[1] h-full w-full">
 				<header className="flex items-center justify-between gap-2">
 					<div className="flex items-center gap-2 font-light">
@@ -103,6 +103,6 @@ export const Book: React.FC<BookComponentProps> = memo(function Book({ book, ind
 					/>
 				</div>
 			)}
-		</li>
+		</div>
 	);
 });
