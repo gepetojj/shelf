@@ -21,7 +21,7 @@ export const Forms: React.FC = memo(function Forms() {
 				withItemsBorders={false}
 				data={[
 					{ value: "book", label: "Livro" },
-					{ value: "common", label: "Genérico" },
+					{ value: "common", label: "Artigo/Outros" },
 				]}
 				value={tab}
 				onChange={setTab}
