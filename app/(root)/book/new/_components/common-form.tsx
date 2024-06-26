@@ -12,12 +12,12 @@ import { Dropzone, PDF_MIME_TYPE } from "@mantine/dropzone";
 import { notifications } from "@mantine/notifications";
 import { IconFileCheck, IconFileIsr, IconFileX } from "@tabler/icons-react";
 
+import { submission } from "../upload/client/submission";
+
 interface Fields {
-	identifier?: string;
 	title: string;
 	description: string;
 	authors?: string[];
-	publishers?: string[];
 	disciplines: string[];
 	topics: string[];
 }
@@ -38,7 +38,6 @@ export const CommonForm: React.FC<CommonFormProps> = memo(function CommonForm({}
 
 	const tagsApi = api.fileTags.list.useQuery();
 	const [authors, setAuthors] = useState<string[]>([]);
-	const [publishers, setPublishers] = useState<string[]>([]);
 	const [disciplines, setDisciplines] = useState<string[]>([]);
 	const [topics, setTopics] = useState<string[]>([]);
 
@@ -73,27 +72,19 @@ export const CommonForm: React.FC<CommonFormProps> = memo(function CommonForm({}
 				});
 			}
 
-			const body = new FormData();
-			body.append("file", file);
-
-			const { upload } = await import("../actions/upload");
-			const result = await upload(
-				{
-					disciplines: fields.disciplines,
-					topics: fields.topics,
-					blobs: body,
-					book: {
-						title: fields.title,
-						description: fields.description,
-						authors: fields.authors || [
-							name({ first: user.firstName, last: user.lastName, username: user.username || "" }),
-						],
-						publishers: undefined,
-						globalIdentifier: undefined,
-					},
-				},
-				user.id,
-			);
+			const result = await submission({
+				identifier: undefined,
+				title: fields.title,
+				description: fields.description,
+				disciplines: fields.disciplines,
+				authors: fields.authors || [
+					name({ first: user.firstName, last: user.lastName, username: user.username || "" }),
+				],
+				publishers: undefined,
+				topics: fields.topics,
+				file,
+				userId: user.id,
+			});
 
 			if (result.success) {
 				notifications.show({

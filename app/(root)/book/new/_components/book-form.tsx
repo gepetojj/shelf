@@ -12,6 +12,7 @@ import { Dropzone, PDF_MIME_TYPE } from "@mantine/dropzone";
 import { notifications } from "@mantine/notifications";
 import { IconFileCheck, IconFileIsr, IconFileX } from "@tabler/icons-react";
 
+import { submission } from "../upload/client/submission";
 import { ISBNSearch } from "./isbn-search";
 
 interface Fields {
@@ -78,19 +79,19 @@ export const BookForm: React.FC<BookFormProps> = memo(function BookForm({ isbn }
 				});
 			}
 
-			const body = new FormData();
-			body.append("file", file);
-
-			const { upload } = await import("../actions/upload");
-			const result = await upload(
-				{
-					disciplines: fields.disciplines,
-					topics: fields.topics,
-					blobs: body,
-					book,
-				},
-				user.id,
-			);
+			const result = await submission({
+				identifier: book.globalIdentifier || undefined,
+				title: book.title,
+				description: book.description || "",
+				disciplines: fields.disciplines,
+				authors: book.authors || [],
+				publishers: book.publishers || [],
+				topics: fields.topics,
+				file,
+				thumbnailUrl: book.thumbnailUrl || undefined,
+				thumbnailAltUrl: book.thumbnailAltUrl || undefined,
+				userId: user.id,
+			});
 
 			if (result.success) {
 				notifications.show({
