@@ -5,4 +5,5 @@ export interface StorageRepository {
 	streamOne(location: string): Readable;
 	create(location: string, data: Buffer): Promise<void>;
 	delete(location: string): Promise<void>;
+	deleteFolder(location: string): Promise<void>;
 }

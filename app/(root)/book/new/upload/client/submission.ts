@@ -1,3 +1,5 @@
+import { megaToBytes } from "@/lib/bytes";
+
 import { uploadChunk } from "../server/upload-chunk";
 import { uploadFinal } from "../server/upload-final";
 import { chunkChopping } from "./chunk-chopping";
@@ -22,6 +24,10 @@ export const submission = async (fields: SubmissionFields) => {
 	const chunks = await chunksIntegrity(groups);
 	const uploadId = crypto.randomUUID();
 	const startedAt = new Date().valueOf();
+
+	if (fields.file.size > megaToBytes(50)) {
+		return { success: false, message: "O arquivo enviado é maior que o limite de 50MB." };
+	}
 
 	for (let index = 0; index < chunks.length; index++) {
 		const { chunk, checksum } = chunks[index];

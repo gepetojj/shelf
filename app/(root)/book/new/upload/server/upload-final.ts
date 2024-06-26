@@ -12,7 +12,7 @@ import { megaToBytes } from "@/lib/bytes";
 import { promiseHandler } from "@/lib/promise-handler";
 import { Prisma, PrismaClient } from "@prisma/client";
 
-import { assemblyChunks } from "./assembly-chunks";
+import { assembleChunks } from "./assemble-chunks";
 
 const inputs = z.object({
 	disciplines: z.array(z.string().trim()).min(1).max(5),
@@ -71,7 +71,6 @@ export const uploadFinal = async (input: Omit<Inputs, "chunk">, form: FormData):
 		logger.error("Failed to upload book", { err });
 		return { success: false, message: err?.message || "Não foi possível fazer upload do livro. Tente novamente." };
 	}
-	console.log(data);
 
 	if (data.book.identifier) {
 		const exists = await promiseHandler(
@@ -87,7 +86,7 @@ export const uploadFinal = async (input: Omit<Inputs, "chunk">, form: FormData):
 	const bookId = crypto.randomUUID();
 	const filename = data.book.title.toLocaleLowerCase("en").replaceAll(" ", "-");
 
-	const file = await assemblyChunks(data.chunk, data.totalChunks, `chunk_uploads/${data.startedAt}_${data.uploadId}`);
+	const file = await assembleChunks(data.chunk, data.totalChunks, `chunk_uploads/${data.startedAt}_${data.uploadId}`);
 	const fileType = await fileTypeFromBuffer(file);
 
 	const extension = fileType?.ext || "pdf";
@@ -187,6 +186,12 @@ export const uploadFinal = async (input: Omit<Inputs, "chunk">, form: FormData):
 		logger.error("Failed to register file", { err });
 		await storage.delete(path);
 		return { success: false, message: "Não foi possível registrar o livro." };
+	}
+
+	try {
+		await storage.deleteFolder(`chunk_uploads/${data.startedAt}_${data.uploadId}`);
+	} catch (err: any) {
+		logger.error("Failed to delete chunk folder", { err });
 	}
 
 	return { success: true, message: "Livro enviado com sucesso." };

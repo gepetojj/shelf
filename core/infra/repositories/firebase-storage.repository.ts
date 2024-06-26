@@ -56,7 +56,7 @@ export class FirebaseStorageRepository implements StorageRepository {
 			});
 			throw new UnknownError({
 				message: "Erro ao criar o documento no armazenamento.",
-				location: "firebase_storage:stream_one",
+				location: "firebase_storage:create",
 				context: { location },
 			});
 		}
@@ -67,13 +67,29 @@ export class FirebaseStorageRepository implements StorageRepository {
 			const [response] = await storage.file(location).delete();
 			if (response.statusCode >= 400) throw new Error("Failed to delete file.");
 		} catch (err: any) {
-			this.logger.error("Failed to create file", {
+			this.logger.error("Failed to delete file", {
 				err: err.message || err.stack || err,
 				location,
 			});
 			throw new UnknownError({
-				message: "Erro ao criar o documento no armazenamento.",
-				location: "firebase_storage:stream_one",
+				message: "Erro ao deletar o documento.",
+				location: "firebase_storage:delete",
+				context: { location },
+			});
+		}
+	}
+
+	async deleteFolder(location: string): Promise<void> {
+		try {
+			await storage.deleteFiles({ prefix: location });
+		} catch (err: any) {
+			this.logger.error("Failed to delete folder", {
+				err: err.message || err.stack || err,
+				location,
+			});
+			throw new UnknownError({
+				message: "Erro ao deletar a pasta.",
+				location: "firebase_storage:delete_folder",
 				context: { location },
 			});
 		}

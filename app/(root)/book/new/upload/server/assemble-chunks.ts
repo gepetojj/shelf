@@ -7,7 +7,7 @@ import { Registry } from "@/core/infra/container/registry";
 const storage = container.get<StorageRepository>(Registry.StorageRepository);
 const logger = container.get<Logger>(Registry.Logger);
 
-export const assemblyChunks = async (finalChunk: Blob, chunksLen: number, basePath: string) => {
+export const assembleChunks = async (finalChunk: Blob, chunksLen: number, basePath: string) => {
 	if (chunksLen === 1) {
 		return Buffer.from(await finalChunk.arrayBuffer());
 	}
