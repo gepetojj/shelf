@@ -95,7 +95,13 @@ export const filesRouter = createTRPCRouter({
 	search: publicProcedure.input(z.object({ query: z.string() })).query(async ({ input }) => {
 		try {
 			const data = await database.post.findMany({
-				where: { title: { search: input.query } },
+				where: {
+					OR: [
+						{ title: { contains: input.query, mode: "insensitive" } },
+						{ authors: { has: input.query } },
+						{ tags: { some: { tag: { name: { contains: input.query, mode: "insensitive" } } } } },
+					],
+				},
 				include: { uploader: true, tags: { include: { tag: true } } },
 			});
 			return data;
