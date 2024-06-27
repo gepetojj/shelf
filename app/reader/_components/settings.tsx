@@ -80,7 +80,7 @@ export const Settings: React.FC = memo(function Settings({}) {
 				<Stack gap={10}>
 					<NumberInput
 						label="Altere a página:"
-						description="Escolha a página que deseja ler."
+						description={`Escolha a página que deseja ler. Páginas: ${totalPages}.`}
 						value={currentPage}
 						min={1}
 						minLength={1}
