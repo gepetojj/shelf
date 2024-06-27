@@ -30,6 +30,7 @@ const handler = (req: NextRequest) =>
 			if (process.env.NODE_ENV === "development") {
 				logger.error(`❌ tRPC failed on ${path ?? "<no-path>"}: ${error.message}`);
 			}
+			if (error.code === "FORBIDDEN" || error.code === "UNAUTHORIZED") return;
 			Sentry.captureException(error, { tags: { path } });
 		},
 	});

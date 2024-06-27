@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { api } from "@/trpc/server";
-import { Loader } from "@mantine/core";
+import { SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
+import { Button, Loader } from "@mantine/core";
+import { IconLock, IconLogin2 } from "@tabler/icons-react";
 
 const PDFViewer = dynamic(() => import("@/app/reader/_components/pdf-viewer").then(mod => mod.PDFViewer));
 
@@ -38,22 +40,55 @@ export default async function Page({ params }: Readonly<{ params: { id: string }
 				</div>
 			</section>
 			<section className="flex h-full w-full justify-center gap-2 px-4 pb-3">
-				<Suspense
-					fallback={
-						<div className="h-full w-full">
-							<Loader
-								size={50}
-								color="yellow"
-								type="dots"
-							/>
-						</div>
-					}
-				>
-					<PDFViewer
-						location={book.files[0].path}
-						startPage={progress?.page}
-					/>
-				</Suspense>
+				<SignedIn>
+					<Suspense
+						fallback={
+							<div className="h-full w-full">
+								<Loader
+									size={50}
+									color="yellow"
+									type="dots"
+								/>
+							</div>
+						}
+					>
+						<PDFViewer
+							location={book.files[0].path}
+							startPage={progress?.page}
+						/>
+					</Suspense>
+				</SignedIn>
+
+				<SignedOut>
+					<div className="mt-10 flex h-full flex-col items-center justify-center gap-1 rounded-xl bg-main-foreground p-5">
+						<IconLock size={48} />
+						<h1 className="mt-1 text-center text-2xl">Você precisa criar uma conta para ler</h1>
+						<h2 className="pb-5 text-sm text-neutral-200">
+							Em menos de 1 minuto você estará acessando diversos conteúdos relevantes gratuitamente.
+						</h2>
+						<SignInButton
+							mode="modal"
+							forceRedirectUrl={`/reader/${params.id}`}
+						>
+							<div className="flex w-full justify-end">
+								<div className="hidden w-full home-break:inline">
+									<Button
+										className="min-w-full shadow-sm"
+										radius="xl"
+										rightSection={<IconLogin2 size={20} />}
+									>
+										Entre já
+									</Button>
+								</div>
+								<div className="home-break:hidden">
+									<Button radius="xl">
+										<IconLogin2 size={20} />
+									</Button>
+								</div>
+							</div>
+						</SignInButton>
+					</div>
+				</SignedOut>
 			</section>
 		</div>
 	);

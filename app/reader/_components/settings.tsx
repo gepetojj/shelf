@@ -3,6 +3,7 @@
 import { memo, useCallback, useEffect, useMemo } from "react";
 
 import { api } from "@/trpc/react";
+import { useUser } from "@clerk/nextjs";
 import { ActionIcon, Divider, Drawer, NumberInput, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -11,6 +12,7 @@ import { IconExternalLink, IconMenu, IconTrash } from "@tabler/icons-react";
 import { useSettings } from "./settings-context";
 
 export const Settings: React.FC = memo(function Settings({}) {
+	const { user } = useUser();
 	const { currentPage, totalPages, zoom, annotations, fileId, setCurrentPage, setZoom } = useSettings();
 	const [opened, { toggle, close }] = useDisclosure(false);
 
@@ -58,6 +60,8 @@ export const Settings: React.FC = memo(function Settings({}) {
 			document.removeEventListener("reader-open-drawer", openDrawer);
 		};
 	}, [toggle]);
+
+	if (!user) return null;
 
 	return (
 		<>
