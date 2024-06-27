@@ -30,12 +30,22 @@ export const defaultMetadata: Metadata = {
 		siteName: "Shelf",
 		locale: "pt_BR",
 		url: getURL(),
+		images: [
+			{
+				url: `${getURL()}/api/og`,
+			},
+		],
 	},
 	twitter: {
 		card: "summary_large_image",
 		title: "Shelf: Organize suas leituras",
 		description:
 			"Transforme a maneira como você lê, organiza e compartilha conhecimento com o Shelf, a solução perfeita para aprimorar sua experiência de leitura. Com o Shelf, você terá uma biblioteca digital sempre ao seu alcance, onde quer que esteja.",
+		images: [
+			{
+				url: `${getURL()}/api/og`,
+			},
+		],
 	},
 	category: "Books & Literature",
 };
