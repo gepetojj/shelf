@@ -5,10 +5,11 @@ import { useEffect } from "react";
 import { AppHeader } from "@/components/ui/app-header";
 import { Layout } from "@/components/ui/layout";
 import { Button } from "@mantine/core";
+import * as Sentry from "@sentry/nextjs";
 
 export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
 	useEffect(() => {
-		console.error(error);
+		Sentry.captureException(error);
 	}, [error]);
 
 	return (

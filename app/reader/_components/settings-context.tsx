@@ -45,9 +45,6 @@ export const SettingsProvider: React.FC<React.PropsWithChildren<SettingsProvider
 			progressApi.mutate(
 				{ bookId: fileId, page },
 				{
-					onSuccess: () => {
-						console.info("Progresso sincronizado para a página", page);
-					},
 					onError: error => {
 						if (error.message === "Você não tem permissão para fazer isso.") return;
 						notifications.show({

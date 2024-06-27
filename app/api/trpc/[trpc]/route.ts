@@ -1,7 +1,11 @@
 import { type NextRequest } from "next/server";
+import { Logger } from "winston";
 
+import { Registry } from "@/core/infra/container/registry";
+import { container } from "@/core/infra/container/server-only";
 import { appRouter } from "@/server/api/root";
 import { createTRPCContext } from "@/server/api/trpc";
+import * as Sentry from "@sentry/nextjs";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 
 /**
@@ -14,18 +18,20 @@ const createContext = async (req: NextRequest) => {
 	});
 };
 
+const logger = container.get<Logger>(Registry.Logger);
+
 const handler = (req: NextRequest) =>
 	fetchRequestHandler({
 		endpoint: "/api/trpc",
 		req,
 		router: appRouter,
 		createContext: () => createContext(req),
-		onError:
-			process.env.NODE_ENV === "development"
-				? ({ path, error }) => {
-						console.error(`❌ tRPC failed on ${path ?? "<no-path>"}: ${error.message}`);
-					}
-				: undefined,
+		onError: ({ path, error }) => {
+			if (process.env.NODE_ENV === "development") {
+				logger.error(`❌ tRPC failed on ${path ?? "<no-path>"}: ${error.message}`);
+			}
+			Sentry.captureException(error, { tags: { path } });
+		},
 	});
 
 export { handler as GET, handler as POST };
