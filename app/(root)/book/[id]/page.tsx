@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 	const book = await api.files.one({ id: params.id, comments: true }).catch(() => notFound());
 	return {
 		title: book.title,
-		description: `Leia ${book.title} no Shelf: ${book.description}`,
+		description: `Leia "${book.title}" no Shelf: ${book.description}`,
 		openGraph: {
 			images: [
 				{
