@@ -1,7 +1,10 @@
 import { Suspense } from "react";
 
+import { defaultMetadata } from "@/app/metadata";
+import { JsonLD } from "@/components/logic/jsonld";
 import { AppHeader } from "@/components/ui/app-header";
 import { Layout } from "@/components/ui/layout";
+import { getURL } from "@/lib/url";
 
 import { ContextProvider } from "./_components/context";
 import { Filters } from "./_components/layout/filters";
@@ -41,6 +44,17 @@ export default function Page({
 				</>
 				<Filters />
 			</Layout>
+			<JsonLD
+				content={{
+					"@context": "https://schema.org",
+					"@type": "Brand",
+					"name": "Shelf",
+					"logo": `${getURL()}/logo.png`,
+					"description": defaultMetadata.description || "",
+					"image": `${getURL()}/api/og`,
+					"url": getURL(),
+				}}
+			/>
 		</ContextProvider>
 	);
 }

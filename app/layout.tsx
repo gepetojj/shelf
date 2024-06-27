@@ -1,5 +1,4 @@
 import clsx from "clsx/lite";
-import type { Metadata } from "next";
 import { Nunito_Sans } from "next/font/google";
 
 import { ThemesProvider } from "@/components/logic/themes-provider";
@@ -16,6 +15,7 @@ import "@ungap/with-resolvers";
 import { Analytics } from "@vercel/analytics/react";
 
 import "./globals.css";
+import { defaultMetadata } from "./metadata";
 
 const nunito = Nunito_Sans({
 	subsets: ["latin"],
@@ -25,10 +25,7 @@ const nunito = Nunito_Sans({
 	variable: "--font-nunito-sans",
 });
 
-export const metadata: Metadata = {
-	title: "Shelf: Organize suas leituras",
-	description: "Organize suas leituras acadêmicas e leia diretamente do navegador.",
-};
+export const metadata = defaultMetadata;
 
 export default async function Layout({
 	children,
