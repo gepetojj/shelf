@@ -16,9 +16,9 @@ export default async function Page() {
 						</div>
 						<div
 							id="section-0"
-							className="flex flex-col gap-3 text-neutral-200"
+							className="flex flex-col gap-3 text-justify text-neutral-200"
 						>
-							<p className="text-justify">
+							<p>
 								Termos e condições gerais de uso (e de compra e venda) do OU site Shelfbooks OU
 								aplicativo Shelfbooks.
 							</p>
