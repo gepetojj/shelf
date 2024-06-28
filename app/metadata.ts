@@ -48,4 +48,7 @@ export const defaultMetadata: Metadata = {
 		],
 	},
 	category: "Books & Literature",
+	other: {
+		"google-adsense-account": "ca-pub-8042613292083876",
+	},
 };
