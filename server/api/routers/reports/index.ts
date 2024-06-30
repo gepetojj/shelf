@@ -1,15 +1,16 @@
 import { Logger } from "winston";
 import { z } from "zod";
 
+import { PostService } from "@/core/domain/services/post.service";
+import { ReportService } from "@/core/domain/services/report.service";
 import { Registry } from "@/core/infra/container/registry";
 import { container } from "@/core/infra/container/server-only";
-import { promiseHandler } from "@/lib/promise-handler";
 import { daysBetween } from "@/lib/time";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { PrismaClient } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 
-const database = container.get<PrismaClient>(Registry.Prisma);
+const reportService = container.get<ReportService>(Registry.ReportService);
+const postService = container.get<PostService>(Registry.PostService);
 const logger = container.get<Logger>(Registry.Logger);
 
 export const reportsRouter = createTRPCRouter({
@@ -22,17 +23,7 @@ export const reportsRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ input, ctx }) => {
-			const lastReport = await promiseHandler(
-				database.report.findFirst({
-					where: { postId: input.postId, user: { externalId: ctx.auth.userId } },
-					orderBy: { createdAt: "desc" },
-				}),
-				{
-					location: "reports_router:create:find_last_report",
-					message: "Não foi possível encontrar a última denúncia.",
-				},
-			);
-
+			const lastReport = await reportService.findFirstByPostAndUser(input.postId, ctx.auth.userId);
 			if (lastReport?.createdAt && daysBetween(lastReport.createdAt, new Date()) < 7) {
 				throw new TRPCError({
 					code: "TOO_MANY_REQUESTS",
@@ -40,17 +31,8 @@ export const reportsRouter = createTRPCRouter({
 				});
 			}
 
-			const post = await promiseHandler(
-				database.post.findUnique({ where: { id: input.postId }, include: { uploader: true } }),
-				{
-					location: "reports_router:create:find_post",
-					message: "Não foi possível encontrar a postagem.",
-				},
-			);
-
-			if (!post) {
-				throw new TRPCError({ code: "NOT_FOUND", message: "Postagem não encontrada." });
-			}
+			const post = await postService.findById(input.postId);
+			if (!post) throw new TRPCError({ code: "NOT_FOUND", message: "Postagem não encontrada." });
 			if (post.uploader.externalId === ctx.auth.userId) {
 				throw new TRPCError({
 					code: "FORBIDDEN",
@@ -59,13 +41,11 @@ export const reportsRouter = createTRPCRouter({
 			}
 
 			try {
-				const report = await database.report.create({
-					data: {
-						post: { connect: { id: input.postId } },
-						user: { connect: { externalId: ctx.auth.userId } },
-						motive: input.motive,
-						description: input.description,
-					},
+				const report = await reportService.create({
+					postId: input.postId,
+					externalId: ctx.auth.userId,
+					motive: input.motive,
+					description: input.description,
 				});
 				return report;
 			} catch (err: any) {
