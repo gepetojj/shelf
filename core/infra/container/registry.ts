@@ -12,4 +12,5 @@ export const Registry = {
 	CommentService: Symbol.for("CommentService"),
 	EnduranceService: Symbol.for("EnduranceService"),
 	AnnotationService: Symbol.for("AnnotationService"),
+	TagService: Symbol.for("TagService"),	
 } as const;

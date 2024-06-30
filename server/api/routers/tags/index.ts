@@ -1,19 +1,19 @@
 import { Logger } from "winston";
 import { z } from "zod";
 
+import { TagService } from "@/core/domain/services/tag.service";
 import { Registry } from "@/core/infra/container/registry";
 import { container } from "@/core/infra/container/server-only";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
-import { PrismaClient } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 
-const database = container.get<PrismaClient>(Registry.Prisma);
+const service = container.get<TagService>(Registry.TagService);
 const logger = container.get<Logger>(Registry.Logger);
 
-export const fileTagsRouter = createTRPCRouter({
-	one: publicProcedure.input(z.object({ id: z.string().uuid().optional() })).query(async ({ input }) => {
+export const tagsRouter = createTRPCRouter({
+	one: publicProcedure.input(z.object({ id: z.string().uuid() })).query(async ({ input }) => {
 		try {
-			const data = await database.tag.findUnique({ where: { id: input.id } });
+			const data = await service.findById(input.id);
 			if (!data) throw new TRPCError({ code: "NOT_FOUND", message: "Tag não encontrada." });
 			return data;
 		} catch (err: any) {
@@ -24,7 +24,7 @@ export const fileTagsRouter = createTRPCRouter({
 
 	list: publicProcedure.input(z.object({ books: z.boolean().optional() }).optional()).query(async ({ input }) => {
 		try {
-			const tags = await database.tag.findMany({ include: { posts: input?.books } });
+			const tags = await service.findAll(input?.books ? { posts: true } : undefined);
 			return tags;
 		} catch (err: any) {
 			logger.error(`[file_tags_router:list] Failed to list tags: ${err.message}`, { err });
@@ -34,7 +34,7 @@ export const fileTagsRouter = createTRPCRouter({
 
 	search: publicProcedure.input(z.object({ query: z.string() })).query(async ({ input }) => {
 		try {
-			const data = await database.tag.findMany({ where: { name: { search: input.query } } });
+			const data = await service.search(input.query);
 			return data;
 		} catch (err: any) {
 			logger.error(`[file_tags_router:search] Failed to search tags: ${err.message}`, { input, err });
