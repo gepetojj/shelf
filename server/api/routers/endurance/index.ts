@@ -1,13 +1,13 @@
 // import { Logger } from "winston";
-// import { Registry } from "@/core/infra/container/registry";
-// import { container } from "@/core/infra/container/server-only";
+import { Registry } from "@/core/infra/container/registry";
+import { container } from "@/core/infra/container/server-only";
 import { promiseHandler } from "@/lib/promise-handler";
 import { DAY } from "@/lib/time";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { PrismaClient } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 
-const database = new PrismaClient();
+const database = container.get<PrismaClient>(Registry.Prisma);
 // const logger = container.get<Logger>(Registry.Logger);
 
 export const enduranceRouter = createTRPCRouter({

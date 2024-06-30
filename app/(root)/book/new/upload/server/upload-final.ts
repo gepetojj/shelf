@@ -50,7 +50,7 @@ type Outputs = {
 	message: string;
 };
 
-const database = new PrismaClient();
+const database = container.get<PrismaClient>(Registry.Prisma);
 const storage = container.get<StorageRepository>(Registry.StorageRepository);
 const logger = container.get<Logger>(Registry.Logger);
 

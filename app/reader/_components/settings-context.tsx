@@ -45,6 +45,17 @@ export const SettingsProvider: React.FC<React.PropsWithChildren<SettingsProvider
 			progressApi.mutate(
 				{ bookId: fileId, page },
 				{
+					onSuccess: data => {
+						if (data.achievements.length > 0) {
+							data.achievements.forEach(achievement => {
+								notifications.show({
+									title: "Eba! Conquista desbloqueada!",
+									message: `${achievement.name}: ${achievement.description}`,
+									color: "green",
+								});
+							});
+						}
+					},
 					onError: error => {
 						if (error.message === "Você não tem permissão para fazer isso.") return;
 						notifications.show({

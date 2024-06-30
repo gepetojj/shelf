@@ -5,9 +5,13 @@ import { AppHeader } from "@/components/ui/app-header";
 import { Layout } from "@/components/ui/layout";
 import { removeTime } from "@/lib/time";
 import { api } from "@/trpc/server";
+import { IconMoodSad, IconMoodTongueWink2, IconTrophy } from "@tabler/icons-react";
 
 export default async function Page() {
-	const { sequence, streak } = await api.endurance.list();
+	const [{ sequence, streak }, { achieved, toAchieve }] = await Promise.all([
+		api.endurance.list(),
+		api.achievements.list(),
+	]);
 
 	sequence.map(day => new Date(day.toISOString()));
 	const sequenceInTimestamp = sequence.map(date => date.valueOf());
@@ -17,7 +21,7 @@ export default async function Page() {
 			<Layout>
 				<>
 					<AppHeader />
-					<div className="flex flex-col gap-4 p-4 pb-10 sm:px-12">
+					<div className="flex flex-col gap-8 p-4 pb-10 sm:px-12">
 						<div className="flex w-full flex-col gap-6 rounded bg-main-foreground px-6 py-4">
 							<div className="flex w-full items-center justify-between gap-6">
 								<div className="flex max-w-[65%] flex-col gap-2">
@@ -68,6 +72,68 @@ export default async function Page() {
 										</div>
 									);
 								})}
+							</div>
+						</div>
+
+						<div className="flex flex-col gap-2">
+							<h2 className="text-2xl font-bold">Conquistas</h2>
+							<ul className="flex flex-col gap-2">
+								{achieved.length > 0 ? (
+									achieved.map(av => (
+										<li
+											key={`achievement-${av.code}`}
+											className="flex items-center justify-between gap-4 p-4"
+										>
+											<div>
+												<IconTrophy size={36} />
+											</div>
+											<div>
+												<h3 className="text-lg font-medium text-neutral-100">{av.name}</h3>
+												<p className="text-neutral-200">{av.description}</p>
+											</div>
+										</li>
+									))
+								) : (
+									<li className="flex w-full flex-col items-center justify-center gap-2 py-4">
+										<IconMoodSad size={48} />
+										<div className="flex flex-col items-center justify-center text-center">
+											<span className="text-neutral-100">
+												Você ainda não completou nenhuma conquista
+											</span>
+											<span className="text-sm text-neutral-200">
+												Continue lendo para desbloquear novas aventuras!
+											</span>
+										</div>
+									</li>
+								)}
+							</ul>
+							<div className="flex flex-col gap-2 pt-4">
+								<h3 className="text-sm font-light text-neutral-300">Ainda disponíveis</h3>
+								{toAchieve.length > 0 ? (
+									toAchieve.map(av => (
+										<div
+											key={`locked-achievement-${av.code}`}
+											className="flex items-center justify-between gap-4 p-4"
+										>
+											<div>
+												<h3 className="text-lg font-medium text-neutral-300">{av.name}</h3>
+												<p className="text-neutral-400">{av.description}</p>
+											</div>
+										</div>
+									))
+								) : (
+									<div className="flex w-full flex-col items-center justify-center gap-2 py-4">
+										<IconMoodTongueWink2 size={48} />
+										<div className="flex flex-col items-center justify-center text-center">
+											<span className="text-neutral-100">
+												Você já completou todos os desafios até agora!
+											</span>
+											<span className="text-sm text-neutral-200">
+												Fique ligado(a) nas próximas novidades
+											</span>
+										</div>
+									</div>
+								)}
 							</div>
 						</div>
 					</div>

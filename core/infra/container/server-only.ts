@@ -6,7 +6,7 @@ import { FirebaseStorageRepository } from "../repositories/firebase-storage.repo
 import { Registry } from "./registry";
 
 container.rebind(Registry.Logger).toConstantValue(logger);
-container.bind(Registry.Prisma).toDynamicValue(() => new PrismaClient());
+container.bind(Registry.Prisma).toConstantValue(new PrismaClient());
 container
 	.bind(Registry.StorageRepository)
 	.toDynamicValue(ctx => new FirebaseStorageRepository(ctx.container.get(Registry.Logger)));

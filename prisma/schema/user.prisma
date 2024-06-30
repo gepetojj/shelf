@@ -17,4 +17,5 @@ model User {
     Progress    Progress[]
     Report      Report[]
     Endurance   Endurance?
+    Achievement Achievement[]
 }

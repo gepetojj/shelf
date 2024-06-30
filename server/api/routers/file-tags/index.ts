@@ -7,7 +7,7 @@ import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { PrismaClient } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 
-const database = new PrismaClient();
+const database = container.get<PrismaClient>(Registry.Prisma);
 const logger = container.get<Logger>(Registry.Logger);
 
 export const fileTagsRouter = createTRPCRouter({

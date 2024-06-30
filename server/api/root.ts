@@ -1,3 +1,4 @@
+import { achievementsRouter } from "@/server/api/routers/achievements";
 import { commentsRouter } from "@/server/api/routers/comments";
 import { enduranceRouter } from "@/server/api/routers/endurance";
 import { fileAnnotationsRouter } from "@/server/api/routers/file-annotations";
@@ -15,6 +16,7 @@ export const appRouter = createTRPCRouter({
 	comments: commentsRouter,
 	reports: reportsRouter,
 	endurance: enduranceRouter,
+	achievements: achievementsRouter,
 });
 
 export type AppRouter = typeof appRouter;

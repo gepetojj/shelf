@@ -18,7 +18,7 @@ const getHandlerHeaders = z.object({
 	signature: z.string(),
 });
 
-const database = new PrismaClient();
+const database = container.get<PrismaClient>(Registry.Prisma);
 const logger = container.get<Logger>(Registry.Logger);
 
 router.post(async req => {

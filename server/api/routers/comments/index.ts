@@ -8,7 +8,7 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/
 import { PrismaClient } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 
-const database = new PrismaClient();
+const database = container.get<PrismaClient>(Registry.Prisma);
 const logger = container.get<Logger>(Registry.Logger);
 
 export const commentsRouter = createTRPCRouter({

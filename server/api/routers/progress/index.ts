@@ -1,14 +1,15 @@
 import { Logger } from "winston";
 import { z } from "zod";
 
+import { ACHIEVEMENTS } from "@/core/domain/entities/achievement";
 import { Registry } from "@/core/infra/container/registry";
 import { container } from "@/core/infra/container/server-only";
 import { promiseHandler } from "@/lib/promise-handler";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { PrismaClient } from "@prisma/client";
+import { $Enums, PrismaClient } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 
-const database = new PrismaClient();
+const database = container.get<PrismaClient>(Registry.Prisma);
 const logger = container.get<Logger>(Registry.Logger);
 
 export const progressRouter = createTRPCRouter({
@@ -71,50 +72,39 @@ export const progressRouter = createTRPCRouter({
 				},
 			);
 			if (!book) throw new TRPCError({ code: "NOT_FOUND", message: "Livro não encontrado." });
-
-			// Atualiza ou cria o endurance
-
-			const endurance = await promiseHandler(database.endurance.findUnique({ where: { userId: user.id } }), {
-				location: "progress_router:upsert:find_endurance",
-				message: "Não foi possível encontrar o endurance.",
+			const progresses = await promiseHandler(database.progress.findMany({ where: { userId: user.id } }), {
+				location: "progress_router:upsert:find_progresses",
+				message: "Não foi possível encontrar o progresso.",
 			});
-			if (!endurance) {
-				await promiseHandler(
-					database.endurance.create({
+
+			const data = await database.$transaction(async tx => {
+				// Atualiza ou cria o endurance
+
+				const endurance = await tx.endurance.findUnique({ where: { userId: user.id } });
+				if (!endurance) {
+					await tx.endurance.create({
 						data: { userId: user.id, sequence: [new Date()] },
-					}),
-					{
-						location: "progress_router:upsert:create_endurance",
-						message: "Não foi possível criar o endurance.",
-					},
-				);
-			} else {
-				const isTodayIntoEndurance = endurance.sequence.some(date => {
-					const today = new Date();
-					return (
-						date.getUTCDate() === today.getUTCDate() &&
-						date.getUTCMonth() === today.getUTCMonth() &&
-						date.getUTCFullYear() === today.getUTCFullYear()
-					);
-				});
-				if (!isTodayIntoEndurance) {
-					await promiseHandler(
-						database.endurance.update({
+					});
+				} else {
+					const isTodayIntoEndurance = endurance.sequence.some(date => {
+						const today = new Date();
+						return (
+							date.getUTCDate() === today.getUTCDate() &&
+							date.getUTCMonth() === today.getUTCMonth() &&
+							date.getUTCFullYear() === today.getUTCFullYear()
+						);
+					});
+					if (!isTodayIntoEndurance) {
+						await tx.endurance.update({
 							where: { userId: user.id },
 							data: { sequence: { push: new Date() } },
-						}),
-						{
-							location: "progress_router:upsert:update_endurance",
-							message: "Não foi possível atualizar o endurance.",
-						},
-					);
+						});
+					}
 				}
-			}
 
-			// Atualiza ou cria o progresso
+				// Atualiza ou cria o progresso
 
-			const data = await promiseHandler(
-				database.progress.upsert({
+				const progress = await tx.progress.upsert({
 					where: {
 						userId_bookId_fileId: { userId: user.id, bookId: input.bookId, fileId: book.files[0].id },
 					},
@@ -127,9 +117,36 @@ export const progressRouter = createTRPCRouter({
 					update: {
 						page: input.page,
 					},
-				}),
-				{ location: "progress_router:upsert:upsert_progress", message: "Não foi possível salvar o progresso." },
-			);
+				});
+
+				// Cria os achievements
+
+				const achievements = await tx.achievement.findMany({ where: { userId: user.id } });
+				const availableAchievements = ACHIEVEMENTS.filter(
+					av => !achievements.map(av => av.code).includes(Object.keys(av)[0] as any),
+				);
+				const achievementsToCreate = availableAchievements.filter(av => {
+					const achievement = Object.values(av)[0];
+					return achievement.canActivate(book, progress, progresses);
+				});
+
+				if (achievementsToCreate.length > 0) {
+					await tx.achievement.createMany({
+						data: achievementsToCreate
+							.map(av => Object.keys(av)[0] as $Enums.AchievementCode)
+							.map(code => ({ userId: user.id, code })),
+					});
+				}
+
+				return {
+					progress,
+					achievements: achievementsToCreate.map(av => {
+						const achievement = Object.values(av)[0];
+						return achievement.toJSON();
+					}),
+				};
+			});
+
 			return data;
 		}),
 });

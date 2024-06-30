@@ -1,0 +1,13 @@
+model Achievement {
+    code      AchievementCode
+    userId    String
+    createdAt DateTime        @default(now())
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@id([code, userId])
+}
+
+enum AchievementCode {
+    FIRST_BOOK_READ
+}
