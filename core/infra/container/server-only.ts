@@ -4,6 +4,7 @@ import { container } from ".";
 import { logger } from "../logger";
 import { FirebaseStorageRepository } from "../repositories/firebase-storage.repository";
 import { AchievementServiceImpl } from "../services/achievement.service";
+import { AnnotationServiceImpl } from "../services/annotation.service";
 import { CommentServiceImpl } from "../services/comment.service";
 import { EnduranceServiceImpl } from "../services/endurance.service";
 import { UserServiceImpl } from "../services/user.service";
@@ -26,6 +27,9 @@ container.bind(Registry.CommentService).toDynamicValue(ctx => {
 });
 container.bind(Registry.EnduranceService).toDynamicValue(ctx => {
 	return new EnduranceServiceImpl(ctx.container.get(Registry.Prisma), ctx.container.get(Registry.Logger));
+});
+container.bind(Registry.AnnotationService).toDynamicValue(ctx => {
+	return new AnnotationServiceImpl(ctx.container.get(Registry.Prisma), ctx.container.get(Registry.Logger));
 });
 
 export { container };
