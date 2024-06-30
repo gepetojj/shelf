@@ -1,3 +1,4 @@
+import clsx from "clsx/lite";
 import Link from "next/link";
 
 import { AppNav } from "@/components/ui/app-nav";
@@ -51,16 +52,26 @@ export default async function Layout({
 							</div>
 						</SignInButton>
 					</SignedOut>
-					<div className="flex w-full items-center justify-center gap-1 text-xs text-neutral-300">
+					<div
+						className={clsx(
+							"flex w-full flex-col items-end justify-center gap-1 text-xs",
+							"text-neutral-300 home-break:flex-row home-break:items-center",
+						)}
+					>
 						<Link href="/terms/tos">Termos de uso</Link>
-						<span>·</span>
+						<span className="hidden home-break:inline">·</span>
 						<Link href="/terms/privacy">Privacidade</Link>
 					</div>
 				</div>
 			</aside>
 
 			{/* Navegação para telas menores */}
-			<div className="fixed bottom-0 z-10 inline w-full border-t border-t-white/10 bg-main-foreground p-2 animate-in slide-in-from-bottom-2 home-break-mobile:hidden">
+			<div
+				className={clsx(
+					"fixed bottom-0 z-10 inline w-full border-t border-t-white/10 bg-main-foreground",
+					"p-2 animate-in slide-in-from-bottom-2 home-break-mobile:hidden",
+				)}
+			>
 				<AppNav />
 			</div>
 

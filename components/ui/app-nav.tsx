@@ -124,6 +124,7 @@ export const AppNav: React.FC = memo(function AppNav() {
 			<SignedOut>
 				<Link
 					href="/sign-in"
+					onClick={() => sendGAEvent({ event: "sign_in_button_click" })}
 					className={clsx(
 						"items-center justify-center gap-3 rounded-2xl bg-main p-1 text-black",
 						"duration-200 hover:brightness-90 home-break-mobile:hidden",

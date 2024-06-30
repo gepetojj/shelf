@@ -82,7 +82,7 @@ export default async function Page() {
 									achieved.map(av => (
 										<li
 											key={`achievement-${av.code}`}
-											className="flex items-center justify-between gap-4 p-4"
+											className="flex items-center gap-4 p-4"
 										>
 											<div>
 												<IconTrophy size={36} />
