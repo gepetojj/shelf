@@ -8,15 +8,16 @@ import { memo, useCallback } from "react";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { sendGAEvent } from "@next/third-parties/google";
 import {
-	IconBell,
-	IconBellFilled,
 	IconBookmark,
 	IconBookmarkFilled,
+	IconFlame,
 	IconHome,
 	IconHomeFilled,
 	IconLogin2,
 	IconTextPlus,
 } from "@tabler/icons-react";
+
+import { IconFlameFilled } from "../icons/flame-filled";
 
 type NavOption = {
 	href: string;
@@ -44,12 +45,12 @@ type NavOption = {
 const NAV_OPTIONS: NavOption[] = [
 	{ href: "/", label: "Página inicial", Icon: IconHome, ActiveIcon: IconHomeFilled },
 	{
-		href: "/notifications",
+		href: "/streak",
 		signedOutHref: "/sign-in",
-		label: "Notificações",
+		label: "Sequência",
 		deep: true,
-		Icon: IconBell,
-		ActiveIcon: IconBellFilled,
+		Icon: IconFlame,
+		ActiveIcon: IconFlameFilled,
 	},
 	{
 		href: "/shelf",

@@ -15,3 +15,7 @@ button {
 .reader-annotation {
 	@apply bg-orange-400/40;
 }
+
+.text-gradient-flame {
+	@apply bg-gradient-to-br from-[#ff4d4d] to-[#f9cb28] bg-clip-text text-transparent;
+}
