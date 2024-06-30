@@ -8,4 +8,5 @@ export const Registry = {
 	ListRelevantUseCase: Symbol.for("ListRelevantUseCase"),
 
 	UserService: Symbol.for("UserService"),
+	AchievementService: Symbol.for("AchievementService"),
 } as const;

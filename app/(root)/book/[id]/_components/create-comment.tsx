@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { memo, useCallback, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-import { api } from "@/trpc/react";
+import { api } from "@/server/trpc/react";
 import { TextInput } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { IconSend2 } from "@tabler/icons-react";

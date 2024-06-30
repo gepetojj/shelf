@@ -3,7 +3,7 @@
 import { memo, useCallback } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-import { api } from "@/trpc/react";
+import { api } from "@/server/trpc/react";
 import { Button, Modal, Text, TextInput } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 

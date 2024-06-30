@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { memo, useMemo } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
-import { api } from "@/trpc/react";
+import { api } from "@/server/trpc/react";
 import { Drawer, Loader } from "@mantine/core";
 
 import { useContext } from "../context";

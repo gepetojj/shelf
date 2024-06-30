@@ -5,7 +5,7 @@ import { memo, useCallback, useState } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 
 import { FileExternalProps } from "@/core/domain/entities/file-external";
-import { api } from "@/trpc/react";
+import { api } from "@/server/trpc/react";
 import { useUser } from "@clerk/nextjs";
 import { Button, Group, TagsInput } from "@mantine/core";
 import { Dropzone, PDF_MIME_TYPE } from "@mantine/dropzone";

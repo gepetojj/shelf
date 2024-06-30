@@ -4,7 +4,7 @@ import Script from "next/script";
 
 import { ThemesProvider } from "@/components/logic/themes-provider";
 import { config } from "@/config";
-import { TRPCReactProvider } from "@/trpc/react";
+import { TRPCReactProvider } from "@/server/trpc/react";
 import { ptBR } from "@clerk/localizations";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ColorSchemeScript } from "@mantine/core";

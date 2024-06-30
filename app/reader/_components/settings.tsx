@@ -2,7 +2,7 @@
 
 import { memo, useCallback, useEffect, useMemo } from "react";
 
-import { api } from "@/trpc/react";
+import { api } from "@/server/trpc/react";
 import { useUser } from "@clerk/nextjs";
 import { ActionIcon, Divider, Drawer, NumberInput, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";

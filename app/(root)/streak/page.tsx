@@ -4,7 +4,7 @@ import { IconFlameFilled } from "@/components/icons/flame-filled";
 import { AppHeader } from "@/components/ui/app-header";
 import { Layout } from "@/components/ui/layout";
 import { removeTime } from "@/lib/time";
-import { api } from "@/trpc/server";
+import { api } from "@/server/trpc/server";
 import { IconMoodSad, IconMoodTongueWink2, IconTrophy } from "@tabler/icons-react";
 
 export default async function Page() {

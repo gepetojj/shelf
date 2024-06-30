@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { memo } from "react";
 
-import { api } from "@/trpc/react";
+import { api } from "@/server/trpc/react";
 import { useDebouncedCallback } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { Prisma } from "@prisma/client";

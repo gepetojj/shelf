@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { memo, useMemo } from "react";
 
-import { api } from "@/trpc/react";
+import { api } from "@/server/trpc/react";
 import { AspectRatio, Button } from "@mantine/core";
 import { IconBookOff } from "@tabler/icons-react";
 

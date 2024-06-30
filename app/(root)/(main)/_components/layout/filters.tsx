@@ -2,7 +2,7 @@
 
 import { memo, useMemo } from "react";
 
-import { api } from "@/trpc/react";
+import { api } from "@/server/trpc/react";
 import { Select } from "@mantine/core";
 
 import { useContext } from "../context";

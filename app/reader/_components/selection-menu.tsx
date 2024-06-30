@@ -3,7 +3,7 @@
 import clsx from "clsx";
 import { memo, useCallback, useEffect, useState } from "react";
 
-import { api } from "@/trpc/react";
+import { api } from "@/server/trpc/react";
 import { ActionIcon, Button, Modal, Stack, Text, Textarea, Tooltip, Transition } from "@mantine/core";
 import { useClickOutside, useDebouncedCallback, useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";

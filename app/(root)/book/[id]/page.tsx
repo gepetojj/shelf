@@ -7,7 +7,7 @@ import { AppHeader } from "@/components/ui/app-header";
 import { Layout } from "@/components/ui/layout";
 import { name } from "@/lib/name";
 import { getURL } from "@/lib/url";
-import { api } from "@/trpc/server";
+import { api } from "@/server/trpc/server";
 import { Spoiler } from "@mantine/core";
 
 import { Book } from "./_components/book";

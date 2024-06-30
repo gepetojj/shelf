@@ -3,7 +3,7 @@
 import { memo, useCallback } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 
-import { api } from "@/trpc/react";
+import { api } from "@/server/trpc/react";
 import { notifications } from "@mantine/notifications";
 import { IconSearch, IconSettings } from "@tabler/icons-react";
 

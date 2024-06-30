@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { memo, useMemo } from "react";
 
-import { api } from "@/trpc/react";
+import { api } from "@/server/trpc/react";
 import { IconCategory2 } from "@tabler/icons-react";
 
 export const TabByTags: React.FC = memo(function TabByTags({}) {

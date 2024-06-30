@@ -6,7 +6,7 @@ import { Suspense } from "react";
 import { JsonLD } from "@/components/logic/jsonld";
 import { name } from "@/lib/name";
 import { getURL } from "@/lib/url";
-import { api } from "@/trpc/server";
+import { api } from "@/server/trpc/server";
 import { SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import { Button, Loader } from "@mantine/core";
 import { IconLock, IconLogin2 } from "@tabler/icons-react";
