@@ -1,9 +1,15 @@
+export const MILLISECOND = 1;
+export const SECOND = MILLISECOND * 1000;
+export const MINUTE = SECOND * 60;
+export const HOUR = MINUTE * 60;
+export const DAY = HOUR * 24;
+
 export const now = () => {
 	return new Date().valueOf();
 };
 
-export const seconds = (milliseconds: number) => {
-	return Math.floor(milliseconds / 1000);
+export const seconds = (ms: number) => {
+	return Math.floor(ms / SECOND);
 };
 
 export const daysBetween = (date1: Date, date2: Date) => {

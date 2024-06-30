@@ -16,4 +16,5 @@ model User {
     posts       Post[]
     Progress    Progress[]
     Report      Report[]
+    Endurance   Endurance?
 }

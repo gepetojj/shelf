@@ -1,4 +1,5 @@
 import { commentsRouter } from "@/server/api/routers/comments";
+import { enduranceRouter } from "@/server/api/routers/endurance";
 import { fileAnnotationsRouter } from "@/server/api/routers/file-annotations";
 import { fileTagsRouter } from "@/server/api/routers/file-tags";
 import { filesRouter } from "@/server/api/routers/files";
@@ -13,6 +14,7 @@ export const appRouter = createTRPCRouter({
 	progress: progressRouter,
 	comments: commentsRouter,
 	reports: reportsRouter,
+	endurance: enduranceRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -59,18 +59,59 @@ export const progressRouter = createTRPCRouter({
 		.input(z.object({ bookId: z.string().uuid(), page: z.coerce.number().min(1).max(9999) }))
 		.mutation(async ({ input, ctx }) => {
 			const user = await promiseHandler(database.user.findUnique({ where: { externalId: ctx.auth.userId } }), {
-				location: "progress_router:one:find_user",
+				location: "progress_router:upsert:find_user",
 				message: "Não foi possível encontrar o usuário.",
 			});
 			if (!user) throw new TRPCError({ code: "NOT_FOUND", message: "Usuário não encontrado." });
 			const book = await promiseHandler(
 				database.post.findUnique({ where: { id: input.bookId }, include: { files: true } }),
 				{
-					location: "progress_router:one:find_book",
+					location: "progress_router:upsert:find_book",
 					message: "Não foi possível encontrar o livro.",
 				},
 			);
 			if (!book) throw new TRPCError({ code: "NOT_FOUND", message: "Livro não encontrado." });
+
+			// Atualiza ou cria o endurance
+
+			const endurance = await promiseHandler(database.endurance.findUnique({ where: { userId: user.id } }), {
+				location: "progress_router:upsert:find_endurance",
+				message: "Não foi possível encontrar o endurance.",
+			});
+			if (!endurance) {
+				await promiseHandler(
+					database.endurance.create({
+						data: { userId: user.id, sequence: [new Date()] },
+					}),
+					{
+						location: "progress_router:upsert:create_endurance",
+						message: "Não foi possível criar o endurance.",
+					},
+				);
+			} else {
+				const isTodayIntoEndurance = endurance.sequence.some(date => {
+					const today = new Date();
+					return (
+						date.getUTCDate() === today.getUTCDate() &&
+						date.getUTCMonth() === today.getUTCMonth() &&
+						date.getUTCFullYear() === today.getUTCFullYear()
+					);
+				});
+				if (!isTodayIntoEndurance) {
+					await promiseHandler(
+						database.endurance.update({
+							where: { userId: user.id },
+							data: { sequence: { push: new Date() } },
+						}),
+						{
+							location: "progress_router:upsert:update_endurance",
+							message: "Não foi possível atualizar o endurance.",
+						},
+					);
+				}
+			}
+
+			// Atualiza ou cria o progresso
 
 			const data = await promiseHandler(
 				database.progress.upsert({
