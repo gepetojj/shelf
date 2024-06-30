@@ -9,4 +9,5 @@ export const Registry = {
 
 	UserService: Symbol.for("UserService"),
 	AchievementService: Symbol.for("AchievementService"),
+	CommentService: Symbol.for("CommentService"),
 } as const;
