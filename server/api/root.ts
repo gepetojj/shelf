@@ -3,6 +3,7 @@ import { annotationsRouter } from "@/server/api/routers/annotations";
 import { commentsRouter } from "@/server/api/routers/comments";
 import { enduranceRouter } from "@/server/api/routers/endurance";
 import { filesRouter } from "@/server/api/routers/files";
+import { notificationRouter } from "@/server/api/routers/notifications";
 import { progressRouter } from "@/server/api/routers/progress";
 import { reportsRouter } from "@/server/api/routers/reports";
 import { tagsRouter } from "@/server/api/routers/tags";
@@ -17,6 +18,7 @@ export const appRouter = createTRPCRouter({
 	reports: reportsRouter,
 	endurance: enduranceRouter,
 	achievements: achievementsRouter,
+	notifications: notificationRouter,
 });
 
 export type AppRouter = typeof appRouter;

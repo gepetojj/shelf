@@ -5,9 +5,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { memo, useCallback } from "react";
 
+import { api } from "@/server/trpc/react";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { sendGAEvent } from "@next/third-parties/google";
 import {
+	IconBell,
+	IconBellFilled,
 	IconBookmark,
 	IconBookmarkFilled,
 	IconFlame,
@@ -45,6 +48,14 @@ type NavOption = {
 const NAV_OPTIONS: NavOption[] = [
 	{ href: "/", label: "Página inicial", Icon: IconHome, ActiveIcon: IconHomeFilled },
 	{
+		href: "/notifications",
+		signedOutHref: "/sign-in",
+		label: "Notificações",
+		deep: true,
+		Icon: IconBell,
+		ActiveIcon: IconBellFilled,
+	},
+	{
 		href: "/streak",
 		signedOutHref: "/sign-in",
 		label: "Sequência",
@@ -63,6 +74,12 @@ const NAV_OPTIONS: NavOption[] = [
 ];
 
 const Option = (option: NavOption) => {
+	let hasNotification = false;
+	if (option.href === "/notifications") {
+		const unread = api.notifications.unread.useQuery();
+		hasNotification = unread.data ? unread.data.length > 0 : false;
+	}
+
 	const pathname = usePathname();
 	const isActive = useCallback(
 		(option: NavOption) => {
@@ -78,7 +95,16 @@ const Option = (option: NavOption) => {
 			onClick={() => sendGAEvent({ event: "app_nav_page_click", value: option.label })}
 			className={"flex w-fit items-center gap-3 rounded-3xl p-2 px-4 duration-200 hover:bg-neutral-800"}
 		>
-			{isActive(option) ? <option.ActiveIcon className="text-xl" /> : <option.Icon className="text-xl" />}
+			{isActive(option) ? (
+				<option.ActiveIcon className="text-xl" />
+			) : (
+				<div className="relative">
+					{hasNotification && (
+						<span className="absolute -right-1 -top-1 inline-flex h-3 w-3 rounded-full bg-main"></span>
+					)}
+					<option.Icon className="text-xl" />
+				</div>
+			)}
 			<span className={clsx("text-lg", "hidden home-break:inline", isActive(option) && "font-bold")}>
 				{option.label}
 			</span>

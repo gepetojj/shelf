@@ -2,6 +2,7 @@ import { Logger } from "winston";
 import { z } from "zod";
 
 import { ACHIEVEMENTS } from "@/core/domain/entities/achievement";
+import { EnduranceService } from "@/core/domain/services/endurance.service";
 import { Registry } from "@/core/infra/container/registry";
 import { container } from "@/core/infra/container/server-only";
 import { promiseHandler } from "@/lib/promise-handler";
@@ -9,6 +10,7 @@ import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { $Enums, PrismaClient } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 
+const enduranceService = container.get<EnduranceService>(Registry.EnduranceService);
 const database = container.get<PrismaClient>(Registry.Prisma);
 const logger = container.get<Logger>(Registry.Logger);
 
@@ -82,10 +84,12 @@ export const progressRouter = createTRPCRouter({
 
 				const endurance = await tx.endurance.findUnique({ where: { userId: user.id } });
 				if (!endurance) {
+					// Cria o primeiro registro do streak
 					await tx.endurance.create({
 						data: { userId: user.id, sequence: [new Date()] },
 					});
 				} else {
+					// Adiciona no registro do streak se o dia atual ainda não estiver
 					const isTodayIntoEndurance = endurance.sequence.some(date => {
 						const today = new Date();
 						return (
@@ -95,10 +99,24 @@ export const progressRouter = createTRPCRouter({
 						);
 					});
 					if (!isTodayIntoEndurance) {
+						// Primeiro registro do streak adicionando o dia
 						await tx.endurance.update({
 							where: { userId: user.id },
 							data: { sequence: { push: new Date() } },
 						});
+
+						// Envia notificação caso streak seja módulo de uma semana
+						if ((enduranceService.getStreak(endurance.sequence) + 1) % 7 === 0) {
+							await tx.notification.create({
+								data: {
+									user: { connect: { externalId: user.externalId } },
+									trigger: "STREAK",
+									title: "Já se passou uma semana!",
+									textContent:
+										"Você completou uma semana de leitura diária sem interrupções. Continue assim!",
+								},
+							});
+						}
 					}
 				}
 

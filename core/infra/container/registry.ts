@@ -15,4 +15,5 @@ export const Registry = {
 	TagService: Symbol.for("TagService"),
 	ReportService: Symbol.for("ReportService"),
 	PostService: Symbol.for("PostService"),
+	NotificationService: Symbol.for("NotificationService"),
 } as const;

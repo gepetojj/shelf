@@ -7,6 +7,7 @@ import { AchievementServiceImpl } from "../services/achievement.service";
 import { AnnotationServiceImpl } from "../services/annotation.service";
 import { CommentServiceImpl } from "../services/comment.service";
 import { EnduranceServiceImpl } from "../services/endurance.service";
+import { NotificationServiceImpl } from "../services/notification.service";
 import { PostServiceImpl } from "../services/post.service";
 import { ReportServiceImpl } from "../services/report.service";
 import { TagServiceImpl } from "../services/tag.service";
@@ -42,6 +43,9 @@ container.bind(Registry.ReportService).toDynamicValue(ctx => {
 });
 container.bind(Registry.PostService).toDynamicValue(ctx => {
 	return new PostServiceImpl(ctx.container.get(Registry.Prisma), ctx.container.get(Registry.Logger));
+});
+container.bind(Registry.NotificationService).toDynamicValue(ctx => {
+	return new NotificationServiceImpl(ctx.container.get(Registry.Prisma), ctx.container.get(Registry.Logger));
 });
 
 export { container };

@@ -10,12 +10,13 @@ model User {
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
 
-    annotations Annotation[]
-    comments    Comment[]
-    files       File[]
-    posts       Post[]
-    Progress    Progress[]
-    Report      Report[]
-    Endurance   Endurance?
-    Achievement Achievement[]
+    annotations  Annotation[]
+    comments     Comment[]
+    files        File[]
+    posts        Post[]
+    Progress     Progress[]
+    Report       Report[]
+    Endurance    Endurance?
+    Achievement  Achievement[]
+    Notification Notification[]
 }

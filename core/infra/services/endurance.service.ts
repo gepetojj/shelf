@@ -2,6 +2,7 @@ import { Logger } from "winston";
 
 import { EnduranceService } from "@/core/domain/services/endurance.service";
 import { UnknownError } from "@/errors/infra";
+import { DAY, removeTime } from "@/lib/time";
 import { Prisma, PrismaClient } from "@prisma/client";
 
 export class EnduranceServiceImpl implements EnduranceService {
@@ -29,5 +30,32 @@ export class EnduranceServiceImpl implements EnduranceService {
 				context: { err, userId },
 			});
 		}
+	}
+
+	getStreak(sequence: Date[]): number {
+		const today = removeTime(new Date());
+		let lastDate: Date | undefined = undefined;
+		let streak = 0;
+
+		for (let index = sequence.length - 1; index >= 0; index--) {
+			const element = sequence[index];
+			if (!lastDate) {
+				const diff = Math.abs(today.getTime() - element.getTime());
+				if (diff > DAY) break;
+				lastDate = element;
+				streak++;
+				continue;
+			}
+
+			const diff = Math.abs(lastDate.getTime() - element.getTime());
+			if (diff <= DAY) {
+				streak++;
+				lastDate = element;
+			} else {
+				break;
+			}
+		}
+
+		return streak;
 	}
 }
