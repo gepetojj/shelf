@@ -4,9 +4,11 @@ import { createContext, useCallback, useContext, useMemo, useState } from "react
 import { memo } from "react";
 
 import { api } from "@/server/trpc/react";
-import { useDebouncedCallback } from "@mantine/hooks";
+import { useDebouncedCallback, useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { Prisma } from "@prisma/client";
+
+import { EndReachedEvent } from "./events/end-reached";
 
 export type SettingsContextProps = {
 	totalPages: number;
@@ -32,6 +34,9 @@ export const SettingsProvider: React.FC<React.PropsWithChildren<SettingsProvider
 		const annotations = api.fileAnnotations.list.useQuery({ fileId }).data ?? [];
 		const progressApi = api.progress.upsert.useMutation();
 
+		const [endReachedEventOpen, endReachedEventControls] = useDisclosure(false);
+		const [endReachedEventBooksRead, setEndReachedEventBooksRead] = useState(0);
+
 		const [totalPages, setTotalPages] = useState(0);
 		const [currentPage, setLocalCurrentPage] = useState(1);
 		const [zoom, setZoom] = useState(1);
@@ -46,6 +51,11 @@ export const SettingsProvider: React.FC<React.PropsWithChildren<SettingsProvider
 				{ bookId: fileId, page },
 				{
 					onSuccess: data => {
+						if (data.events.firstTimeEndReached) {
+							setEndReachedEventBooksRead(data.events.firstTImeEndReachedBooksRead);
+							endReachedEventControls.open();
+						}
+
 						if (data.achievements.length > 0) {
 							data.achievements.forEach(achievement => {
 								notifications.show({
@@ -57,7 +67,7 @@ export const SettingsProvider: React.FC<React.PropsWithChildren<SettingsProvider
 						}
 					},
 					onError: error => {
-						if (error.message === "Você não tem permissão para fazer isso.") return;
+						if (error.data?.code === "FORBIDDEN" || error.data?.code === "UNAUTHORIZED") return;
 						notifications.show({
 							title: "Erro ao salvar o progresso",
 							message: error.message || "Houve um erro desconhecido.",
@@ -90,6 +100,13 @@ export const SettingsProvider: React.FC<React.PropsWithChildren<SettingsProvider
 					setZoom,
 				}}
 			>
+				<EndReachedEvent
+					show={endReachedEventOpen}
+					onClose={endReachedEventControls.close}
+					pagesRead={currentPage}
+					booksRead={endReachedEventBooksRead}
+				/>
+
 				{children}
 			</context.Provider>
 		);

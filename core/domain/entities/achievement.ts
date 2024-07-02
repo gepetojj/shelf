@@ -2,7 +2,7 @@ import { $Enums, Prisma } from "@prisma/client";
 
 import { FirstBookReadAchievement } from "./achievements/first-book-read-achievement";
 
-export type Achievement = {
+export interface Achievement {
 	code: $Enums.AchievementCode;
 	name: string;
 	description: string;
@@ -13,7 +13,7 @@ export type Achievement = {
 		progresses: Prisma.ProgressGetPayload<{}>[],
 	) => boolean;
 	toJSON: () => { code: $Enums.AchievementCode; name: string; description: string };
-};
+}
 
 export const ACHIEVEMENTS: Record<$Enums.AchievementCode, Achievement>[] = [
 	{ FIRST_BOOK_READ: new FirstBookReadAchievement() },

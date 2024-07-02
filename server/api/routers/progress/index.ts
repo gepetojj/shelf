@@ -104,6 +104,9 @@ export const progressRouter = createTRPCRouter({
 
 				// Atualiza ou cria o progresso
 
+				const previousProgress = progresses.find(p => p.bookId === input.bookId);
+				const isTheEnd = input.page >= Math.floor(book.pages * 0.9);
+
 				const progress = await tx.progress.upsert({
 					where: {
 						userId_bookId_fileId: { userId: user.id, bookId: input.bookId, fileId: book.files[0].id },
@@ -113,9 +116,11 @@ export const progressRouter = createTRPCRouter({
 						bookId: input.bookId,
 						fileId: book.files[0].id,
 						page: input.page,
+						reachedTheEnd: isTheEnd,
 					},
 					update: {
 						page: input.page,
+						reachedTheEnd: isTheEnd || undefined,
 					},
 				});
 
@@ -144,6 +149,10 @@ export const progressRouter = createTRPCRouter({
 						const achievement = Object.values(av)[0];
 						return achievement.toJSON();
 					}),
+					events: {
+						firstTimeEndReached: !previousProgress?.reachedTheEnd && isTheEnd,
+						firstTImeEndReachedBooksRead: progresses.filter(p => p.reachedTheEnd).length + 1,
+					},
 				};
 			});
 

@@ -1,10 +1,12 @@
 model Progress {
-    userId    String
-    bookId    String
-    fileId    String
-    page      Int
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    userId        String
+    bookId        String
+    fileId        String
+    page          Int
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+    // Events
+    reachedTheEnd Boolean  @default(false) // If the user reached the end of the book at least once
 
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
     book Post @relation(fields: [bookId], references: [id], onDelete: Cascade)
