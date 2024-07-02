@@ -24,7 +24,7 @@ export const AppHeader: React.FC = memo(function AppHeader({}) {
 					position="bottom"
 				>
 					<span className="relative top-0 h-fit cursor-pointer rounded-lg bg-main px-1 text-xs text-black">
-						alfa
+						beta
 					</span>
 				</Tooltip>
 			</div>

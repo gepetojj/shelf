@@ -50,6 +50,7 @@ export const EndReachedEvent: React.FC<EndReachedEventProps> = memo(function End
 					backgroundOpacity: 0.55,
 					blur: 2,
 				}}
+				transitionProps={{ transition: "scale", duration: 200 }}
 				size="xl"
 			>
 				<div className="flex h-fit w-full flex-col items-center justify-center gap-6 p-10 text-center">
