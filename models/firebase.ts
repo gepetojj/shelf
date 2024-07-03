@@ -19,15 +19,27 @@ const storage = firebase.storage().bucket();
 
 if (process.env.NODE_ENV === "production") {
 	try {
-		storage.addLifecycleRule({
-			action: {
-				type: "Delete",
-			},
-			condition: {
-				age: 1,
-				matchesPrefix: ["chunk_uploads"],
-			},
-		});
+		(async () => {
+			const [meta] = await storage.getMetadata();
+			const deleteRules = (meta.lifecycle?.rule || []).filter(rule => rule.action.type === "Delete");
+
+			if (deleteRules.length > 1) {
+				await storage.setMetadata({ lifecycle: null });
+				deleteRules.length = 0;
+			}
+
+			if (deleteRules.length === 0) {
+				await storage.addLifecycleRule({
+					action: {
+						type: "Delete",
+					},
+					condition: {
+						age: 1,
+						matchesPrefix: ["chunk_uploads"],
+					},
+				});
+			}
+		})();
 	} catch (err: any) {
 		console.error("Failed to set lifecycle rule", {
 			err: err.message || err.stack || err,
