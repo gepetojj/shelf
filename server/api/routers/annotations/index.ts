@@ -28,13 +28,10 @@ export const annotationsRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ input, ctx }) => {
-			const owner = await userService.findByExternalId(ctx.auth.userId);
-			if (!owner) throw new TRPCError({ code: "NOT_FOUND", message: "Usuário não encontrado." });
-
 			const data = await annotationService.upsert({
 				substrings: input.substrings,
 				onCreate: {
-					ownerId: owner.id,
+					ownerId: ctx.auth.userId,
 					postId: input.fileId,
 					page: input.page,
 					textContent: input.text,
@@ -57,14 +54,11 @@ export const annotationsRouter = createTRPCRouter({
 			}),
 		)
 		.mutation(async ({ input, ctx }) => {
-			const owner = await userService.findByExternalId(ctx.auth.userId);
-			if (!owner) throw new TRPCError({ code: "NOT_FOUND", message: "Usuário não encontrado." });
-
 			const data = await annotationService.upsert({
 				substrings: input.substrings,
 				comment: input.comment,
 				onCreate: {
-					ownerId: owner.id,
+					ownerId: ctx.auth.userId,
 					postId: input.fileId,
 					page: input.page,
 					textContent: input.text,
