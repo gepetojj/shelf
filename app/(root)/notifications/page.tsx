@@ -1,6 +1,7 @@
 import { AppHeader } from "@/components/ui/app-header";
 import { Layout } from "@/components/ui/layout";
 import { api } from "@/server/trpc/server";
+import { Checkbox } from "@mantine/core";
 import { IconArchiveOff, IconSteam } from "@tabler/icons-react";
 
 export default async function Page() {
@@ -13,6 +14,12 @@ export default async function Page() {
 					<AppHeader />
 					<div className="flex flex-col px-4 py-4 pb-10 sm:px-12">
 						<h1 className="text-2xl font-bold">Notificações</h1>
+						<div className="flex w-full items-center justify-center gap-2 py-4">
+							<Checkbox />
+							<span className="flex w-full items-center gap-2">
+								Eu aceito receber notificações e conteúdo promocional via email.
+							</span>
+						</div>
 						{notifications.length > 0 ? (
 							<ul className="flex w-full flex-col gap-4 py-6">
 								{notifications.map(notification => (
